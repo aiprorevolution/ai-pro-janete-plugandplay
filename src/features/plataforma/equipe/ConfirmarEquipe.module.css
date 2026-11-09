@@ -1,0 +1,114 @@
+/* A confirmação da Equipe (o .veu e o .dialogo do protótipo B). Branco sobre o véu navy, a lista do
+   que acontece ao desativar com o ícone em cinza, e a cor só no botão de confirmar (o perigo do
+   AI PRO fica cheio dentro do diálogo). */
+
+.ceVeu {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--via-z-modal) + 10);
+  display: grid;
+  place-items: center;
+  padding: var(--sb-esp-4);
+  background: var(--sb-veu);
+  animation: ce-aparece 240ms var(--via-ease-out) backwards;
+}
+
+.ceDialogo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+  width: min(460px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: var(--sb-esp-6);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta);
+  animation: ce-dialogo 420ms var(--via-ease-out) backwards;
+}
+
+.ceTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  overflow-wrap: anywhere;
+}
+
+.ceTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.ceLista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ceItem {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.45;
+}
+
+.ceItem b {
+  font-weight: var(--sb-peso-forte);
+}
+
+/* O ícone fica no cinza da tinta: a cor de alerta é só do botão final. */
+.ceIcone {
+  display: flex;
+  margin-top: 3px;
+  color: var(--sb-tinta-3);
+}
+
+.ceAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sb-esp-2);
+  margin-top: var(--sb-esp-1);
+}
+
+@media (max-width: 899px) {
+  .ceDialogo {
+    padding: var(--sb-esp-5);
+  }
+
+  .ceAcoes > * {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ceVeu,
+  .ceDialogo {
+    animation: none;
+  }
+}
+
+@keyframes ce-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ce-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}

@@ -1,0 +1,292 @@
+/* Uma etapa do quadro (o `.coluna` do protótipo): o cabeçalho enxuto e a lista de cards. Ganho e
+   Perdido fechados viram o trilho vertical de 76 px (`.trilho`). */
+
+.kbCol {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 236px;
+  min-height: 0;
+  border-radius: 24px;
+  background: color-mix(in srgb, #e9edf3 55%, var(--sb-canvas));
+  scroll-snap-align: start;
+  transition:
+    background-color 0.2s var(--sb-ease-assentar),
+    box-shadow 0.2s var(--sb-ease-assentar);
+}
+
+.kbCol[data-fim] {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.kbCol[data-sobre],
+.kbTrilho[data-sobre] {
+  background: var(--sb-azul-nevoa);
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+/* O cabeçalho: a cor num ponto, o nome, o número e no máximo 2 ícones discretos. */
+.kbColCab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 6px 4px 14px;
+}
+
+.kbColTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.3;
+}
+
+.kbColNome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Em Ganho e Perdido abertos, o próprio título recolhe a etapa. */
+.kbColTagBotao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 36px;
+  margin-left: -8px;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.kbColTagBotao:hover {
+  background: var(--sb-branco);
+}
+
+.kbColTagBotao:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sb-azul);
+}
+
+.kbColTagBotao svg {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.kbColCor {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 22%, transparent);
+}
+
+.kbColConta {
+  flex: none;
+  color: var(--sb-tinta-2);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  font-weight: var(--sb-peso-medio);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "A Janete pode mover para cá": o símbolo só em contorno, discreto. */
+.kbColJanete {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--sb-tinta-3);
+}
+
+.kbColJanete svg,
+svg.kbColJanete {
+  width: 16px;
+  height: 16px;
+}
+
+.kbColExpandir {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.kbColExpandir:hover {
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+.kbColExpandir:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sb-azul);
+}
+
+.kbColLista {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 8px 10px;
+  scrollbar-width: thin;
+}
+
+.kbColSolta {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-height: 56px;
+  border: 2px dashed var(--sb-azul);
+  border-radius: 16px;
+  color: var(--sb-azul-texto);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+/* Ganho e Perdido: o recorte dos últimos 30 dias, com o total de todas as datas (decisão 13). */
+.kbColRecorte {
+  margin: 0 0 6px;
+  padding: 0 6px;
+  color: var(--sb-tinta-2);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.kbColVazia {
+  display: grid;
+  place-items: center;
+  min-height: 64px;
+  margin: 0;
+  padding: 12px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: 16px;
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+/* Com filtro ligado, a coluna vazia é só uma linha de texto (a caixa tracejada é da etapa vazia de verdade). */
+.kbColVazia[data-leve] {
+  display: block;
+  min-height: 0;
+  padding: 6px 6px 0;
+  border: 0;
+  text-align: left;
+}
+
+/* ---------- Ganho e Perdido fechados: o trilho vertical ---------- */
+
+.kbTrilho {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+  padding: 14px 6px;
+  border: 0;
+  border-radius: 24px;
+  background: color-mix(in srgb, #e9edf3 55%, var(--sb-canvas));
+  color: var(--sb-tinta);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--sb-ease-assentar),
+    box-shadow 0.2s var(--sb-ease-assentar);
+}
+
+.kbTrilho:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kbTrilho:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.kbTrilho .kbColTag {
+  min-width: 28px;
+  min-height: 0;
+  padding: 10px 0;
+  writing-mode: vertical-rl;
+}
+
+/* Com filtro ou busca, o trilho mostra "0 de 3", como as colunas: em pé, numa linha só. */
+.kbTrilho .kbColConta {
+  font-size: 0.84375rem;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+}
+
+.kbTrilhoSeta {
+  color: var(--sb-tinta-2);
+}
+
+.kbSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 899px), (pointer: coarse) {
+  .kbColExpandir,
+  .kbColTagBotao {
+    width: 44px;
+    min-height: 44px;
+    height: 44px;
+  }
+
+  .kbColTagBotao {
+    width: auto;
+  }
+}
+
+@media (max-width: 899px) {
+  .kbCol,
+  .kbCol[data-fim] {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .kbColLista {
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kbCol,
+  .kbTrilho,
+  .kbColTagBotao,
+  .kbColExpandir {
+    transition: none;
+  }
+}

@@ -1,0 +1,489 @@
+/* As abas Resumo e Linha do tempo do perfil (AbaResumo.tsx e AbaLinha.tsx), no desenho do Contatos 4
+   (`.c4-ev`, `.c4-ev-rail`, `.c4-ev-card`, `.c4-fatos`) sem os contêineres coloridos (decisão 5 do
+   equipe): cartões brancos sobre o fundo da plataforma, filtros só texto e a cor só no detalhe
+   (a bolinha da etapa e o ícone). */
+
+.abAba {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+  min-width: 0;
+}
+
+/* O cartão branco: só a linha fina separa do fundo, sem sombra nem cor. */
+.abCartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-3);
+  min-width: 0;
+  padding: var(--sb-pad-card);
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+}
+
+.abSubtitulo,
+.abTitulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+/* ---------- Resumo: o texto da Janete ---------- */
+
+.abResumoCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sb-esp-2);
+}
+
+/* "Atualizado há 5 min" (contatos.resumo_janete_em): cinza, à direita do título; no celular, desce. */
+.abAtualizado {
+  margin-left: auto;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  white-space: nowrap;
+}
+
+.abResumoTexto {
+  max-width: var(--sb-leitura-max);
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-leitura);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* Cortado em 6 linhas; o "Ler o resumo inteiro" abre. */
+.abCortado {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+}
+
+/* O link pequeno ("Ler o resumo inteiro", "ver", "Ver na conversa"): texto azul, sem caixa. */
+.abLink {
+  align-self: flex-start;
+  flex: none;
+  padding: 2px 0;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.abLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.abLink:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.abVazioTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+}
+
+/* ---------- Resumo: os fatos (lista simples, rótulo em cinza e valor) ---------- */
+
+.abFatos {
+  display: grid;
+  grid-template-columns: minmax(7rem, max-content) minmax(0, 1fr);
+  gap: var(--sb-esp-2) var(--sb-esp-5);
+  margin: 0;
+  padding-top: var(--sb-esp-3);
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* Cada par entra na grade do dl (o div fica "transparente" para o layout). */
+.abFato {
+  display: contents;
+}
+
+.abFatoRotulo {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+}
+
+.abFatoValor {
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+  overflow-wrap: anywhere;
+}
+
+.abFatoValor .abLink {
+  margin-left: 2px;
+  font-size: var(--sb-fs-meta);
+}
+
+/* ---------- Resumo: os últimos acontecimentos ---------- */
+
+.abUltimos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.abUltimo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  padding: var(--sb-esp-2) 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.abUltimo:first-child {
+  border-top: 0;
+}
+
+.abUltIcone,
+.abIcone {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+}
+
+.abUltIcone {
+  width: 28px;
+  height: 28px;
+}
+
+.abUltCorpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.abUltTitulo {
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.abUltMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+}
+
+.abUltQuando {
+  flex: none;
+  white-space: nowrap;
+}
+
+.abRodape {
+  display: flex;
+  padding-top: var(--sb-esp-2);
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* ---------- Quem fez (Janete, iniciais, celular ou sistema) ---------- */
+
+.abQuem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 12rem;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+}
+
+.abQuem > svg {
+  flex: none;
+}
+
+.abQuemNome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* As iniciais num círculo neutro (não o avatar colorido do lead). */
+.abSigla {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  color: var(--sb-tinta-2);
+  font-size: 0.5625rem;
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+}
+
+/* ---------- Linha do tempo ---------- */
+
+.abCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-3);
+}
+
+.abFiltros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sb-esp-1);
+}
+
+/* O filtro é só texto: o escolhido fica em tinta forte e sublinhado, os outros em cinza. */
+.abFiltro {
+  min-height: var(--sb-controle-compacto);
+  padding: 0 var(--sb-esp-2);
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--app-t-state);
+}
+
+.abFiltro:hover {
+  color: var(--sb-tinta);
+}
+
+.abFiltro[aria-pressed='true'] {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.abFiltro:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.abFrase {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+}
+
+.abEventos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cada acontecimento: o trilho (ícone, data e hora) à esquerda e o cartão branco à direita. */
+.abEvento {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: var(--sb-esp-3);
+  padding-bottom: var(--sb-esp-3);
+}
+
+.abTrilho {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 6px;
+}
+
+/* A linha que liga um acontecimento ao próximo. */
+.abTrilho::after {
+  content: '';
+  flex: 1 1 auto;
+  width: 2px;
+  min-height: 8px;
+  margin: 6px 0 calc(-1 * var(--sb-esp-3));
+  border-radius: 2px;
+  background: var(--sb-linha);
+}
+
+.abEvento:last-child .abTrilho::after {
+  display: none;
+}
+
+.abIcone {
+  width: 32px;
+  height: 32px;
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+
+.abData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-micro);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* O cartão fica na altura do conteúdo (align-self: start): sem isso, a grade o esticava até a altura
+   do trilho (ícone e data), e o cartão sem rodapé, como o "Contato criado", ganhava um vão embaixo. */
+.abCorpo {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  gap: 4px;
+  min-width: 0;
+  padding: var(--sb-esp-3) var(--sb-esp-4);
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+}
+
+.abEvTopo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sb-esp-3);
+  min-width: 0;
+}
+
+.abEvTitulo {
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  overflow-wrap: anywhere;
+}
+
+/* A descrição vai até 3 linhas. */
+.abEvDesc {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.abEvPe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px var(--sb-esp-3);
+  margin-top: 2px;
+}
+
+/* A etapa daquele momento: texto pequeno com a bolinha, nunca selo. */
+.abEtapa {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+}
+
+.abSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- celular ---------- */
+
+@media (max-width: 899px) {
+  .abCartao {
+    padding: var(--sb-pad-card-compacto);
+  }
+
+  /* Os fatos viram uma coluna: o rótulo em cima do valor. */
+  .abFatos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .abFatoValor {
+    margin-bottom: var(--sb-esp-2);
+  }
+
+  /* O "Ver na conversa" do último acontecimento desce para baixo do texto. */
+  .abUltimo {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .abUltimo > .abLink {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .abEvento {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--sb-esp-2);
+  }
+
+  .abCorpo {
+    padding: var(--sb-esp-3);
+  }
+
+  .abEvTopo {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

@@ -1,0 +1,681 @@
+/* =============================================================================
+   O palco do funil da versão final (o da B, spec 7), com a faixa da mudança 5: a Janete no centro.
+
+   A vista fica presa embaixo do topo da casca, da altura visível, e é transparente ao clique: só o
+   cartão, o fundo de tela e os controles recebem o ponteiro. Tudo o que anima lê variáveis escritas
+   pelo motor (Palco.tsx), só com transform, opacity e clip-path:
+     --g-*            a geometria medida no redimensionamento (no palco)
+     --dvb-cy/ch/cr   a posição, a altura e o raio do cartão (na vista)
+     --dvb-fundo      onde termina o fundo de tela atrás do cartão
+     --dvb-sa/sb/sc   a escala de cada camada de sombra (a altura do cartão sobre a dela)
+     --a-*            as camadas da coreografia, já passadas pelas curvas
+   ============================================================================= */
+
+/* Na final o palco é um item da grade da página (o espaço até os 4 números é o gap dela). */
+.dvbPalco {
+  --dvb-v0: calc(100dvh - var(--sb-topo));
+  position: relative;
+  min-width: 0;
+}
+
+
+/* ---------- a vista presa ---------- */
+
+.dvbVista {
+  position: sticky;
+  top: var(--sb-topo);
+  z-index: 2;
+  height: var(--g-v, var(--dvb-v0));
+  pointer-events: none;
+}
+
+/* O fundo de tela atrás do cartão: acompanha a borda de baixo do cartão (14 px abaixo dela, só por
+   transform), com uma borda suave de 16 px; os capítulos sobem colados embaixo dele (o motor desce o
+   detalhe para o 1º capítulo começar logo abaixo do cartão). No fim, é a faixa de tela atrás do índice,
+   e os capítulos e o resultado somem suavemente ao passar por baixo dela. Recebe o clique onde aparece
+   (nada escondido fica clicável). */
+.dvbFaixaFundo {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  right: -4px;
+  height: calc(var(--g-v, var(--dvb-v0)) + 16px);
+  background: linear-gradient(to bottom, var(--sb-canvas) calc(100% - 16px), transparent);
+  transform: translateY(calc(var(--dvb-fundo, var(--g-v, var(--dvb-v0))) - var(--g-v, var(--dvb-v0))));
+  /* Nunca passa do topo da vista: com o funil ainda na dobra, a vista está abaixo dos cartões de cima,
+     e o fundo que sobe com o cartão não pode cobrir o topo da página (o pedaço acima da vista é
+     recortado). */
+  clip-path: inset(max(0px, calc(var(--g-v, var(--dvb-v0)) - var(--dvb-fundo, var(--g-v, var(--dvb-v0))))) 0 0 0);
+  pointer-events: auto;
+}
+
+.dvbVista[data-movendo] .dvbFaixaFundo {
+  will-change: transform;
+}
+
+/* O véu: o fundo da página escurece 4% enquanto o funil vem para a frente. Ele cobre a área que rola,
+   da borda de baixo do topo da casca ao pé da janela (o menu de 240 px e o topo ficam de fora), e nasce
+   suave embaixo do topo (56 px de transição): nenhuma emenda dura entre o topo claro e o conteúdo. A
+   cada quadro só muda a opacidade. Fica na camada da vista: por baixo do topo (z 3) e do cartão. */
+.dvbVeu {
+  position: fixed;
+  top: var(--sb-topo);
+  left: 240px;
+  right: 0;
+  bottom: 0;
+  background: var(--sb-navy);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+  opacity: calc(var(--a-veu, 0) * 0.04);
+  pointer-events: none;
+}
+
+.dvbVista[data-movendo] .dvbVeu {
+  will-change: opacity;
+}
+
+/* ---------- o cartão (o MESMO elemento do repouso à faixa) ---------- */
+
+.dvbCartaoFunil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--g-hmax, 420px);
+  transform: translateY(var(--dvb-cy, 0px));
+  pointer-events: none;
+}
+
+.dvbVista[data-movendo] .dvbCartaoFunil,
+.dvbVista[data-movendo] :is(.dvbSombraA, .dvbSombraB, .dvbSombraC) {
+  will-change: transform, opacity;
+}
+
+/* As sombras são três camadas fixas, cada uma com a altura de um estado (repouso, aberto, faixa), que
+   se revezam pela opacidade. O raio de cada uma é fixo (a sombra nunca é redesenhada a cada quadro): a
+   do repouso e a do aberto acompanham a altura do cartão pela escala; a da faixa não escala, só segue o
+   pé do cartão (é a borda de baixo que precisa dela; os lados do cartão alto já têm a do aberto). A
+   profundidade vem do véu e da troca de camada, não do peso: a do aberto é a flutuante do AI PRO. */
+.dvbSombraA,
+.dvbSombraB,
+.dvbSombraC {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+
+.dvbSombraA {
+  height: var(--g-h0, 400px);
+  border-radius: 24px;
+  box-shadow: var(--sb-sombra-card);
+  opacity: var(--a-sombra-a, 1);
+  transform: scaleY(var(--dvb-sa, 1));
+}
+
+.dvbSombraB {
+  height: var(--g-h1, 760px);
+  border-radius: 16px;
+  box-shadow: var(--sb-sombra-flutuante);
+  opacity: var(--a-sombra-b, 0);
+  transform: scaleY(var(--dvb-sb, 1));
+}
+
+.dvbSombraC {
+  height: var(--g-hs, 68px);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--sb-navy) 6%, transparent),
+    0 12px 24px -16px color-mix(in srgb, var(--sb-navy) 30%, transparent);
+  opacity: var(--a-sombra-c, 0);
+  transform: translateY(calc(var(--dvb-ch, 68px) - var(--g-hs, 68px)));
+}
+
+/* O fundo branco do cartão: a altura e o raio mudam só pelo recorte (nada de animar height). */
+.dvbMoldura {
+  position: absolute;
+  inset: 0;
+  background: var(--sb-branco);
+  clip-path: inset(0 0 calc(var(--g-hmax, 420px) - var(--dvb-ch, 420px)) 0 round var(--dvb-cr, 24px));
+  pointer-events: auto;
+}
+
+.dvbConteudo {
+  position: absolute;
+  inset: 0;
+}
+
+/* Na fase 3 o conteúdo segue a borda de baixo do cartão: o que ainda esmaece embaixo (as métricas)
+   nunca aparece fora dele, sobre o fundo da página (o recorte é o mesmo do fundo branco; os lados e o
+   topo ficam livres). */
+[data-dash-fase='indice'] .dvbConteudo {
+  clip-path: inset(-40px -40px calc(var(--g-hmax, 420px) - var(--dvb-ch, 420px)) -40px);
+}
+
+/* Dentro do cartão, só os controles recebem o ponteiro (o resto deixa passar para a moldura). As dicas
+   das colunas não recebem (ficam por cima do alvo sem roubar o hover); a do "como contamos" recebe
+   (Topo.module.css, .dvd-infoBalao aberta), para dar para ler passando o mouse por cima dela. */
+.dvbConteudo :is(button, a) {
+  pointer-events: auto;
+}
+
+/* A faixa real do índice, no lugar exato da desenhada; aparece quando o desenho termina. Antes disso
+   ela só fica transparente e sem clique, mas continua na árvore e na ordem do Tab (o marco "Etapas do
+   funil" existe o tempo todo): o foco nela rola até a faixa real aparecer (Palco.tsx). */
+.dvbIndiceCaixa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--g-hs, 68px);
+  opacity: 0;
+}
+
+.dvbVista:not([data-troca]) .dvbIndiceCaixa :is(.dvbChip, .dvbIndiceJaneteBotao) {
+  pointer-events: none;
+}
+
+.dvbVista[data-troca] .dvbIndiceCaixa {
+  opacity: 1;
+}
+
+/* A entrada da 1ª vez: o cartão aparece com os outros cartões (só a opacidade, sem mexer no lugar). */
+.dvbCartaoFunil[data-entra-funil] > * {
+  animation: dvbAparece var(--app-motion-reveal) var(--via-ease-out) backwards;
+  animation-delay: calc(var(--dvb-ordem, 0) * 60ms);
+}
+
+@keyframes dvbAparece {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- o trilho e os capítulos ---------- */
+
+/* A viagem do palco preso: VIAGEM_TELAS (coreografia.ts) telas. */
+.dvbTrilho {
+  height: calc(var(--g-v, var(--dvb-v0)) * 2);
+}
+
+/* Os capítulos sobem por baixo da vista: em p = 1 o 1º começa a 124 px do topo visível, logo abaixo
+   da faixa e da borda suave do fundo (8 de folga + 68 da faixa + 14 + 16 da borda + 18 de folga). Ao
+   chegar num capítulo pelo índice (ou com o Tab), o título dele fica inteiro, fora do degradê. */
+.dvbDetalhe[data-modo='palco'] {
+  --dvb-margem-cap: calc(var(--sb-topo) + 124px);
+  position: relative;
+  z-index: 1;
+  margin-top: calc(124px - var(--g-v, var(--dvb-v0)));
+  /* A vista presa tem a altura da área visível e só solta quando o fim do palco (o conteúdo dele; o
+     padding do palco não conta para o sticky) chega ao pé da tela. Para a faixa das etapas ficar presa
+     até o resultado (spec 7.3, inclusive no capítulo dos que saíram), o detalhe ganha embaixo a altura
+     visível menos 160 px, e o resultado sobe a mesma medida (Resultado.module.css): a vista solta
+     quando o resultado chega a ~180 px do topo visível, e ele passa por baixo da faixa até lá. */
+  padding-bottom: calc(100dvh - var(--sb-topo) - 160px);
+}
+
+.dvbDetalhe[data-modo='aberto'] {
+  --dvb-margem-cap: calc(var(--sb-topo) + 116px);
+  margin-top: 40px;
+}
+
+.dvbDetalhe[data-modo='celular'] {
+  --dvb-margem-cap: 80px;
+  margin-top: 28px;
+}
+
+/* ---------- o cartão em fluxo (sem palco) ---------- */
+
+.dvbCartaoFluxo {
+  position: relative;
+  padding: 22px 28px 24px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.dvbCartaoFluxo[data-modo='celular'] {
+  padding: 18px;
+  border-radius: 20px;
+}
+
+.dvbCartaoFluxo[data-entra-funil] {
+  animation: dvbEntra var(--app-motion-reveal) var(--via-ease-out) backwards;
+  animation-delay: calc(var(--dvb-ordem, 0) * 60ms);
+}
+
+@keyframes dvbEntra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* =============================================================================
+   O índice das etapas
+   ============================================================================= */
+
+.dvbIndiceLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dvbChip {
+  color: var(--sb-tinta);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+.dvbChip:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.dvbChipNome {
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O mesmo espaçamento e a mesma altura de linha proporcional das camadas do número do funil (a
+   troca do desenho para a faixa real não muda um pixel). */
+.dvbChip .dvbChipNumero {
+  color: var(--sb-tinta);
+  font-size: 15px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.dvbChipOsso {
+  display: block;
+  width: 34px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--sb-esqueleto);
+}
+
+.dvbChipTrilho {
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--sb-linha);
+}
+
+.dvbChipBarra {
+  display: block;
+  height: 100%;
+  border-radius: 1.5px;
+  background: var(--sb-azul);
+}
+
+.dvbChip[data-ganho] .dvbChipBarra {
+  background: var(--sb-sucesso);
+}
+
+.dvbChipSairam {
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 16px;
+}
+
+.dvbChipSeta {
+  display: grid;
+  place-items: center;
+  color: var(--sb-tinta-3);
+}
+
+/* A Janete no centro da faixa (mudança 5 da final): o botão de 44 px com o símbolo, sem moldura. */
+.dvbIndiceJanete {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.dvbIndiceJaneteBotao {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dvbIndiceJaneteBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* O capítulo visível: o chip ganha o azul de "onde você está". */
+.dvbChip[aria-current='true'] {
+  background: var(--sb-azul-claro);
+}
+
+.dvbChip[aria-current='true'] .dvbChipNome,
+.dvbChip[aria-current='true'] .dvbChipSairam {
+  color: var(--sb-azul-texto);
+}
+
+/* ---------- no palco: a mesma geometria da faixa desenhada ----------
+   chip de 8 a 60 px · nome em 16 · número de 15 px em 33 · mini barra de 3 px em 53 (do topo do
+   cartão). Da final: 6 chips da mesma largura (--g-cw), com a Janete no centro (--g-nz) e a seta no vão
+   (--g-vao) entre os chips de cada lado; o 1º chip começa a 16 px da esquerda e o último termina a
+   16 px da direita (a faixa é simétrica em volta da Janete). */
+
+.dvbIndice[data-modo='palco'] {
+  position: absolute;
+  inset: 0;
+}
+
+.dvbIndice[data-modo='palco'] .dvbIndiceLista {
+  position: relative;
+  height: 100%;
+}
+
+.dvbIndice[data-modo='palco'] .dvbIndiceItem {
+  position: absolute;
+  top: 8px;
+  left: calc(16px + var(--i, 0) * (var(--g-cw) + var(--g-vao)) + var(--depois, 0) * (var(--g-nz) - var(--g-vao)));
+  width: var(--g-cw);
+  height: 52px;
+}
+
+/* a Janete: o lugar do centro, com o botão de 44 px no meio (o desenho dela pousa no mesmo ponto) */
+.dvbIndice[data-modo='palco'] .dvbIndiceJanete {
+  position: absolute;
+  top: 8px;
+  left: calc(16px + 3 * (var(--g-cw) + var(--g-vao)) - var(--g-vao));
+  width: var(--g-nz);
+  height: 52px;
+}
+
+.dvbIndice[data-modo='palco'] .dvbIndiceJaneteBotao {
+  pointer-events: auto;
+}
+
+.dvbIndice[data-modo='palco'] .dvbChip {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-canvas);
+  pointer-events: auto;
+}
+
+.dvbIndice[data-modo='palco'] .dvbChip:hover {
+  background: var(--sb-linha);
+}
+
+.dvbIndice[data-modo='palco'] .dvbChip[aria-current='true'] {
+  background: var(--sb-azul-claro);
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipNome {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: calc(var(--g-cw) - 24px);
+}
+
+.dvbIndice[data-modo='palco'] .dvbChip .dvbChipNumero {
+  position: absolute;
+  top: 25px;
+  left: 12px;
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipOsso {
+  position: absolute;
+  top: 27px;
+  left: 12px;
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipTrilho {
+  position: absolute;
+  top: 45px;
+  left: 12px;
+  width: var(--g-mini);
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipBarra {
+  width: calc(var(--g-mini) * var(--dvb-v, 0));
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipSairam {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+}
+
+.dvbIndice[data-modo='palco'] .dvbChipSeta {
+  position: absolute;
+  top: 18px;
+  left: var(--g-cw);
+  width: var(--g-vao);
+  height: 16px;
+}
+
+/* ---------- sem palco (computador): uma faixa presa embaixo do topo ---------- */
+
+.dvbIndice[data-modo='aberto'] {
+  position: sticky;
+  top: var(--sb-topo);
+  z-index: 2;
+  margin: 16px -8px 0;
+  padding: 8px 8px 10px;
+  background: var(--sb-canvas);
+}
+
+/* A mesma geometria da faixa do palco: 6 chips da mesma largura, a seta de 22 px num vão próprio
+   (entre os 3 da esquerda e entre os 3 da direita; entre o Ganho e o "Para onde foram" o vão fica
+   vazio) e a Janete no centro, com 64 px. A largura do chip sai da largura da fileira (cqw), então ter
+   ou não ter seta não muda o chip. */
+.dvbIndice[data-modo='aberto'] .dvbIndiceLista {
+  --dvb-chip-aberto: calc((100cqw - 4 * 22px - 64px) / 6);
+  display: flex;
+  align-items: stretch;
+  padding: 8px;
+  border-radius: 20px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  container-type: inline-size;
+}
+
+.dvbIndice[data-modo='aberto'] .dvbIndiceItem {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  min-width: 0;
+}
+
+/* o vão vazio entre o Ganho e o "Para onde foram" (a faixa fica simétrica em volta da Janete) */
+.dvbIndice[data-modo='aberto'] .dvbIndiceItem:has(+ .dvbIndiceItem[data-sairam])::after {
+  content: '';
+  flex: none;
+  width: 22px;
+}
+
+/* Como no palco: o nome em cima do número (nunca cortado) e a mini barra embaixo. */
+.dvbIndice[data-modo='aberto'] .dvbChip {
+  display: grid;
+  flex: none;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 2px;
+  width: var(--dvb-chip-aberto);
+  min-width: 0;
+  min-height: 52px;
+  padding: 8px 12px 10px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-canvas);
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChip:hover {
+  background: var(--sb-linha);
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChip[aria-current='true'] {
+  background: var(--sb-azul-claro);
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChipNome {
+  overflow: visible;
+  white-space: normal;
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChipTrilho {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChipBarra {
+  width: calc(var(--dvb-v, 0) * 100%);
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChipSairam {
+  grid-column: 1 / -1;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.3;
+}
+
+.dvbIndice[data-modo='aberto'] .dvbChipSeta {
+  flex: none;
+  align-self: center;
+  width: 22px;
+}
+
+/* sem palco, a Janete também fica no centro da faixa, com um respiro de cada lado */
+.dvbIndice[data-modo='aberto'] .dvbIndiceJanete {
+  width: 64px;
+}
+
+/* Abaixo de 1280, os 6 chips não cabem com o nome e o número lado a lado: a fileira passa a rolar na
+   horizontal, como no celular, com o nome em cima do número e sem as setas. */
+@media (max-width: 1279px) {
+  .dvbIndice[data-modo='aberto'] .dvbIndiceLista {
+    gap: 6px;
+    overflow-x: auto;
+    scroll-padding-inline: 8px;
+    scrollbar-width: none;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbIndiceLista::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbIndiceItem {
+    flex: none;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbChip {
+    flex: none;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbChipNome {
+    white-space: nowrap;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbChipSeta,
+  .dvbIndice[data-modo='aberto'] .dvbIndiceItem:has(+ .dvbIndiceItem[data-sairam])::after {
+    display: none;
+  }
+
+  .dvbIndice[data-modo='aberto'] .dvbChipSairam br {
+    display: none;
+  }
+}
+
+/* ---------- no celular: uma fileira de chips presa no topo, que rola na horizontal ---------- */
+
+.dvbIndice[data-modo='celular'] {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  margin: 14px -16px 0;
+  padding: 8px 0;
+  background: var(--sb-canvas);
+  box-shadow: 0 1px 0 var(--sb-linha);
+}
+
+.dvbIndice[data-modo='celular'] .dvbIndiceLista {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scroll-padding-inline: 16px;
+  scrollbar-width: none;
+}
+
+.dvbIndice[data-modo='celular'] .dvbIndiceLista::-webkit-scrollbar {
+  display: none;
+}
+
+.dvbIndice[data-modo='celular'] .dvbIndiceItem {
+  display: flex;
+  flex: none;
+}
+
+.dvbIndice[data-modo='celular'] .dvbChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  white-space: nowrap;
+}
+
+.dvbIndice[data-modo='celular'] .dvbChip[aria-current='true'] {
+  background: var(--sb-azul-claro);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-azul) 35%, transparent);
+}
+
+.dvbIndice[data-modo='celular'] .dvbChipNome {
+  overflow: visible;
+}
+
+.dvbIndice[data-modo='celular'] .dvbChipTrilho,
+.dvbIndice[data-modo='celular'] .dvbChipSeta {
+  display: none;
+}
+
+.dvbIndice[data-modo='celular'] .dvbChipSairam br {
+  display: none;
+}
+
+/* ---------- larguras ---------- */
+
+/* O nome da etapa em 12 px abaixo de 1360; perto da largura mínima do palco, o nome mais longo pode
+   sair com reticências no chip (o nome inteiro está no nome acessível do link). */
+@media (max-width: 1359px) {
+  .dvbChipNome,
+  .dvbChipSairam {
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dvbCartaoFunil[data-entra-funil] > *,
+  .dvbCartaoFluxo[data-entra-funil] {
+    animation: none;
+  }
+
+  .dvbChip {
+    transition: none;
+  }
+}

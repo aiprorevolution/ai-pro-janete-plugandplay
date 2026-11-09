@@ -1,0 +1,477 @@
+/* =============================================================================
+   O resultado do período (spec 9), vindo da versão D: os 5 números grandes num cartão só, separados
+   por fios verticais, com o encerramento embaixo; "Janete × equipe" e o custo detalhado (admin) em
+   cartões. O título segue o mesmo desenho dos capítulos ("O resultado do período · nos últimos 30
+   dias"), para a página fechar na mesma linguagem.
+   ============================================================================= */
+
+.resultado {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  padding: 56px 0 24px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* No palco, o resultado sobe a mesma medida que o detalhe ganhou embaixo (Palco.module.css): a faixa das
+   etapas fica presa até ele, e ele passa por baixo dela (camada 1, abaixo da vista presa, que é 2;
+   acima do pé vazio do detalhe, que também é 1 e vem antes). */
+[data-dash-modo='palco'] > .resultado {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(160px + var(--sb-topo) - 100dvh);
+}
+
+.resultado :is(a, button, [tabindex]) {
+  scroll-margin-top: calc(var(--sb-topo) + 24px);
+}
+
+.resultadoCab {
+  display: grid;
+  gap: 6px;
+  max-width: 72ch;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--sb-fs-destaque);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-titulo);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.titulo em {
+  color: var(--sb-tinta-3);
+  font-style: normal;
+  font-weight: var(--sb-peso-medio);
+}
+
+.tituloSep {
+  display: inline;
+}
+
+.titulo:focus {
+  outline: none;
+}
+
+.titulo:focus-visible {
+  border-radius: var(--sb-r-chip);
+  box-shadow: var(--sb-anel);
+}
+
+.frase {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+}
+
+.bloco {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 20px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.blocoTitulo {
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+}
+
+/* ---------- os 5 números grandes ---------- */
+
+.grandes {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.grande {
+  flex: 1 1 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 20px 4px 24px;
+  border-left: 1px solid var(--sb-linha);
+}
+
+.grande:first-child {
+  padding-left: 4px;
+  border-left: 0;
+}
+
+.grande dt {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: var(--sb-ls-rotulo);
+}
+
+.grande dd {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+/* o número encolhe com a tela (clamp) e a unidade é menor e mais leve: nada encosta no fio */
+.grande b {
+  font-size: clamp(2.25rem, 3.4vw, 3.25rem);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.grandeUnidade {
+  font-size: 1.25rem;
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: 0;
+}
+
+.grande span {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+}
+
+.encerramento {
+  margin: 8px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--sb-linha);
+  font-size: var(--sb-fs-destaque);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-titulo);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+/* ---------- Janete × equipe e o custo ---------- */
+
+/* colunas explícitas: o atendente tem "Janete × equipe" na largura inteira (4 colunas dentro); o admin,
+   2 colunas (Janete × equipe à esquerda; o Custo e o Por modelo empilhados à direita) */
+.resultadoBlocos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.resultadoBlocos[data-admin] {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.resultadoColuna {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+.linhas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+
+.resultadoBlocos[data-admin] .linhas {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.linha {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.resultadoBlocos[data-admin] .linha {
+  padding: 14px 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.resultadoBlocos[data-admin] .linha:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.trilho {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--sb-canvas);
+}
+
+/* cada pedaço reparte a largura pelo flex-grow do número cru (nenhuma soma) */
+.trilho > span {
+  display: block;
+  flex-basis: 0;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--sb-azul);
+}
+
+.trilho > span[data-tom='janete'],
+.legenda i[data-tom='janete'] {
+  background: var(--sb-azul);
+}
+
+.trilho > span[data-tom='equipe'],
+.legenda i[data-tom='equipe'] {
+  background: var(--sb-navy);
+}
+
+/* o tom que precisa aparecer sobre o canvas (nada abaixo de ~3:1 de contraste) */
+.trilho > span[data-tom='celular'],
+.legenda i[data-tom='celular'] {
+  background: var(--sb-borda-campo);
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  list-style: none;
+}
+
+.legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legenda i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.apoio {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+}
+
+.apoio[data-forte] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  color: var(--sb-tinta);
+}
+
+.apoio[data-forte] b {
+  font-size: 1.625rem;
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.pares {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.pares > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pares dt {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+}
+
+.pares dd {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* a tabela simples do custo (tipo; modelo e provedor) */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sb-fs-meta);
+}
+
+.tabela caption {
+  padding-bottom: 6px;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+  text-align: left;
+}
+
+.tabela th,
+.tabela td {
+  padding: 5px 0;
+  border-top: 1px solid var(--sb-linha);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.tabela thead th {
+  padding-top: 0;
+  border-top: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-medio);
+}
+
+.tabela tbody th {
+  color: var(--sb-tinta-2);
+  font-weight: var(--sb-peso-regular);
+}
+
+/* o id do modelo como vem (claude-haiku-5-5), na fonte monoespaçada */
+.tabela tbody th.modelo {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.92em;
+  letter-spacing: 0;
+}
+
+/* o custo por dia: o gráfico dos capítulos, mais baixo */
+.custoDia > [role='img'] {
+  height: 48px;
+}
+
+.tabela td:last-child,
+.tabela thead th:last-child {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tabela tbody td:last-child {
+  font-weight: var(--sb-peso-forte);
+}
+
+.resultadoPe {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.honesta {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-wrap: pretty;
+}
+
+.vazioLinha {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+}
+
+/* ---------- larguras ---------- */
+
+@media (max-width: 1279px) {
+  .resultadoBlocos[data-admin] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resultadoColuna {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .resultadoBlocos[data-admin] .linhas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+  }
+
+  .resultadoBlocos[data-admin] .linha {
+    padding: 0;
+    border-top: 0;
+  }
+}
+
+@media (max-width: 1079px) {
+  .grande b {
+    font-size: 2.5rem;
+  }
+
+  .linhas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .resultado {
+    gap: 16px;
+    padding: 36px 0 16px;
+  }
+
+  .resultadoBlocos,
+  .resultadoBlocos[data-admin],
+  .resultadoColuna {
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .linhas,
+  .resultadoBlocos[data-admin] .linhas {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .bloco {
+    padding: 16px;
+  }
+
+  .grandes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+
+  .grande,
+  .grande:first-child {
+    padding: 0;
+    border-left: 0;
+  }
+
+  .grande b {
+    font-size: 2rem;
+  }
+
+  /* "· nos últimos 30 dias" vira a linha de baixo do título, sem o ponto pendurado (como nos capítulos) */
+  .titulo em {
+    display: block;
+  }
+
+  .tituloSep {
+    display: none;
+  }
+
+  /* a tabela por modelo: o nome do modelo pode quebrar (nada alarga a página) */
+  .tabela tbody th {
+    overflow-wrap: anywhere;
+  }
+}

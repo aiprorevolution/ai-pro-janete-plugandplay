@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // One installation per named database. membros/{uid} controls access;
+    // instalacao/principal holds the immutable owner. Business writes use the
+    // authenticated server and application validation; the owner can also operate
+    // through the AI Studio preview while its runtime has no dedicated IAM role.
+    // cofre_config/{id} contains the installation encryption secret (owner only).
+    // mudancas/{collection} is a small revision marker for real-time invalidation.
+    function signedIn() { return request.auth != null; }
+    function verified() { return signedIn() && request.auth.token.email_verified == true; }
+    function member() { return verified() && exists(/databases/$(database)/documents/membros/$(request.auth.uid)) && get(/databases/$(database)/documents/membros/$(request.auth.uid)).data.ativo == true; }
+    function admin() { return member() && get(/databases/$(database)/documents/membros/$(request.auth.uid)).data.papel == 'admin'; }
+    function owner() { return verified() && exists(/databases/$(database)/documents/instalacao/principal) && get(/databases/$(database)/documents/instalacao/principal).data.ownerUid == request.auth.uid; }
+    function bootstrapping() { return verified() && !exists(/databases/$(database)/documents/instalacao/principal) && getAfter(/databases/$(database)/documents/instalacao/principal).data.ownerUid == request.auth.uid; }
+    function validRow() { return request.resource.data.size() <= 100; }
+    function validMember(uid) { return request.resource.data.keys().hasAll(['id','user_id','nome','email','papel','ativo','criado_em']) && request.resource.data.id == uid && request.resource.data.user_id == uid && request.resource.data.nome is string && request.resource.data.email is string && request.resource.data.papel in ['admin','atendente'] && request.resource.data.ativo is bool; }
+    function ownInvite() { return verified() && exists(/databases/$(database)/documents/convites/$(request.auth.token.email.lower())); }
+    function admittedAfter() { return ownInvite() && !exists(/databases/$(database)/documents/membros/$(request.auth.uid)) && getAfter(/databases/$(database)/documents/membros/$(request.auth.uid)).data.user_id == request.auth.uid && getAfter(/databases/$(database)/documents/membros/$(request.auth.uid)).data.email.lower() == request.auth.token.email.lower() && getAfter(/databases/$(database)/documents/membros/$(request.auth.uid)).data.ativo == true; }
+    function validInviteAdmission(uid) { return ownInvite() && uid == request.auth.uid && get(/databases/$(database)/documents/convites/$(request.auth.token.email.lower())).data.expires_at_ms > request.time.toMillis() && request.resource.data.email.lower() == request.auth.token.email.lower() && request.resource.data.papel == get(/databases/$(database)/documents/convites/$(request.auth.token.email.lower())).data.papel && request.resource.data.ativo == true; }
+    match /instalacao/principal {
+      allow get: if verified();
+      allow create: if verified() && request.resource.data.keys().hasOnly(['id','ownerUid','criado_em','versao']) && request.resource.data.id == 'principal' && request.resource.data.ownerUid == request.auth.uid && request.resource.data.versao == 1 && request.resource.data.criado_em is string && getAfter(/databases/$(database)/documents/membros/$(request.auth.uid)).data.papel == 'admin';
+      allow update, delete, list: if false;
+    }
+    match /membros/{uid} {
+      allow read: if member() || (signedIn() && uid == request.auth.uid);
+      allow create: if validMember(uid) && ((bootstrapping() && uid == request.auth.uid && request.resource.data.email == request.auth.token.email && request.resource.data.papel == 'admin') || validInviteAdmission(uid) || owner());
+      allow update: if validMember(uid) && ((owner() && (uid != request.auth.uid || (request.resource.data.papel == 'admin' && request.resource.data.ativo == true))) || (member() && uid == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome','vistos','atualizado_em'])));
+      allow delete: if owner() && uid != request.auth.uid;
+    }
+    match /convites/{email} {
+      allow read: if admin() || (verified() && email == request.auth.token.email.lower());
+      allow create, update: if admin() && validRow() && request.resource.data.keys().hasAll(['email','papel','expires_at_ms']) && request.resource.data.email == email && request.resource.data.papel in ['admin','atendente'] && request.resource.data.expires_at_ms is number;
+      allow delete: if admin() || (verified() && email == request.auth.token.email.lower() && getAfter(/databases/$(database)/documents/membros/$(request.auth.uid)).data.email.lower() == email);
+    }
+    match /cofre_config/{id} {
+      allow get: if owner();
+      allow list,delete: if false;
+      allow create,update: if owner() && request.resource.data.keys().hasOnly(['secret','version','createdAt']) && request.resource.data.secret is string && request.resource.data.secret.size() >= 32 && request.resource.data.version == 1 && request.resource.data.createdAt is string && (!exists(/databases/$(database)/documents/cofre_config/$(id)) || request.resource.data.secret == resource.data.secret);
+    }
+    match /mudancas/{collection} {
+      allow read: if member();
+      allow create,update: if (admin() || bootstrapping() || admittedAfter()) && request.resource.data.keys().hasOnly(['id','revision','updated_at']) && request.resource.data.id == collection && request.resource.data.revision is string && request.resource.data.updated_at is string;
+      allow delete: if false;
+    }
+    match /{collection}/{id} {
+      allow read: if member() && collection in ['configuracao','etapas','contatos','contato_identificadores','contato_etapa_historico','conversas','mensagens','contexto_versoes','conversa_eventos','conexao_eventos','rodadas','ia_precos'];
+      // Ciphertext/connections are never returned by the application API. Firebase
+      // project owners retain access to their own data, as they do in the console.
+      allow read: if admin() && collection in ['conexoes','ia_chaves','auditoria','ia_chamadas','indices_unicos','sequencias','resumo_diario','motor','eventos_webhook'];
+      allow create,update: if validRow() && ((admin() && collection in ['configuracao','etapas','contatos','contato_identificadores','contato_etapa_historico','conversas','mensagens','contexto_versoes','conversa_eventos','conexao_eventos','rodadas','ia_precos','conexoes','ia_chaves','auditoria','ia_chamadas','indices_unicos','sequencias','resumo_diario','motor','eventos_webhook']) || (bootstrapping() && collection in ['configuracao','etapas']) || (admittedAfter() && collection == 'auditoria'));
+      allow delete: if admin() && collection in ['contatos','contato_identificadores','contato_etapa_historico','conversas','mensagens','contexto_versoes','conversa_eventos','rodadas','ia_chamadas','eventos_webhook','conexoes','ia_chaves','indices_unicos'];
+    }
+  }
+}

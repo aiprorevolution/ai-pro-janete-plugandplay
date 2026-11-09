@@ -1,0 +1,150 @@
+/* A vista de uma área (o `.vista` e o `.vista-cab` do F), com o estado vazio da onda 1. */
+
+.vista {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* backwards, e não both: a animação que continua valendo depois de acabar prende dentro da
+     vista os filhos com position: fixed (gavetas, diálogos, avisos). */
+  animation: vista 0.45s var(--via-ease-out) backwards;
+}
+
+/* A entrada roda uma vez por troca de área: a vista que monta de novo na mesma visita (a tela
+   "carregando", a pronta) aparece sem animação, e o esqueleto da troca nunca anima (useEntradaUnica e
+   CarregandoArea, em AreaVazia.tsx). */
+.vista[data-sem-entrada] {
+  animation: none;
+}
+
+/* O esqueleto do Dashboard fica na caixa da espera dele (TelaDashboard.module.css: até 1.200 px,
+   centralizada, com o título de 1,75rem), para nada andar quando a espera entra no lugar. */
+.vista[data-carregando-area][data-area='dashboard'] {
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  box-sizing: border-box;
+}
+
+.vista[data-carregando-area][data-area='dashboard'] .titulo {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+/* O esqueleto do Chat: como na tela dele (TelaChat.module.css), sem o vão e com o cabeçalho da vista
+   só para o leitor de tela (o título visível do Chat é o da lista). */
+.vista[data-carregando-area][data-area='chat'] {
+  gap: 0;
+}
+
+/* O Kanban preenche a altura que sobra embaixo do topo (no computador, o .platConteudo dele vira
+   coluna flex; no celular isto não muda nada). */
+.vista[data-area='kanban'] {
+  flex: 1;
+  min-height: 0;
+}
+
+/* No Kanban, o título e a frase ficam só para o leitor de tela (premissa da revisão com prints de
+   30/10, como no protótipo Kanban 2): continuam no DOM, e o h1 segue recebendo o foco dos atalhos e
+   do tour. Fora do fluxo (absolute), o cabeçalho não ocupa linha nem soma o vão de 24 px: o quadro
+   sobe e ganha a altura. As outras áreas não mudam (o esqueleto do Chat segue a tela dele). */
+.vista[data-area='kanban'] > .cab,
+.vista[data-carregando-area][data-area='chat'] > .cab {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cab {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 46rem;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--sb-fs-pagina);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  outline: none;
+}
+
+.descricao {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+/* O estado vazio da plataforma (o `.vazio-plat` e o `.esboco` do F). */
+.vazioPlat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.esboco {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(100%, 18rem);
+  margin-bottom: 8px;
+}
+
+.esboco span {
+  display: block;
+  height: 12px;
+  border-radius: 8px;
+  background: var(--sb-esqueleto);
+}
+
+.esboco .curto {
+  width: 38%;
+}
+
+.vazioTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.vazioTexto {
+  max-width: 44ch;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+@keyframes vista {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vista {
+    animation: none;
+  }
+}

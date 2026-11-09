@@ -1,0 +1,222 @@
+/* O bastão do Chat (rodada 2): quem conduz a conversa, em dois botões pequenos lado a lado, na
+   linha do nome. Na frente (à esquerda), o lado de quem está com a conversa, destacado; atrás (à
+   direita), o outro lado, em contorno, como ação. A troca de lugar é animada no componente (FLIP,
+   element.animate), não aqui.
+   Os rótulos curtos entram pelas container queries do cabeçalho (o container é o .cvCab da
+   Conversa.module.css): até 600 px, rótulos curtos. Daí para baixo, depende do que a frente mostra
+   (o data-frente do grupo):
+   - um estado (a Janete ou você atendendo): até 480 px, a frente fica só com o ícone ou o avatar, para
+     o nome e o estado do cabeçalho terem espaço; até 440 px, o de trás fica só com a palavra;
+   - uma ação (esperando, outra pessoa, celular): a frente nunca perde a palavra; até 440 px, o de
+     trás (o "Devolver") fica só com o símbolo da Janete, com o nome acessível inteiro. */
+
+.baBastao {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.baLado {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 15rem;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  font-family: var(--sb-fonte);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  color: var(--sb-tinta);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--app-t-state),
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+/* O de trás: a ação, em contorno. */
+.baLado[data-lado='tras']:hover {
+  background: var(--sb-azul-nevoa);
+  box-shadow: inset 0 0 0 1px var(--sb-azul);
+}
+
+/* O da frente: quem conduz, destacado e sem contorno. Na troca de lugar, ele passa por cima do que
+   vai para trás (parados, os dois não se encostam: há 6 px entre eles). */
+.baLado[data-lado='frente'] {
+  z-index: 1;
+  box-shadow: none;
+}
+
+.baLado:disabled {
+  cursor: default;
+}
+
+/* A Janete atende: azul claro. */
+.baLado[data-tom='janete'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+/* Uma pessoa atende (você ou outra): navy. */
+.baLado[data-tom='voce'],
+.baLado[data-tom='outro'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+/* Outra pessoa atende: o mesmo navy, com um contorno claro por dentro, para não parecer o "Com você"
+   (que é estado, sem ação). A classe dupla vence o "sem contorno" da frente. */
+.baLado.baLado[data-tom='outro'] {
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--sb-branco) 55%, transparent);
+}
+
+.baLado[data-tom='outro']:hover {
+  background: var(--sb-navy-2);
+}
+
+/* Esperando: âmbar, o destaque de quem chama. */
+.baLado[data-tom='espera'] {
+  background: var(--sb-areia);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-atencao) 35%, transparent);
+  color: var(--sb-atencao);
+}
+
+.baLado[data-tom='espera']:hover {
+  box-shadow: inset 0 0 0 1px var(--sb-atencao);
+}
+
+/* Respondida pelo celular: a frente é a ação "Assumir pela plataforma", ativa e destacada no azul do
+   hover das ações (nunca o cinza do canvas, que parecia desabilitado). */
+.baLado.baLado[data-tom='celular'] {
+  background: var(--sb-azul-nevoa);
+  box-shadow: inset 0 0 0 1px var(--sb-azul);
+  color: var(--sb-tinta);
+}
+
+.baLado[data-tom='celular']:hover {
+  background: var(--sb-azul-claro);
+}
+
+/* A classe tripla vence o contorno do hover e dos tons: o anel de foco nunca some. O contorno
+   transparente aparece no alto contraste do Windows, que apaga o box-shadow. */
+.baLado.baLado.baLado:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+.baIcone {
+  flex: none;
+}
+
+/* O avatar de quem atende: 22 px, com as iniciais em 11,5 px (o --sb-fs-micro, que aqui vale também
+   para as iniciais). No botão navy, ele clareia para não sumir no fundo. */
+.baMembro {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+  line-height: 1;
+}
+
+.baLado[data-tom='voce'] .baMembro,
+.baLado[data-tom='outro'] .baMembro {
+  background: color-mix(in srgb, var(--sb-branco) 20%, transparent);
+}
+
+.baCel {
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  color: var(--sb-tinta-2);
+}
+
+.baTxt {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Rótulos curtos quando o cabeçalho (o container) fica estreito. */
+.baCurto {
+  display: none;
+}
+
+@container (max-width: 600px) {
+  .baLongo {
+    display: none;
+  }
+
+  .baCurto {
+    display: inline;
+  }
+}
+
+/* Estreito (a coluna da conversa entre 1024 e 1440 px, com ou sem a ficha): a frente que mostra um
+   estado fica só com o ícone ou o avatar, para o nome e o estado do cabeçalho terem espaço. A que
+   mostra uma ação nunca perde a palavra. */
+@container (max-width: 480px) {
+  .baBastao[data-frente='estado'] > .baLado[data-lado='frente'] {
+    flex: none;
+    width: 32px;
+    padding: 0;
+  }
+
+  .baBastao[data-frente='estado'] > .baLado[data-lado='frente'] .baTxt {
+    display: none;
+  }
+}
+
+/* Bem estreito (o celular): com a frente num estado, o de trás fica só com a palavra; com a frente
+   numa ação, o de trás ("Devolver") fica só com o símbolo da Janete, e a frente com a palavra. */
+@container (max-width: 440px) {
+  .baBastao[data-frente='estado'] > .baLado[data-lado='tras'] {
+    padding: 0 12px;
+  }
+
+  .baBastao[data-frente='estado'] > .baLado[data-lado='tras'] > :first-child:not(.baTxt) {
+    display: none;
+  }
+
+  .baBastao[data-frente='acao'] > .baLado[data-lado='tras'] {
+    flex: none;
+    width: 32px;
+    padding: 0;
+  }
+
+  .baBastao[data-frente='acao'] > .baLado[data-lado='tras'] .baTxt {
+    display: none;
+  }
+}
+
+/* Celular: 32 px visíveis; a faixa invisível do ::after leva o toque a 44 px. */
+@media (max-width: 899px) {
+  .baLado::after {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baLado {
+    transition: none;
+  }
+}

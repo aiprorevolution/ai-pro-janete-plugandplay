@@ -1,0 +1,40 @@
+import { type Classes } from "@/components/aipro/cx";
+
+import estilos from "./TelaContexto.module.css";
+
+/** As classes da tela do Contexto (TelaContexto.module.css). */
+export const s = estilos as Classes<
+  | "tela"
+  | "cabDir"
+  | "nums"
+  | "num"
+  | "btnEns"
+  | "btnEnsIc"
+  | "fraco"
+  | "legenda"
+  | "leg"
+  | "legTr"
+  | "tOn"
+  | "tOff"
+  | "tRasc"
+  | "faixa"
+  | "palco"
+  | "palcoSecao"
+  | "secaoVoo"
+  | "secaoVoando"
+  | "secaoSai"
+  | "mapaSai"
+  | "mapaChega"
+  | "mapaOculto"
+  | "rodape"
+  | "rodEsq"
+  | "rodDiv"
+  | "pilula"
+  | "rodHist"
+  | "rodHistIc"
+  | "v3"
+  | "v3Disco"
+  | "toast"
+  | "toastIc"
+  | "sr"
+>;

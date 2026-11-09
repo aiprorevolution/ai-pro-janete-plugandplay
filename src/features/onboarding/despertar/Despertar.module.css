@@ -1,0 +1,218 @@
+/* =============================================================================
+   3 · "Oi, eu sou a Janete" (F-Final.dc.html: .despertar, .d-*, .halo e os keyframes
+   acende, d-letra e sb-entrada), com as curvas locais do F trocadas pelos tokens:
+     --e-out → --via-ease-out   --e-mola → --via-ease-spring   --e-snap → --via-ease-snap
+   ============================================================================= */
+
+.despertar {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(100vh - var(--onb-nav-h, 4.5rem));
+  min-height: calc(100dvh - var(--onb-nav-h, 4.5rem));
+  padding: 48px 16px 96px;
+  overflow: hidden;
+  animation: tela-entra 0.5s var(--via-ease-out) backwards;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  text-align: center;
+}
+
+.wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 9rem;
+  height: 9rem;
+}
+
+.halo {
+  position: absolute;
+  inset: -70%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--sb-azul) 16%, transparent),
+    color-mix(in srgb, var(--sb-azul-claro) 40%, transparent) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 1.2s var(--via-ease-out),
+    transform 1.4s var(--via-ease-out);
+}
+
+.wrap[data-acesa] .halo {
+  opacity: 0.95;
+  transform: none;
+}
+
+/* antes do voo até o chat (E4): o halo se apaga junto com o texto */
+.wrap[data-apaga] .halo {
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.18s var(--via-ease-snap),
+    transform 0.18s var(--via-ease-snap);
+}
+
+/* o alvo do voo: o símbolo de 144 dentro dele */
+.simbolo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 9rem;
+  height: 9rem;
+}
+
+/* onde o símbolo em voo pousa, a troca viajante → símbolo é instantânea (sem piscar), como no F */
+.simbolo[data-oculto] {
+  opacity: 0;
+}
+
+.wrap[data-acesa] .simbolo {
+  animation: acende 0.8s var(--via-ease-spring);
+}
+
+.texto {
+  min-height: 15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition:
+    opacity 0.18s var(--via-ease-snap),
+    transform 0.18s var(--via-ease-snap);
+}
+
+/* fase de saída antes do voo até o chat (diretriz 7) */
+.texto[data-sai] {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.titulo {
+  min-height: 1.1em;
+  margin: 0;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.032em;
+  line-height: 1.05;
+  color: var(--sb-tinta);
+  outline: none;
+}
+
+.palavras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.26em;
+}
+
+.palavra {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.palavra[data-nome] {
+  color: var(--sb-azul);
+}
+
+.letra {
+  display: inline-block;
+  animation: d-letra 0.6s var(--via-ease-out) both;
+}
+
+.sub {
+  max-width: 40ch;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: 1.0625rem;
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+  animation: sb-entrada 0.6s var(--via-ease-out) 0.05s both;
+}
+
+.acoes {
+  animation: sb-entrada 0.6s var(--via-ease-out) 0.2s both;
+}
+
+.pular {
+  position: absolute;
+  right: 24px;
+  bottom: 16px;
+}
+
+@keyframes tela-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes acende {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes d-letra {
+  from {
+    opacity: 0;
+    transform: translateY(0.38em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sb-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 899px) {
+  .despertar {
+    min-height: calc(100dvh - var(--onb-nav-h-celular, 7.25rem));
+  }
+}
+
+@media (max-width: 599px) {
+  .texto {
+    min-height: 16rem;
+  }
+}
+
+/* movimento reduzido: estado final no primeiro quadro */
+@media (prefers-reduced-motion: reduce) {
+  .despertar,
+  .despertar *,
+  .despertar *::before,
+  .despertar *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}

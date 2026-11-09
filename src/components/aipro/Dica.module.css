@@ -1,0 +1,107 @@
+.dica {
+  position: relative;
+  display: inline-flex;
+}
+
+.balao {
+  position: absolute;
+  bottom: calc(100% + var(--sb-esp-2));
+  left: 50%;
+  z-index: var(--via-z-tooltip);
+  width: max-content;
+  max-width: 240px;
+  padding: var(--sb-esp-1) var(--sb-esp-3);
+  border-radius: var(--sb-r-chip);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, 2px);
+  transition:
+    opacity var(--app-t-state),
+    transform var(--app-t-state),
+    visibility var(--app-t-state);
+}
+
+.dica[data-lado='baixo'] .balao {
+  top: calc(100% + var(--sb-esp-2));
+  bottom: auto;
+  transform: translate(-50%, -2px);
+}
+
+.dica[data-lado='direita'] .balao {
+  top: 50%;
+  bottom: auto;
+  left: calc(100% + var(--sb-esp-2));
+  transform: translate(-2px, -50%);
+}
+
+.dica:hover .balao,
+.dica:has(:focus-visible) .balao {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: var(--app-motion-state);
+}
+
+.dica[data-lado='direita']:hover .balao,
+.dica[data-lado='direita']:has(:focus-visible) .balao {
+  transform: translate(0, -50%);
+}
+
+/* Alinhamento na borda (`alinhamento`, só em cima e embaixo): o balão encosta no
+   início ou no fim do filho, sem o -50% do centro. Para o controle no canto de um
+   contêiner que recorta: centralizado, o balão de "Próximo mês" passava 15px da
+   borda do acordeão do calendário a 320 e saía como "Próximo mê". */
+.dica[data-alinhamento='fim']:not([data-lado='direita']) .balao {
+  right: 0;
+  left: auto;
+}
+
+.dica[data-alinhamento='inicio']:not([data-lado='direita']) .balao {
+  left: 0;
+}
+
+.dica[data-alinhamento]:not([data-lado='direita']) .balao {
+  transform: translate(0, 2px);
+}
+
+.dica[data-alinhamento][data-lado='baixo'] .balao {
+  transform: translate(0, -2px);
+}
+
+.dica[data-alinhamento]:not([data-lado='direita']):hover .balao,
+.dica[data-alinhamento]:not([data-lado='direita']):has(:focus-visible) .balao {
+  transform: translate(0, 0);
+}
+
+/* Com o menu ou painel do filho aberto, a dica sai: o foco fica no gatilho depois do
+   clique e o balão "Ações de Ana Ribeiro" cobria o primeiro item do menu de moderação
+   (foto i-sala-menu-lado-1440 da integração). Trocar a dica por `semDica` enquanto
+   aberto remontava o botão e o foco voltava ao body ao fechar. */
+.dica.dica:has([aria-expanded='true']) .balao {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Toque não tem hover: no celular a dica só aparece com teclado. */
+@media (hover: none) {
+  .dica:hover:not(:has(:focus-visible)) .balao {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .balao {
+    transition: none;
+  }
+}

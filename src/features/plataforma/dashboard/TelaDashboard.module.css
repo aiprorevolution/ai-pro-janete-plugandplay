@@ -1,0 +1,32 @@
+/* Os 3 estados do Dashboard antes da tela (TelaDashboard.tsx): o h1 e o osso dos cartões, ou o erro. */
+
+.espera {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  box-sizing: border-box;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.titulo:focus {
+  outline: none;
+}
+
+/* A releitura que falhou, com os números de antes na tela. */
+.avisoTopo {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+  box-sizing: border-box;
+}

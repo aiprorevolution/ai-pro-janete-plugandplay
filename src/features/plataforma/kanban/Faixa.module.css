@@ -1,0 +1,1010 @@
+/* A linha de ferramentas do Kanban 2 (o `.barra` do protótipo), a régua do "Rever no quadro" (`.replay`)
+   e a caixa de "Editar etapas" (`.dlg`). */
+
+.kfBarra {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+/* No computador a barra fica numa linha: a frase da Janete ao vivo encolhe com reticências, em vez de a
+   barra quebrar e o quadro pular. */
+@media (min-width: 900px) {
+  .kfBarra {
+    flex-wrap: nowrap;
+  }
+}
+
+/* ---------- a busca (o texto de exemplo cabe inteiro) ---------- */
+
+.kfBusca {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  width: min(18rem, 100%);
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: 999px;
+  background: var(--sb-branco);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.kfBusca:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.kfBuscaIcone {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.kfBusca input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.kfBusca input:focus,
+.kfBusca input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.kfBusca input::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.kfBusca input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.kfFiltro {
+  flex: none;
+}
+
+/* ---------- à direita: a Janete ao vivo, o "Desde que você saiu" e as etapas ---------- */
+
+.kfDir {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+  margin-left: auto;
+}
+
+.kfVivo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 22rem;
+  margin: 0 6px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.84375rem;
+  line-height: 1.4;
+}
+
+.kfVivo > :first-child {
+  flex: none;
+}
+
+/* O verbo e o nome em dois pedaços com reticências próprias: o verbo encolhe primeiro e o nome guarda
+   pelo menos 4,5rem ("Escrevendo para Ana Cl…"). */
+.kfVivoTexto {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* `pre`, e não `nowrap`: o espaço do fim ("Escrevendo para ") separa o verbo do nome e não pode sumir. */
+.kfVivoAcao {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.kfVivoAlvo {
+  flex: 0 1 auto;
+  min-width: 4.5rem;
+  max-width: 12rem;
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kfAncora {
+  position: relative;
+  flex: none;
+}
+
+.kfBotao {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: 999px;
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.kfBotao:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kfBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.kfBotao[data-etapas] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--sb-tinta-2);
+}
+
+.kfBotao[data-etapas]:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kfBadge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.71875rem;
+  font-weight: var(--sb-peso-forte);
+}
+
+/* ---------- o "Desde que você saiu" ---------- */
+
+.kfDesde {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(28rem, calc(100vw - 32px));
+  /* Só a lista rola: o cabeçalho, o resumo e as ações ("Rever no quadro") ficam sempre à vista. */
+  max-height: min(36rem, calc(100dvh - 120px));
+  overflow: hidden;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  animation: kf-entra 0.32s var(--sb-ease-assentar) both;
+}
+
+.kfDesde:focus-visible {
+  outline: none;
+}
+
+.kfDesdeCab {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.kfOlho {
+  margin: 0;
+  color: var(--sb-azul-texto);
+  font-size: 0.78125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.4;
+}
+
+.kfDesdeTitulo {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+}
+
+.kfFechar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+  cursor: pointer;
+}
+
+.kfFechar:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kfFechar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.kfResumo {
+  flex: none;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.84375rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.kfResumo b {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte-mono);
+  font-weight: var(--sb-peso-forte);
+}
+
+.kfLista {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.kfItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-top: 1px solid var(--sb-linha);
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kfItem:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kfItem:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.kfItemHora {
+  grid-row: 1 / span 2;
+  padding-top: 2px;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+}
+
+.kfItemTitulo {
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.35;
+}
+
+.kfItemMotivo {
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.kfAcoes {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kfPrimario,
+.kfDiscreto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.kfPrimario {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.kfPrimario:hover:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.kfDiscreto {
+  background: transparent;
+  color: var(--sb-tinta);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.kfDiscreto:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+/* O `.btn-disc` do protótipo (Arquivar, Restaurar): sem contorno. */
+.kfDiscreto.kfSemContorno {
+  color: var(--sb-tinta-2);
+  box-shadow: none;
+}
+
+.kfDiscreto.kfSemContorno:hover:not(:disabled) {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.kfDiscreto.kfSemContorno:focus-visible {
+  box-shadow: var(--sb-anel);
+}
+
+.kfPrimario:disabled,
+.kfDiscreto:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kfPrimario:focus-visible,
+.kfDiscreto:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.kfDica {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.78125rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* No painel "Desde", a dica de baixo não encolhe (só a lista rola). Na linha de cada etapa, ela fica
+   flexível para quebrar dentro do diálogo. */
+.kfDesde > .kfDica {
+  flex: none;
+}
+
+/* ---------- "Rever no quadro": a régua do dia ---------- */
+
+.kfReplay {
+  display: grid;
+  flex: none;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 10px 12px 10px 14px;
+  border-radius: 20px;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  animation: kf-entra 0.32s var(--sb-ease-assentar) both;
+}
+
+.kfPlay {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  cursor: pointer;
+}
+
+.kfPlay:focus-visible,
+.kfVoltar:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--sb-navy),
+    0 0 0 4px #7cc4ff;
+}
+
+.kfReplayTit {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.kfReplayHora {
+  font-family: var(--sb-fonte-mono);
+  font-size: 1.0625rem;
+  font-weight: var(--sb-peso-forte);
+}
+
+.kfReplayTexto {
+  color: #b8c2d9;
+  font-size: 0.8125rem;
+}
+
+.kfRegua {
+  position: relative;
+  min-width: 0;
+  padding: 14px 0 18px;
+}
+
+.kfRegua input {
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  accent-color: #7cc4ff;
+  cursor: pointer;
+}
+
+.kfRegua input:focus-visible {
+  outline: 2px solid #7cc4ff;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.kfMarcas {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  left: 0;
+  height: 8px;
+  pointer-events: none;
+}
+
+.kfMarca {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: #7cc4ff;
+}
+
+/* "Passou para a equipe": pela forma (um anel vazado), não por uma cor a mais. */
+.kfMarca[data-tipo='passar'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--sb-areia);
+}
+
+.kfPontas {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  color: #b8c2d9;
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.71875rem;
+}
+
+.kfVoltar {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  font: inherit;
+  font-size: 0.84375rem;
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+}
+
+/* ---------- Editar etapas ---------- */
+
+.kfDlg {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.kfVeu {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: var(--sb-veu);
+  cursor: default;
+  animation: kf-aparece 0.3s var(--sb-ease-assentar) both;
+}
+
+.kfCaixa {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(40rem, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 28px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: kf-dlg 0.48s var(--sb-ease-assentar) both;
+}
+
+.kfCaixa:focus-visible {
+  outline: none;
+}
+
+.kfDlgCab {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.kfDlgTitulo {
+  margin: 2px 0 0;
+  font-size: 1.375rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+}
+
+.kfApoio {
+  margin: 6px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.kfEl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.kfEl[data-arquivada] {
+  margin: 0 -12px;
+  padding: 14px 12px;
+  border-radius: 16px;
+  background: var(--sb-canvas);
+}
+
+.kfOrdem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kfSeta {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+  cursor: pointer;
+}
+
+.kfSeta:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.kfSeta:disabled {
+  color: var(--sb-tinta-3);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.kfSeta:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.kfNome {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: 999px;
+  background: var(--sb-branco);
+}
+
+.kfNome:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.kfNome input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.kfNome input:focus,
+.kfNome input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.kfNome input:disabled {
+  color: var(--sb-tinta-2);
+}
+
+.kfLinha2 {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.kfCores {
+  display: flex;
+  gap: 6px;
+}
+
+.kfCor {
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background-clip: content-box !important;
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  cursor: pointer;
+}
+
+.kfCor[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 2px var(--sb-navy);
+}
+
+.kfCor:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--sb-navy),
+    var(--sb-anel);
+}
+
+.kfTroca {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+}
+
+.kfTroca svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--sb-tinta-3);
+}
+
+.kfTroca:focus-visible {
+  outline: none;
+}
+
+.kfTroca:focus-visible .kfTrocaTrilho {
+  box-shadow: var(--sb-anel);
+}
+
+.kfTrocaTrilho {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--sb-linha-forte);
+  transition: background-color var(--app-t-state);
+}
+
+.kfTrocaTrilho::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--sb-navy) 30%, transparent);
+  transition: transform 0.3s var(--sb-ease-mola);
+}
+
+.kfTroca[aria-checked='true'] .kfTrocaTrilho {
+  background: var(--sb-navy);
+}
+
+.kfTroca[aria-checked='true'] .kfTrocaTrilho::after {
+  transform: translateX(16px);
+}
+
+.kfErro {
+  color: var(--sb-erro);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.kfPe {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.kfSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- larguras ---------- */
+
+/* Até 1439 px (1280 e 1366): a busca mais curta e "Editar etapas" só no ícone, para a barra caber numa linha. */
+@media (max-width: 1439px) {
+  .kfVivo {
+    max-width: 15rem;
+  }
+
+  .kfBusca {
+    width: min(15rem, 100%);
+  }
+
+  .kfBotao[data-etapas] {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .kfBotao[data-etapas] .kfBotaoTexto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Celular: a barra numa linha só. A busca ocupa o resto; o filtro, a Janete ao vivo (só o símbolo; a frase
+   fica para o leitor de tela), o "Desde que você saiu" e as etapas viram ícones. */
+@media (max-width: 899px) {
+  .kfBarra {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .kfBusca {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+
+  .kfDir {
+    flex: none;
+    gap: 4px;
+    margin-left: 0;
+  }
+
+  .kfVivo {
+    flex: none;
+    max-width: none;
+    margin: 0 4px;
+  }
+
+  .kfVivoTexto,
+  .kfBotaoTexto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .kfAncora {
+    position: static;
+  }
+
+  .kfBotao,
+  .kfBotao[data-etapas] {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .kfBadge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+  }
+
+  /* Preso acima da barra de baixo (~84 px), com as ações à vista. Funciona porque a `.vista` anima com
+     `backwards` (sem transform depois da entrada); se ela voltar a ter transform, levar ao NoCorpo. */
+  .kfDesde {
+    position: fixed;
+    top: auto;
+    right: 8px;
+    bottom: 92px;
+    left: 8px;
+    width: auto;
+    max-height: calc(100dvh - 160px);
+  }
+
+  /* O filtro: o círculo de 44 px com borda do protótipo, e o menu ancorado na barra (à direita, a 16 px
+     da borda da tela), em vez de no botão, para não passar da borda esquerda. */
+  .kfBarra .kfFiltro {
+    position: static;
+  }
+
+  .kfBarra .kfFiltro > button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--sb-linha-forte);
+    background: var(--sb-branco);
+  }
+
+  .kfBarra .kfFiltro > button[data-destaque] {
+    border-color: transparent;
+    background: var(--sb-azul-claro);
+  }
+
+  .kfBarra .kfFiltro [role="menu"] {
+    width: min(17.5rem, calc(100vw - 32px));
+  }
+
+  .kfReplay {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px 12px;
+  }
+
+  .kfRegua {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .kfDlg {
+    place-items: end stretch;
+    padding: 0;
+  }
+
+  .kfCaixa {
+    max-height: 92vh;
+    border-radius: 28px 28px 0 0;
+  }
+}
+
+@media (max-width: 899px), (pointer: coarse) {
+  .kfPrimario,
+  .kfDiscreto,
+  .kfVoltar,
+  .kfTroca {
+    min-height: 44px;
+  }
+
+  .kfSeta,
+  .kfFechar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .kfCor {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@keyframes kf-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes kf-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kf-dlg {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kfDesde,
+  .kfReplay,
+  .kfVeu,
+  .kfCaixa {
+    animation: none;
+  }
+
+  .kfTrocaTrilho,
+  .kfTrocaTrilho::after,
+  .kfBotao,
+  .kfBusca {
+    transition: none;
+  }
+}

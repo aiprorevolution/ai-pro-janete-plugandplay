@@ -1,0 +1,8 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Media is served with short-lived URLs by the authenticated server.
+    // Direct client reads/writes are denied. Cloud Run uses its own IAM identity.
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

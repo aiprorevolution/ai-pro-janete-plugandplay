@@ -1,0 +1,165 @@
+/* =============================================================================
+   2d · A fusão do cérebro com a Janete (docs/spec-ajustes-onboarding-r2.md).
+   O check (o disco da validação) vira de novo o logo da IA, como a moeda da validação; o logo
+   vai para a esquerda e de trás dele a Janete em preto e branco ("dormindo") vai para a direita;
+   os dois voltam ao centro, o logo some dentro da Janete e ela ganha cor ("acordada").
+
+   As fases são `data-fase` na raiz (check → vira → separa → junta → acorda → fim); os tempos
+   estão em FusaoJanete.tsx (INICIO_FUSAO). Curvas só dos tokens (--via-ease-*, --sb-ease-*).
+   A cena fica em posição fixa, por cima da tela e logo abaixo do símbolo em voo (z 80), que
+   assume o lugar da Janete quando a cena termina.
+   ============================================================================= */
+
+.cena {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* As duas peças ficam centradas na origem (left/top no style) com o lado do disco da validação. */
+.peca {
+  position: absolute;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- o logo (a moeda) ---------- */
+
+.logo {
+  z-index: 2;
+  perspective: 40rem;
+  transition:
+    transform 0.64s var(--sb-ease-travessia),
+    opacity 0.3s var(--via-ease-out);
+}
+
+.moeda {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.56s var(--via-ease);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* a frente: o check da validação, igual ao `.val[data-vis='ok']` da lista */
+.check {
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.check svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.check path {
+  fill: none;
+  stroke: var(--sb-branco);
+  stroke-width: 4.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* o verso: o logo da IA, como a face da moeda da validação */
+.verso {
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  transform: rotateY(180deg);
+}
+
+.verso.escura {
+  background: var(--sb-grafite);
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.verso img {
+  display: block;
+  height: 28%;
+  width: auto;
+  max-width: 56%;
+  object-fit: contain;
+}
+
+/* ---------- a Janete ---------- */
+
+.janete {
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0.84);
+  transition:
+    transform 0.64s var(--sb-ease-travessia),
+    opacity 0.24s var(--via-ease-out);
+}
+
+/* a mesma sombra do símbolo em voo (VooJanete.module.css): a troca no fim não dá tranco */
+.janete > [data-estado] {
+  box-shadow: 0 22px 36px -22px color-mix(in srgb, var(--sb-navy) 60%, transparent);
+}
+
+/* ---------- as fases ---------- */
+
+/* vira: o check dá meia volta e mostra o logo */
+.cena:not([data-fase='check']) .moeda {
+  transform: rotateY(180deg);
+}
+
+/* separa: o logo vai para a esquerda; a Janete sai de trás dele e vai para a direita */
+.cena[data-fase='separa'] .logo {
+  transform: translateX(calc(var(--afasta) * -1)) scale(0.84);
+}
+
+.cena[data-fase='separa'] .janete {
+  opacity: 1;
+  transform: translateX(var(--afasta)) scale(0.84);
+}
+
+/* junta: os dois voltam ao centro; a Janete passa à frente e o logo some dentro dela */
+.cena[data-fase='junta'] .janete,
+.cena[data-fase='acorda'] .janete,
+.cena[data-fase='fim'] .janete {
+  z-index: 3;
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.56s var(--via-ease-out),
+    opacity 0.24s var(--via-ease-out);
+}
+
+.cena[data-fase='junta'] .logo,
+.cena[data-fase='acorda'] .logo,
+.cena[data-fase='fim'] .logo {
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    transform 0.56s var(--sb-ease-travessia),
+    opacity 0.2s var(--via-ease-snap) 0.34s;
+}
+
+/* acorda: a Janete ganha cor (a transição do próprio símbolo) com um pulso curto de mola */
+.cena[data-fase='acorda'] .janete {
+  animation: acende 0.5s var(--via-ease-spring);
+}
+
+@keyframes acende {
+  0%,
+  100% {
+    scale: 1;
+  }
+  45% {
+    scale: 1.06;
+  }
+}

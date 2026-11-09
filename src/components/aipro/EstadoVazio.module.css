@@ -1,0 +1,176 @@
+.vazio {
+  display: grid;
+  gap: var(--sb-esp-6);
+  padding: var(--sb-esp-6);
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: var(--sb-r-item);
+  background: transparent;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+}
+
+.corpo {
+  display: grid;
+  justify-items: start;
+  gap: var(--sb-esp-3);
+}
+
+.textos {
+  display: grid;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+}
+
+.titulo {
+  margin: 0;
+  /* Classe e não elemento: fora de `data-identidade` o vendor pinta h2–h4 com Geist. */
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.motivo {
+  max-width: 56ch;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+}
+
+.acao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sb-esp-2);
+  margin-top: var(--sb-esp-1);
+}
+
+.icone {
+  display: inline-grid;
+  flex: none;
+}
+
+/* ---------- esboço: o contorno do que vai existir ---------- */
+
+.esboco {
+  display: grid;
+  gap: var(--sb-esp-2);
+}
+
+.osso {
+  display: block;
+  height: 10px;
+  border-radius: var(--sb-r-chip);
+  background: var(--sb-esqueleto);
+}
+
+.osso[data-largura='curta'] {
+  width: 40%;
+}
+
+.osso[data-largura='media'] {
+  width: 72%;
+}
+
+.linhaLista {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  padding: var(--sb-esp-2) 0;
+}
+
+.linhaLista .osso {
+  flex: 1;
+}
+
+.linhaLista .osso[data-largura='media'] {
+  flex: 0 1 72%;
+}
+
+.quadrado {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: calc(var(--sb-r-mini) - 2px);
+  background: var(--sb-esqueleto);
+}
+
+.esboco[data-forma='cartao'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sb-esp-3);
+}
+
+.cartaoOsso {
+  display: grid;
+  align-content: end;
+  gap: var(--sb-esp-2);
+  min-height: 72px;
+  padding: var(--sb-esp-3);
+  border: 1px solid var(--sb-esqueleto);
+  border-radius: calc(var(--sb-r-item) - 4px);
+}
+
+.esboco[data-forma='quadro'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sb-esp-3);
+}
+
+.coluna {
+  display: grid;
+  align-content: start;
+  gap: var(--sb-esp-2);
+}
+
+.coluna .cartaoOsso {
+  min-height: 48px;
+}
+
+.linhaTabela {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--sb-esp-4);
+  padding: var(--sb-esp-2) 0;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.linhaTabela[data-cabecalho] .osso {
+  height: 8px;
+  width: 60%;
+}
+
+/* ---------- compacto: uma linha dentro de card ou lista (a "vaga" do mockup) ---------- */
+
+.compacto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sb-esp-3) var(--sb-esp-4);
+  padding: var(--sb-esp-3) var(--sb-esp-4);
+  border-width: 1.5px;
+}
+
+.compacto .textos {
+  flex: 1 1 14rem;
+}
+
+.compacto .titulo {
+  font-size: var(--sb-fs-corpo);
+}
+
+.compacto .motivo {
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+.compacto .acao {
+  margin-top: 0;
+}
+
+@media (max-width: 599px) {
+  .vazio:not(.compacto) {
+    padding: var(--sb-esp-5);
+  }
+}

@@ -1,0 +1,131 @@
+/* =========================================================
+   O disco do palco que vira o quadro do QR (spec-qr-whatsapp, seção 8).
+   Ele fica exatamente sobre o disco da validação (Lista.module.css: .valAncora com o centro a
+   10,5rem do topo e 9,5rem de lado; o .valTexto começa 6,5rem abaixo do centro). Como o PassoQr
+   começa no topo do .valTexto, o centro daqui fica 6,5rem acima do topo do PassoQr.
+   No círculo, tudo copia o .face parado (fundo, sombra e o tamanho do logo, inclusive o da larga),
+   para a troca com o disco real não aparecer.
+   ========================================================= */
+
+.disco {
+  --disco-lado: 9.5rem;
+  --quadro-lado: 15rem;
+  --disco-tempo: 0.45s; /* = TEMPO_VOLTA_DISCO_MS (DiscoQr.tsx) */
+  position: absolute;
+  left: 50%;
+  top: -6.5rem;
+  width: var(--disco-lado);
+  height: var(--disco-lado);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  /* o .val do palco tem pointer-events: none; só o botão do expirado recebe o clique */
+  pointer-events: none;
+  transition:
+    width var(--disco-tempo) var(--via-ease-out),
+    height var(--disco-tempo) var(--via-ease-out),
+    border-radius var(--disco-tempo) var(--via-ease-out),
+    background-color 0.3s var(--via-ease-snap),
+    box-shadow 0.3s var(--via-ease-snap);
+}
+/* Z-API (nome branco): grafite, como o .face.escura, até o QR chegar */
+.disco[data-escura] {
+  background: var(--sb-grafite);
+  box-shadow:
+    inset 0 0 0 1px transparent,
+    var(--sb-sombra-flutuante);
+}
+.disco[data-forma='quadro'] {
+  width: var(--quadro-lado);
+  height: var(--quadro-lado);
+  border-radius: 1.25rem;
+}
+
+/* o logo no tamanho do disco parado (.face img: 28% e 56% do lado; na larga, 19% e 72%), mesmo
+   quando o quadro cresce: ele fica no meio enquanto o QR é gerado */
+.logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  height: calc(var(--disco-lado) * 0.28);
+  width: auto;
+  max-width: calc(var(--disco-lado) * 0.56);
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s var(--via-ease-out);
+}
+.disco[data-larga] .logo {
+  height: calc(var(--disco-lado) * 0.19);
+  max-width: calc(var(--disco-lado) * 0.72);
+}
+
+/* o QR com ~12px de margem branca: a câmera precisa do fundo claro em volta */
+.imagem {
+  position: absolute;
+  inset: 12px;
+  display: block;
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: opacity 0.3s var(--via-ease-out);
+}
+.logo[data-oculto],
+.imagem[data-oculto] {
+  opacity: 0;
+  transition-duration: 0.18s;
+}
+.apagada {
+  opacity: 0.14;
+}
+
+/* a barra fina dos 20 s, na base do quadro: corre uma vez a cada QR novo (a key muda) */
+.barra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--sb-azul);
+  transform-origin: left center;
+  animation: vida 20s linear both;
+}
+
+.sobreposto {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+.sobreposto > * {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disco,
+  .logo,
+  .imagem {
+    transition: none;
+  }
+  /* sem movimento: a barra fica parada (só o texto diz que o QR muda) */
+  .barra {
+    animation: none;
+    transform: none;
+    opacity: 0.35;
+  }
+}
+
+@keyframes vida {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

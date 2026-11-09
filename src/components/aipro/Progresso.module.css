@@ -1,0 +1,95 @@
+.barra,
+.casas {
+  --espessura: 6px;
+  width: 100%;
+  height: var(--espessura);
+}
+
+.barra[data-espessura='media'],
+.casas[data-espessura='media'] {
+  --espessura: 8px;
+}
+
+.barra {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+}
+
+.barra .preenchimento {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--valor);
+  border-radius: inherit;
+  background: var(--sb-azul);
+}
+
+.casas {
+  display: flex;
+  gap: var(--sb-esp-1);
+}
+
+.casa {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+}
+
+.casa .preenchimento {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sb-azul);
+}
+
+.barra[data-palco],
+.casas[data-palco] .casa {
+  background: var(--sb-palco-superficie-forte);
+}
+
+/* ---------- anel ---------- */
+
+.anel {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+
+.anel svg {
+  /* O traço começa no topo e corre no sentido horário. */
+  transform: rotate(-90deg);
+}
+
+.trilhoAnel {
+  fill: none;
+  stroke: var(--sb-azul-claro);
+}
+
+.valorAnel {
+  fill: none;
+  stroke: var(--sb-azul);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--app-t-reveal);
+}
+
+.centro {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .valorAnel {
+    transition: none;
+  }
+}

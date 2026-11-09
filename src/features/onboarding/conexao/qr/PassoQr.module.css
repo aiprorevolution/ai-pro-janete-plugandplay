@@ -1,0 +1,305 @@
+/* =========================================================
+   O passo "Leia o QR code" (Z-API e Evolution), identidade AI PRO:
+   no palco da validação (abaixo do disco) e no cartão do número caído.
+   Os tokens são os --sb-* e --via-* de src/styles/aipro.css, como a lista.
+   ========================================================= */
+
+.passo {
+  --qr-lado: 232px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  color: var(--sb-tinta);
+  text-align: center;
+  container-type: inline-size;
+  /* o DiscoQr (palco) se posiciona por aqui */
+  position: relative;
+}
+/* No palco, o QR fica no DiscoQr, por cima do disco da validação: o centro dele está 6,5rem acima
+   do topo deste bloco, e o quadro (15rem) termina 7,5rem abaixo do centro, 1rem abaixo do topo.
+   O texto começa abaixo do quadro; no círculo (9,5rem), ele começa no topo, como o ok e o erro. */
+.palco {
+  --palco-folga-quadro: calc(1rem + 22px);
+  --disco-tempo: 0.45s; /* = TEMPO_VOLTA_DISCO_MS (DiscoQr.tsx) */
+  max-width: 44rem;
+  padding-top: 0;
+  transition: padding-top var(--disco-tempo) var(--via-ease-out);
+  /* o DiscoQr fica acima deste bloco (o topo do quadro, 14rem acima): ao rolar até o passo, ele
+     continua na vista, abaixo da barra de etapas presa no topo do onboarding */
+  scroll-margin-top: calc(var(--onb-nav-h, 0px) + 14.5rem);
+}
+.palco[data-forma='quadro'] {
+  padding-top: var(--palco-folga-quadro);
+}
+/* a entrada (sobe e aparece) vai só para o texto: o disco nasce parado, igual ao disco real */
+.palco > :not([data-disco-qr]) {
+  animation: entra 0.4s var(--via-ease-out) both;
+}
+.cartao {
+  gap: 12px;
+  align-items: stretch;
+  text-align: left;
+  animation: entra 0.4s var(--via-ease-out) both;
+}
+
+.cab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.cartao .cab {
+  align-items: flex-start;
+}
+.titulo {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+.palco .titulo {
+  font-size: var(--sb-fs-destaque);
+}
+.cartao .titulo {
+  font-size: var(--sb-fs-cartao);
+  line-height: var(--sb-lh-cartao, 1.3);
+  letter-spacing: -0.012em;
+}
+.titulo:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* o QR ao lado das instruções; num espaço estreito, um embaixo do outro */
+.corpo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px 28px;
+  width: 100%;
+  text-align: left;
+}
+.cartao .corpo {
+  gap: 12px 20px;
+}
+@container (max-width: 30rem) {
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+}
+
+/* o quadro branco com borda: o QR precisa do fundo claro para a câmera ler */
+.quadro {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--qr-lado) + 24px);
+  height: calc(var(--qr-lado) + 24px);
+  padding: 12px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha-forte),
+    var(--sb-sombra-card);
+  overflow: hidden;
+}
+.imagem {
+  display: block;
+  width: var(--qr-lado);
+  height: var(--qr-lado);
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: opacity 0.3s var(--via-ease-out);
+}
+.apagada {
+  opacity: 0.14;
+}
+/* carregando: o lugar do QR, vazio, com o brilho do esqueleto */
+.vazio {
+  position: relative;
+  display: block;
+  width: var(--qr-lado);
+  height: var(--qr-lado);
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-esqueleto);
+  overflow: hidden;
+}
+/* o brilho só no "carregando": no expirado sem imagem guardada, o quadro fica parado */
+.quadro[data-carregando] .vazio::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--sb-esqueleto-brilho) 50%, transparent);
+  transform: translateX(-100%);
+  /* token-ok: ambiente, laço contínuo fora da escala de interação (como o Esqueleto) */
+  animation: brilho 1.6s linear infinite;
+}
+/* a barra fina dos 20 s: corre uma vez a cada QR novo (a key do elemento muda) */
+.barra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--sb-azul);
+  transform-origin: left center;
+  animation: vida 20s linear both;
+}
+.sobreposto {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+/* o reset do Tailwind zera o list-style: os números 1, 2 e 3 voltam aqui (em bloco, para o
+   marcador aparecer; o espaço entre os itens vem da margem) */
+.passos {
+  display: block;
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  list-style: decimal outside;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+.passos li + li {
+  margin-top: 10px;
+}
+/* no palco, os 3 passos descem para baixo do título: um bloco centralizado, com o texto à esquerda */
+.palco .passos {
+  max-width: 30rem;
+  text-align: left;
+}
+.cartao .passos {
+  font-size: var(--sb-fs-apoio);
+}
+.cartao .passos li + li {
+  margin-top: 6px;
+}
+.passos li::marker {
+  font-weight: 600;
+  color: var(--sb-tinta);
+}
+
+.viva {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  min-height: 1.4em;
+}
+.viva[data-estado='expirado'] {
+  color: var(--sb-atencao);
+}
+.viva[data-estado='conectado'] {
+  color: var(--sb-sucesso);
+}
+/* passkey e erro: a linha viva é o texto do bloco */
+.texto {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+/* a falha do "Desconectar e ler de novo" (celular de outro número) */
+.erroLinha {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--sb-fs-apoio);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-erro);
+  text-wrap: pretty;
+}
+
+/* a frase do celular: só em telas de até 600 px */
+.celular {
+  display: none;
+  margin: 0;
+  max-width: 36ch;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.pe {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 12px;
+}
+.pe:empty {
+  display: none;
+}
+.cartao .pe {
+  justify-content: flex-start;
+}
+
+@media (max-width: 600px) {
+  .passo {
+    --qr-lado: 200px;
+  }
+  .celular {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palco,
+  .palco > :not([data-disco-qr]),
+  .cartao,
+  .imagem {
+    animation: none;
+    transition: none;
+  }
+  /* sem movimento: a barra fica parada (só o texto diz que o QR muda) */
+  .barra,
+  .quadro[data-carregando] .vazio::after {
+    animation: none;
+  }
+  .barra {
+    transform: none;
+    opacity: 0.35;
+  }
+}
+
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes vida {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+@keyframes brilho {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* um número formatado ("+55 11 98765-4321") nunca quebra no meio da linha */
+.numero {
+  white-space: nowrap;
+}

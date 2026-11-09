@@ -1,0 +1,386 @@
+/* As abas Mídias e Ficha do perfil do contato (AbaMidias.tsx e AbaFicha.tsx), no desenho do perfil do
+   Contatos 4 (`.c4-midias`, `.c4-ficha`), mas sem os contêineres coloridos (decisão 5 do equipe):
+   cartões brancos sobre o fundo da plataforma, contorno fino, e a cor só em detalhe pequeno. */
+
+.fiAba {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+  min-width: 0;
+}
+
+/* ---------- textos comuns ---------- */
+
+.fiCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sb-esp-1) var(--sb-esp-4);
+}
+
+.fiTitulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.fiMeta {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fiVazio {
+  margin: 0;
+  padding: var(--sb-esp-6);
+  border: 1px dashed var(--sb-linha-forte);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+  text-align: center;
+}
+
+.fiSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Mídias: a grade de cartões ---------- */
+
+.fiGrade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sb-esp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fiMidia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+  padding: var(--sb-esp-3) var(--sb-esp-3) var(--sb-esp-2);
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+}
+
+/* A prévia: altura fixa para a grade ficar alinhada; borda fina em vez de fundo de cor. */
+.fiPrevia {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 132px;
+  margin-bottom: var(--sb-esp-2);
+  overflow: hidden;
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-branco);
+}
+
+.fiCena {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* No banco: a miniatura de verdade (pelo link assinado) e o aviso da mídia que não está no bucket. */
+.fiFoto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fiEstado {
+  display: grid;
+  justify-items: center;
+  gap: var(--sb-esp-1);
+  max-width: 90%;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-align: center;
+}
+
+.fiEstadoBotao {
+  min-height: 32px;
+  padding: 0 var(--sb-esp-2);
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-chip);
+  background: var(--sb-branco);
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  cursor: pointer;
+}
+
+.fiEstadoBotao:focus-visible {
+  outline: 2px solid var(--sb-azul-texto);
+  outline-offset: 2px;
+}
+
+.fiAudio {
+  display: flex;
+  width: min(75%, 240px);
+}
+
+.fiTempo {
+  position: absolute;
+  right: var(--sb-esp-2);
+  bottom: var(--sb-esp-2);
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+}
+
+/* A duração sobre o vídeo: precisa de fundo para ler sobre a imagem; é o único detalhe escuro. */
+.fiTempoVideo {
+  position: absolute;
+  bottom: var(--sb-esp-2);
+  left: var(--sb-esp-2);
+  padding: 2px var(--sb-esp-2);
+  border-radius: var(--sb-r-pilula);
+  background: color-mix(in srgb, var(--sb-navy) 82%, transparent);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-micro);
+}
+
+.fiDoc {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--sb-azul-texto);
+}
+
+.fiDocExt {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+}
+
+/* A figurinha fica pequena: é um detalhe, não uma foto. */
+.fiFigurinha {
+  display: grid;
+  place-items: center;
+  color: var(--sb-tinta-2);
+}
+
+.fiMidiaNome {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fiTransc {
+  display: -webkit-box;
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.fiVer {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  min-height: 32px;
+  margin-top: 2px;
+  padding: 0 var(--sb-esp-1);
+  margin-left: calc(-1 * var(--sb-esp-1));
+  border: 0;
+  border-radius: var(--sb-r-chip);
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+}
+
+.fiVer:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fiVer:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- Ficha: os blocos ---------- */
+
+.fiBloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-3);
+  min-width: 0;
+  padding: var(--sb-esp-5) var(--sb-esp-6);
+  border: 1px solid var(--sb-linha);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+}
+
+.fiBlocoCab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-3);
+  min-height: var(--sb-controle-compacto);
+}
+
+/* A lista de rótulo e valor: rótulo em cinza à esquerda, valor à direita, linha fina entre elas. */
+.fiLista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.fiLista > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+  gap: var(--sb-esp-4);
+  padding: 10px 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.fiLista > div:first-child {
+  border-top: 0;
+}
+
+.fiLista dt {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+.fiLista dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fiVazioValor {
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-regular);
+}
+
+.fiNota {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-regular);
+}
+
+.fiObs {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-corpo);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fiEtapa {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fiEtapa > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Ficha: a edição ---------- */
+
+.fiForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+}
+
+/* Telefone e nome no WhatsApp continuam texto no meio do formulário. */
+.fiForm .fiLista > div {
+  padding: var(--sb-esp-2) 0;
+}
+
+.fiErro {
+  margin: 0;
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-apoio);
+}
+
+.fiAcoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sb-esp-2);
+}
+
+/* ---------- larguras ---------- */
+
+/* Na faixa de 1024 px a coluna da aba é estreita: a lista de rótulo e valor encolhe o rótulo. */
+@media (max-width: 1199px) {
+  .fiLista > div {
+    grid-template-columns: minmax(110px, 140px) minmax(0, 1fr);
+  }
+}
+
+/* Celular: uma coluna de mídias, e o rótulo vai para cima do valor. */
+@media (max-width: 899px) {
+  .fiGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fiBloco {
+    padding: var(--sb-esp-4);
+  }
+
+  .fiLista > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .fiAcoes {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

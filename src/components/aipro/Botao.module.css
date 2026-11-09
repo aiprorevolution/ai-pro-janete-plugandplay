@@ -1,0 +1,189 @@
+/* Botão e BotaoLink compartilham esta folha. Os valores de principal, contorno e
+   suave nos tamanhos padrão e grande são os da /entrar (congelada): mudar aqui
+   muda a tela aprovada. */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sb-esp-2);
+  min-height: var(--sb-controle);
+  padding: var(--sb-esp-2) var(--sb-esp-5);
+  border: 1px solid transparent;
+  border-radius: var(--sb-r-pilula);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-corpo);
+  text-align: center;
+  text-decoration: none;
+  /* Com texto ampliado, o rótulo quebra dentro da pílula em vez de vazar. */
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.botao[data-tamanho='compacto'] {
+  min-height: var(--sb-controle-compacto);
+  padding: var(--sb-esp-1) var(--sb-esp-4);
+  gap: var(--sb-esp-1);
+  font-size: var(--sb-fs-apoio);
+}
+
+.botao[data-tamanho='grande'] {
+  min-height: var(--sb-controle-principal);
+  padding-inline: var(--sb-esp-6);
+}
+
+.botao[data-largo] {
+  width: 100%;
+}
+
+/* ---------- variantes ---------- */
+
+.botao[data-variante='principal'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  box-shadow: var(--sb-sombra-acao);
+}
+
+.botao[data-variante='principal']:hover:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.botao[data-variante='contorno'] {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='contorno']:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.botao[data-variante='suave'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+/* No hover o texto vai para a tinta: o azul de texto sobre o fundo misturado mede
+   4,15:1 no axe (#0668b8 sobre #bbe1fd, 15px), abaixo de AA; a tinta mede 13,1:1.
+   No toque o hover gruda depois do tap, então o estado aparece também no celular. */
+.botao[data-variante='suave']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-azul-claro) 82%, var(--sb-azul) 18%);
+  color: var(--sb-tinta);
+}
+
+/* Terciária: some até ser procurada. 5,95:1 no branco, 5,54:1 no canvas. */
+.botao[data-variante='discreto'] {
+  background: transparent;
+  color: var(--sb-tinta-2);
+}
+
+.botao[data-variante='discreto']:hover:not(:disabled) {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+/* Destrutiva fora de confirmação: contorno vermelho (6,57:1 no branco). */
+.botao[data-variante='perigo'] {
+  border-color: var(--sb-erro);
+  background: var(--sb-branco);
+  color: var(--sb-erro);
+}
+
+.botao[data-variante='perigo']:hover:not(:disabled) {
+  background: var(--sb-erro-claro);
+}
+
+/* Dentro de uma confirmação (diálogo), a destrutiva é a ação do bloco: sólida,
+   branco sobre o vermelho a 6,57:1. Fora do diálogo ela nunca é sólida. */
+:where([role='dialog'], [role='alertdialog']) .botao[data-variante='perigo'] {
+  background: var(--sb-erro);
+  color: var(--sb-tinta-inversa);
+}
+
+:where([role='dialog'], [role='alertdialog']) .botao[data-variante='perigo']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-erro) 86%, var(--sb-navy) 14%);
+}
+
+/* ---------- estados ---------- */
+
+/* Clique marcado só pela cor (item 5a da spec r2: nada se mexe ao clicar). Antes o botão encolhia
+   (scale 0.98) e as bordas dos largos andavam ~8 px. Na /entrar (congelada) muda só este estado. */
+.botao[data-variante='principal']:active:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.botao[data-variante='contorno']:active:not(:disabled) {
+  background: var(--sb-azul-claro);
+}
+
+.botao[data-variante='suave']:active:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-azul-claro) 72%, var(--sb-azul) 28%);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='discreto']:active:not(:disabled) {
+  background: var(--sb-linha);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='perigo']:active:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-erro-claro) 88%, var(--sb-erro) 12%);
+}
+
+.botao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* O principal tem sombra de repouso: o anel se soma a ela, para não sumir nem achatar. */
+.botao[data-variante='principal']:focus-visible {
+  box-shadow: var(--sb-anel), var(--sb-sombra-acao);
+}
+
+/* Desabilitado por regra (verificação pendente, por exemplo): tom, não opacidade. */
+.botao:disabled:not([aria-busy]) {
+  border-color: transparent;
+  background: var(--sb-canvas);
+  box-shadow: none;
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+.botao[aria-busy] {
+  cursor: progress;
+}
+
+.icone {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+
+.depois {
+  transition: transform var(--app-t-touch);
+}
+
+.botao:hover:not(:disabled) .depois {
+  transform: translateX(3px);
+}
+
+.rotulo {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao,
+  .depois {
+    transition: none;
+  }
+
+  .botao:hover:not(:disabled) .depois {
+    transform: none;
+  }
+}

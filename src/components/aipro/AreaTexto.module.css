@@ -1,0 +1,74 @@
+.area {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--sb-controle-campo) * 2);
+  padding: var(--sb-esp-3) var(--sb-esp-4);
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-campo);
+  line-height: var(--sb-lh-corpo);
+  letter-spacing: var(--sb-ls-corpo);
+  resize: vertical;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+/* Cresce com o texto onde há suporte; onde não há, `rows` fixa a altura. */
+@supports (field-sizing: content) {
+  .area {
+    field-sizing: content;
+    max-height: calc(60dvh / var(--app-zoom, 1));
+  }
+}
+
+.area::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.area:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.area:focus-visible {
+  outline: none;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.area[aria-invalid='true'] {
+  border-color: var(--sb-erro);
+}
+
+.area[aria-invalid='true']:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--sb-branco),
+    0 0 0 4px var(--sb-erro);
+}
+
+.area:disabled {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+}
+
+.contador {
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.contador[data-perto] {
+  color: var(--sb-atencao);
+  font-weight: var(--sb-peso-medio);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area {
+    transition: none;
+  }
+}

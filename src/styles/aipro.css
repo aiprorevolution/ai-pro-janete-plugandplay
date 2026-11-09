@@ -1,0 +1,354 @@
+/* =============================================================================
+   AIPRO · tokens da identidade (copiados de /work/projeto-aipro/src/styles/aipro.css)
+
+   Fonte única do visual da Janete: branco e azul AI PRO, arredondado e plano. A marca
+   AI PRO NÃO entra neste projeto; só os tokens, os componentes e as regras de uso.
+
+   Este arquivo só declara. Nada aqui pinta a interface do shadcn/Tailwind que já
+   existe: as telas da Janete marcam a raiz com `data-identidade="aipro"` (ou usam o
+   componente `Pagina`), e só dentro delas a fonte, a cor e o corpo mudam.
+
+   Diferenças em relação ao original:
+   - a família vem do Google Fonts (link no __root.tsx), não de next/font;
+   - a camada antiga (VIA) não existe aqui, então os tempos (--app-t-*), as curvas
+     (--via-ease-*) e a pilha (--via-z-*) que os componentes usam são declarados na
+     seção "Ponte" logo abaixo, com os valores de brand.css, tokens.css e globals.css
+     do projeto-aipro.
+
+   Contraste medido pela fórmula WCAG, sobre o branco salvo indicação.
+   ============================================================================= */
+
+:root {
+  /* ---------- Ponte: tempos, curvas e pilha da camada antiga ---------- */
+
+  /* Curvas (vendor VIA, tokens.css linhas 532-535). */
+  --via-ease: cubic-bezier(0.32, 0.08, 0.24, 1);
+  --via-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --via-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --via-ease-snap: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Durações e atalhos (brand.css linhas 79-86). */
+  --app-motion-state: 140ms;
+  --app-motion-touch: 200ms;
+  --app-motion-reveal: 320ms;
+  --app-motion-scene: 480ms;
+  --app-t-state: var(--app-motion-state) var(--via-ease-snap);
+  --app-t-touch: var(--app-motion-touch) var(--via-ease-snap);
+  --app-t-reveal: var(--app-motion-reveal) var(--via-ease-out);
+  --app-t-scene: var(--app-motion-scene) var(--via-ease-out);
+
+  /* Pilha (globals.css do projeto-aipro). */
+  --via-z-sticky: 40;
+  --via-z-dock: 45;
+  --via-z-overlay: 1000;
+  --via-z-modal: 1100;
+  --via-z-toast: 1200;
+  --via-z-tooltip: 1300;
+
+  /* ---------- Cor: marca ---------- */
+
+  /* 3,27:1 no branco. Preenchimento, ícone, indicador, item ativo e texto de 24px
+     ou mais. Nunca texto pequeno nem rótulo branco dentro de botão. */
+  --sb-azul: #0b91f8;
+  /* 5,71:1 no branco, 4,99:1 no azul claro. Link e todo texto que precisa ser azul. */
+  --sb-azul-texto: #0668b8;
+  /* Fundo do estado ativo, do card do Consultor e de ícones. */
+  --sb-azul-claro: #e2f2fe;
+  /* Hover sutil sobre branco. */
+  --sb-azul-nevoa: #f1f8ff;
+
+  /* 17,9:1 no branco. Ação principal, títulos e texto forte. */
+  --sb-navy: #0e1531;
+  --sb-navy-2: #1c2750;
+  /* Fundo dos momentos escuros. */
+  --sb-palco: #0a1128;
+
+  /* ---------- Cor: texto ---------- */
+
+  --sb-tinta: #0e1531;
+  /* 5,95:1 no branco, 5,54:1 no canvas, 5,20:1 no azul claro. Texto de apoio. */
+  --sb-tinta-2: #5a6478;
+  /* 4,89:1 no branco, 4,56:1 no canvas. Metadado; evitar sobre o azul claro. */
+  --sb-tinta-3: #687186;
+  --sb-tinta-inversa: #ffffff;
+
+  /* ---------- Cor: superfície e linha ---------- */
+
+  --sb-canvas: #f5f7fa;
+  --sb-branco: #ffffff;
+  /* Separadores e contorno decorativo (1,21:1 e 1,39:1). Não bastam para identificar campo. */
+  --sb-linha: #e7eaf0;
+  --sb-linha-forte: #d6dbe5;
+  /* 3,09:1 no branco. Contorno que identifica controle de formulário (WCAG 1.4.11). */
+  --sb-borda-campo: #8a93a6;
+
+  /* ---------- Cor: tintas de categoria ---------- */
+
+  /* Só fundo de selo, chip e ícone. Texto sobre elas é sempre a tinta navy. */
+  --sb-rosa: #fce4ef;
+  --sb-menta: #dff5ea;
+  --sb-areia: #fff2d9;
+
+  /* ---------- Cor: estado ---------- */
+
+  /* Estado se comunica por texto e ícone; a cor reforça, nunca sozinha. */
+  --sb-sucesso: #17845a; /* 4,68:1 no branco; ícone sobre a menta */
+  --sb-atencao: #8a5a00; /* 5,35:1 na areia */
+  --sb-erro: #b42318; /* 6,57:1 no branco, 5,92:1 no erro claro */
+  --sb-erro-claro: #fef0ee;
+
+  /* ---------- Cor: terceiros ---------- */
+
+  /* Verde oficial do logo do WhatsApp: só no glifo. Nenhum texto, fundo ou borda usa. */
+  --sb-whatsapp: #25d366;
+  /* Bloco escuro neutro para logo de terceiro que só funciona sobre escuro (Z-API,
+     Evolution): o "grafite" do F. */
+  --sb-grafite: #16181d;
+
+  /* ---------- Tipografia ---------- */
+
+  /* Poppins e Geist Mono vêm do Google Fonts (link no head do __root.tsx). */
+  --sb-fonte: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sb-fonte-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Três níveis por bloco: título, apoio e metadado. A escala tem oito papéis para
+     cobrir telas diferentes, não para usar oito num mesmo card. */
+  --sb-fs-pagina: clamp(1.75rem, 1.15rem + 1.6vw, 2.5rem); /* 28 a 40px · título da tela */
+  --sb-fs-destaque: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem); /* 22 a 28px · protagonista */
+  --sb-fs-secao: 1.375rem; /* 22px · título de seção */
+  --sb-fs-cartao: 1.0625rem; /* 17px · título de card */
+  --sb-fs-corpo: 0.9375rem; /* 15px · texto e controles */
+  --sb-fs-apoio: 0.84375rem; /* 13,5px · texto secundário e ação compacta */
+  --sb-fs-meta: 0.78125rem; /* 12,5px · data, contagem, rótulo de campo pequeno */
+  --sb-fs-micro: 0.71875rem; /* 11,5px · só selo numérico e pílula de horário */
+  /* Campo de formulário fica em 16px: abaixo disso o iPhone aproxima a tela ao focar. */
+  --sb-fs-campo: 1rem;
+  /* Prosa de vários parágrafos: 16px, o mesmo corpo do campo onde a pessoa escreve. */
+  --sb-fs-leitura: 1rem;
+
+  --sb-peso-regular: 400;
+  --sb-peso-medio: 500;
+  --sb-peso-forte: 600;
+  /* 700 só para numerais gigantes e siglas em capa. Ênfase no texto é tom. */
+  --sb-peso-marca: 700;
+
+  --sb-lh-titulo: 1.15;
+  --sb-lh-cartao: 1.3;
+  --sb-lh-ui: 1.4;
+  --sb-lh-corpo: 1.6;
+
+  /* A Poppins corre larga: pede bem menos tracking negativo que a Geist. */
+  --sb-ls-pagina: -0.022em;
+  --sb-ls-secao: -0.012em;
+  --sb-ls-corpo: -0.003em;
+  --sb-ls-rotulo: 0.01em;
+  --sb-ls-sigla: 0.02em;
+  --sb-ls-capa: -0.032em;
+  --sb-ls-gigante: -0.06em;
+
+  /* ---------- Forma ---------- */
+
+  /* Raio por papel. Concêntrico: raio de dentro = raio de fora − folga. */
+  --sb-r-painel: 28px;
+  --sb-r-card: 24px;
+  --sb-r-item: 16px;
+  --sb-r-mini: 12px;
+  --sb-r-chip: 8px;
+  --sb-r-pilula: 999px;
+
+  /* ---------- Espaço ---------- */
+
+  /* Base 4. Fora desta lista, o valor precisa de motivo escrito. */
+  --sb-esp-1: 4px;
+  --sb-esp-2: 8px;
+  --sb-esp-3: 12px;
+  --sb-esp-4: 16px;
+  --sb-esp-5: 20px;
+  --sb-esp-6: 24px;
+  --sb-esp-7: 28px;
+  --sb-esp-8: 32px;
+  --sb-esp-10: 40px;
+  --sb-esp-12: 48px;
+  --sb-esp-16: 64px;
+
+  /* Papéis de densidade. */
+  --sb-pad-card: 24px;
+  --sb-pad-card-compacto: 20px;
+  --sb-gap-pagina: 24px;
+  --sb-gap-grade: 24px;
+  --sb-gap-lista: 2px;
+
+  /* Alvo de toque e altura de controle. */
+  --sb-controle: 44px;
+  --sb-controle-campo: 48px;
+  --sb-controle-principal: 50px;
+  --sb-item-nav: 44px;
+
+  /* ---------- Layout ---------- */
+
+  --sb-sidebar: 208px;
+  --sb-sidebar-trilho: 72px;
+  --sb-trilho-item-l: 44px;
+  --sb-trilho-item-a: 40px;
+  --sb-topo: 76px;
+  --sb-topo-celular: 64px;
+  --sb-conteudo-max: 1344px;
+  --sb-conteudo-amplo: 1920px;
+  --sb-leitura-max: 760px;
+
+  /* ---------- Elevação ---------- */
+
+  /* Quase plana: o tom separa, a sombra só assenta. */
+  --sb-sombra-card:
+    0 1px 2px color-mix(in srgb, var(--sb-navy) 4%, transparent),
+    0 10px 28px -22px color-mix(in srgb, var(--sb-navy) 22%, transparent);
+  --sb-sombra-flutuante:
+    0 2px 6px color-mix(in srgb, var(--sb-navy) 6%, transparent),
+    0 18px 40px -16px color-mix(in srgb, var(--sb-navy) 30%, transparent);
+  --sb-sombra-acao: 0 12px 26px -16px color-mix(in srgb, var(--sb-navy) 80%, transparent);
+
+  /* ---------- Foco ---------- */
+
+  /* Azul a 3,27:1 sobre o branco atende o mínimo de 3:1 para indicador de foco. */
+  --sb-anel: 0 0 0 2px var(--sb-branco), 0 0 0 4px var(--sb-azul);
+  --sb-anel-escuro: 0 0 0 3px var(--sb-palco), 0 0 0 6px var(--sb-branco);
+
+  /* Breakpoints: 600 · 768 · 900 · 1080 · 1280 · 1440 (n−1 em max-width). */
+
+  /* ---------- Palco: momentos escuros ---------- */
+
+  --sb-palco-tinta: #ffffff;
+  /* 10,46:1 sobre o palco #0a1128. */
+  --sb-palco-tinta-2: #b8c2d9;
+  --sb-palco-superficie: color-mix(in srgb, var(--sb-branco) 8%, transparent);
+  --sb-palco-superficie-forte: color-mix(in srgb, var(--sb-branco) 16%, transparent);
+  --sb-palco-linha: color-mix(in srgb, var(--sb-branco) 14%, transparent);
+
+  /* ---------- Sobreposição e carregamento ---------- */
+
+  /* Fundo atrás de diálogo e folha. A única translucidez da identidade. */
+  --sb-veu: color-mix(in srgb, var(--sb-navy) 48%, transparent);
+  /* Osso do skeleton: 1,15:1 do branco, o bastante para ler forma sem parecer conteúdo. */
+  --sb-esqueleto: #eceff4;
+  --sb-esqueleto-brilho: #f7f9fc;
+
+  /* ---------- Controle e layout ---------- */
+
+  /* Ação dentro de linha e pílula de resumo. */
+  --sb-controle-compacto: 36px;
+  --sb-coluna-apoio: 360px;
+  --sb-coluna-apoio-max: 440px;
+  --sb-coluna-apoio-fluida: clamp(var(--sb-coluna-apoio), 26%, var(--sb-coluna-apoio-max));
+  --sb-lista-max: 1080px;
+  /* Calha horizontal do conteúdo; 16 abaixo de 900. */
+  --sb-pad-pagina: 32px;
+  --sb-pad-pagina-celular: 16px;
+  /* Altura do dock do celular: item 56 + recheio 2 × 8 + borda 2 = 74px numa linha. */
+  --sb-dock-altura: 74px;
+  /* Padding inferior no celular: dock + botão do canto (52) + folgas (42). */
+  --sb-reserva-dock: calc(var(--sb-dock-altura) + 94px);
+  /* Telas de chat: só o dock, preso a max(12px, safe-area) do pé, + 12px de folga. */
+  --sb-reserva-dock-chat: calc(
+    max(var(--sb-esp-3), env(safe-area-inset-bottom)) + var(--sb-dock-altura) + var(--sb-esp-3)
+  );
+
+  /* Curva de retorno físico. Só em `animation`. */
+  --sb-ease-mola: var(--via-ease-spring);
+  /* Passa 1,8% do percurso e assenta. */
+  --sb-ease-assentar: linear(0, 0.37 10%, 0.72 22%, 0.93 36%, 1.018 52%, 1.004 72%, 1);
+  /* Mola leve: passa 4% uma vez e assenta (rigidez 220, amortecimento 18, massa 1). */
+  --sb-ease-mola-leve: linear(0, 0.27 8%, 0.62 18%, 0.9 30%, 1.04 42%, 1.015 56%, 0.996 72%, 1);
+  /* Travessia: sai devagar e chega devagar (in-out cúbica). Percurso longo, como o voo
+     do símbolo entre as etapas. */
+  --sb-ease-travessia: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* =============================================================================
+   Receitas de movimento com nome fixo. Keyframe citado em `animation` dentro de um
+   CSS Module é renomeado pelo escopo: estes dois só valem pelos seletores globais
+   abaixo; em módulo, use [data-entrada]/[data-preencher] e mude só o atraso.
+   ============================================================================= */
+
+@keyframes sb-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes sb-preencher {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Coreografia de entrada da tela: no máximo quatro blocos (ordem 0 a 3). */
+[data-identidade='aipro'] [data-entrada] {
+  animation: sb-entrada var(--app-motion-reveal) var(--via-ease-out) backwards;
+  animation-delay: calc(var(--sb-ordem, 0) * 60ms);
+}
+
+[data-identidade='aipro'] [data-preencher] {
+  transform-origin: left;
+  animation: sb-preencher var(--app-motion-reveal) var(--via-ease-out) backwards;
+}
+
+/* `Pagina entrada={false}` desliga a coreografia da tela inteira. */
+[data-identidade='aipro'][data-sem-entrada] [data-entrada] {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-identidade='aipro'] [data-entrada],
+  [data-identidade='aipro'] [data-preencher] {
+    animation: none;
+  }
+}
+
+/* =============================================================================
+   Escopo da identidade
+
+   Toda tela da Janete marca a raiz com `data-identidade="aipro"`. Fora dele o
+   shadcn/Tailwind continua como está.
+   ============================================================================= */
+
+/* A barra de rolagem aparece e some quando um cartão abre ou fecha e a página passa a caber (ou não)
+   na tela. Sem o espaço reservado, tudo que é centralizado anda uns 15 px para o lado a cada clique
+   ("sai do eixo"). Vale para o app inteiro; em celular, onde a barra flutua, não muda nada. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* A barra de etapas do onboarding (`#onb-nav`) fica presa no topo. Enquanto ela está na tela, toda
+   rolagem até um elemento (scrollIntoView, foco que rola) desconta a altura dela: nada para escondido
+   atrás da barra. Os valores são os de --onb-nav-h (4.5rem; 7.25rem abaixo de 900 px). */
+html:has(#onb-nav:not([data-recolhe])) {
+  scroll-padding-top: 4.5rem;
+}
+
+@media (max-width: 899px) {
+  html:has(#onb-nav:not([data-recolhe])) {
+    scroll-padding-top: 7.25rem;
+  }
+}
+
+[data-identidade='aipro'] {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-corpo);
+  letter-spacing: var(--sb-ls-corpo);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Título herda a família e a cor do escopo; tamanho e peso vêm da classe da tela. */
+[data-identidade='aipro'] :where(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Controles nativos não herdam a fonte do documento: sem isto, um <button> solto
+   saía na fonte do sistema a 13,33px. */
+[data-identidade='aipro'] :where(button, input, select, textarea) {
+  font: inherit;
+}

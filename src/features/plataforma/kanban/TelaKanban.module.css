@@ -1,0 +1,329 @@
+/* O quadro do Kanban 2 (o `.kb` e o `.quadro` do protótipo): a barra em cima e as colunas que rolam
+   para o lado. No computador, o quadro preenche a altura que sobra embaixo do topo (o .platConteudo e a
+   .vista do Kanban já são colunas flex): cada coluna rola por dentro, e a página não cresce com a lista. */
+
+/* A raiz entra entre o .platConteudo e a .vista: ela continua a corrente de flex: 1 da casca. */
+.kbRaiz {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* A VistaArea dá o h1 da área (alvo do tour e dos atalhos da Janete). Como no protótipo e no Chat, o
+   cabeçalho da vista fica só para o leitor de tela, e a barra de ferramentas é a primeira coisa da tela. */
+.kbRaiz > section {
+  gap: 0;
+}
+
+.kbRaiz > section > div:first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A altura: no computador, o que sobra na .vista (o quadro termina a 20 px do fim, pelo padding do
+   .platConteudo), com 520 px no mínimo para janela baixa; no celular, a altura do conteúdo. */
+.kbTela {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .kbTela {
+    flex: 1;
+    height: auto;
+    min-height: 520px;
+  }
+}
+
+.kbQuadro {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+}
+
+/* Ganho e Perdido: dois trilhos de 76 px, um em cima do outro; o aberto vira a coluna estreita. */
+.kbFim {
+  display: flex;
+  flex: 0 0 76px;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 76px;
+  min-height: 0;
+  transition:
+    flex-basis 0.42s var(--sb-ease-assentar),
+    min-width 0.42s var(--sb-ease-assentar);
+}
+
+.kbFim[data-aberta] {
+  flex-basis: 228px;
+  min-width: 228px;
+}
+
+/* Com uma etapa aberta, a outra vira uma linha de 52 px em cima ou embaixo. */
+.kbFim[data-aberta] > button {
+  flex: none;
+  flex-direction: row;
+  justify-content: flex-start;
+  min-height: 52px;
+  padding: 8px 12px;
+}
+
+.kbFim[data-aberta] > button > span:first-child {
+  padding: 0 10px;
+  writing-mode: horizontal-tb;
+}
+
+.kbFim[data-aberta] > button > svg:last-child {
+  margin-left: auto;
+}
+
+.kbVazio {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 24px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: 24px;
+  color: var(--sb-tinta-2);
+  font-size: 0.875rem;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.kbVazio p {
+  max-width: 28rem;
+  margin: 0;
+}
+
+.kbVazioIcone {
+  color: var(--sb-tinta-2);
+}
+
+.kbVazioTitulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: 1.0625rem;
+  font-weight: var(--sb-peso-forte);
+}
+
+.kbLimpar {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+}
+
+.kbLimpar:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.kbLimpar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* As abas do celular: uma etapa por vez. */
+.kbAbas {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  display: flex;
+  flex: none;
+  gap: 6px;
+  margin: 0 -16px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  background: var(--sb-canvas);
+  scrollbar-width: none;
+}
+
+.kbAba {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: 999px;
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.84375rem;
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kbAba svg {
+  width: 16px;
+  height: 16px;
+  color: var(--sb-tinta-3);
+}
+
+/* A aba ativa como o `.chip[aria-pressed=true]` do protótipo: azul-claro com texto azul. */
+.kbAba[aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.kbAba[aria-pressed='true'] svg,
+.kbAba[aria-pressed='true'] .kbAbaConta {
+  color: var(--sb-azul-texto);
+}
+
+.kbAba:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.kbAbaConta {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+}
+
+/* O aviso flutuante ("Você moveu Carla para Qualificado. Desfazer"). */
+.kbToast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 58;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(26rem, calc(100% - 48px));
+  padding: 12px 12px 12px 16px;
+  border-radius: 16px;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: kb-toast 0.32s var(--sb-ease-assentar) both;
+}
+
+.kbToast > svg {
+  flex: none;
+  color: #7cc4ff;
+}
+
+.kbToast button {
+  flex: none;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sb-branco) 14%, transparent);
+  color: var(--sb-tinta-inversa);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+}
+
+.kbToast button:hover {
+  background: color-mix(in srgb, var(--sb-branco) 22%, transparent);
+}
+
+.kbToast button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #7cc4ff;
+}
+
+.kbSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 899px) {
+  .kbTela {
+    gap: 10px;
+    height: auto;
+  }
+
+  .kbQuadro {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* O carrossel do celular: todas as etapas lado a lado, uma por tela (calc(100vw - 32px)), presas no
+     início pelo scroll-snap. A faixa vai de borda a borda; o padding devolve os 16 px de cada lado. */
+  .kbQuadro[data-carrossel] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    scroll-padding: 0 16px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .kbQuadro[data-carrossel]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kbQuadro[data-carrossel] > * {
+    flex: 0 0 calc(100vw - 32px);
+    scroll-snap-align: start;
+  }
+
+  .kbToast {
+    right: 16px;
+    bottom: 96px;
+    left: 16px;
+    max-width: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .kbToast button,
+  .kbLimpar {
+    min-height: 44px;
+  }
+}
+
+@keyframes kb-toast {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kbFim {
+    transition: none;
+  }
+
+  .kbToast {
+    animation: none;
+  }
+}

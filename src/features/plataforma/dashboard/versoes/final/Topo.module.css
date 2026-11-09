@@ -1,0 +1,1760 @@
+/* =============================================================================
+   Dashboard · o topo da versão final, vindo da D ("Órbita"; o funil da D não veio: o palco é o da B
+   em Palco.module.css): a Janete no centro da 2ª fileira, como o eixo de onde os números
+   saem; os cartões brancos do AI PRO em volta; o funil embaixo, espiando na borda da dobra.
+
+   Medidas da dobra 1 (as fileiras são FIXAS: o conteúdo não as estica):
+     1440 × 900 (área visível de ~820 px abaixo do topo de 76 px):
+       herói 80 · gap 20 · fileira 2 (284) · gap 20 · fileira 3 (132) · gap 20 = 556
+       → o funil começa em ~556 e mostra ~264 px: o título (24 + 44), os nomes e os números (20 + 96)
+         e ~80 px do começo das barras.
+     900 a 1439 (1280 × 800, área visível de ~720):
+       herói 72 · gap 16 · fileira 2 (272) · gap 16 · fileira 3 (128) · gap 16 = 520
+       → sobram ~200 px: título, nomes, números e o começo das barras.
+       Em altura menor que 800 (1366 × 768), as fileiras encolhem mais (496), para o "31" dos Perdidos
+       ficar acima do seletor de versão, que é fixo no canto inferior direito (medida a conferir no
+       navegador pela sessão principal).
+   O que cresce com a interação (os problemas da Saúde, as datas do personalizado) abre em painel
+   sobreposto: nada empurra a dobra.
+   Todos os números vêm da fundação; aqui só a forma.
+   ============================================================================= */
+
+.dvd-raiz {
+  --dvd-gap: 20px;
+  /* Onde o cartão do funil prende: embaixo do topo da casca (76 px) com 16 px de folga. */
+  --dvd-topo-fixo: 92px;
+  --dvd-faixa: 72px;
+  --dvd-f2: 284px;
+  --dvd-f3: 132px;
+  --dvd-hero: 80px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--dvd-gap);
+  min-width: 0;
+  color: var(--sb-tinta);
+}
+
+.dvd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- herói ---------- */
+
+.dvd-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px 32px;
+  height: var(--dvd-hero);
+  padding-top: 8px;
+}
+
+.dvd-heroTexto {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.dvd-h1 {
+  margin: 0;
+  font-size: var(--sb-fs-pagina);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.1;
+  letter-spacing: var(--sb-ls-pagina);
+  text-wrap: balance;
+}
+
+/* o h1 recebe foco programático da casca (tabIndex −1, fora da ordem do Tab): um sublinhado discreto no
+   lugar da caixa de foco, que lia como seleção por engano */
+.dvd-h1:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-decoration-color: var(--sb-azul);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.dvd-resumoLinha {
+  margin: 6px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-ui);
+}
+
+.dvd-resumoLinha[data-tom='parada'] {
+  color: var(--sb-erro);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* O lugar da Janete no herói só existe no celular. */
+.dvd-heroJanete {
+  display: none;
+}
+
+/* ---------- período ---------- */
+
+.dvd-periodo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* o <fieldset> tem `min-inline-size: min-content` do navegador: sem zerar, ele nunca encolhe e o
+   overflow-x do celular não age (a página ficava com 474 px e rolava na horizontal) */
+.dvd-segmentos {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  min-inline-size: 0;
+  min-width: 0;
+  max-width: 100%;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.dvd-segmentos legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dvd-seg {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--sb-r-pilula);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.dvd-seg:hover {
+  color: var(--sb-tinta);
+  background: var(--sb-azul-nevoa);
+}
+
+.dvd-seg input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* o ativo é azul-claro com texto azul, como as abas do Kanban e os chips do índice: o único escuro da
+   dobra é o "Precisa de você" */
+.dvd-seg:has(input:checked) {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.dvd-seg:has(input:focus-visible) {
+  box-shadow: var(--sb-anel);
+}
+
+.dvd-periodoMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 12px;
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-align: right;
+}
+
+/* as datas do personalizado: um painel preso ao segmento, alinhado à direita, sem mudar a altura do herói */
+.dvd-datas {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 6;
+  display: grid;
+  gap: 8px;
+  min-width: 300px;
+  padding: 12px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.dvd-datasCampos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dvd-datasCampos label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+}
+
+.dvd-datasCampos input {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+}
+
+.dvd-datasCampos input:focus-visible {
+  outline: none;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.dvd-datasErro {
+  margin: 0;
+  max-width: 40ch;
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-align: right;
+}
+
+/* ---------- as grades dos cartões (fileiras fixas) ---------- */
+
+.dvd-grade2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-rows: var(--dvd-f2);
+  gap: var(--dvd-gap);
+}
+
+/* a coluna de Mensagens é mais larga (1,35): são dois números lado a lado, cada um com a pílula */
+.dvd-grade4 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: var(--dvd-f3);
+  gap: var(--dvd-gap);
+}
+
+/* os 4 cartões entram direto na grade; no celular o grupo vira a grade 2 × 2 */
+.dvd-numeros {
+  display: contents;
+}
+
+/* O cartão base da versão: o do AI PRO (branco, sem borda, raio 24, sombra quase nula), compacto. */
+.dvd-cartao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  padding: 20px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  isolation: isolate;
+}
+
+@supports (corner-shape: squircle) {
+  .dvd-cartao {
+    corner-shape: squircle;
+  }
+}
+
+.dvd-cartaoTopo {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.dvd-rotulo {
+  flex: 0 1 auto;
+  overflow: hidden;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* o rótulo com o (i) ao lado, como um grupo (o atalho do cartão fica do outro lado do topo) */
+.dvd-rotuloGrupo {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* o complemento discreto do rótulo ("· 89% pela Janete"), que empurra o (i) para a direita */
+.dvd-rotuloExtra {
+  flex: 0 1 auto;
+  overflow: hidden;
+  min-width: 0;
+  margin-right: auto;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvd-rotuloExtra::before {
+  content: '· ';
+}
+
+/* o que só cabe a partir de 1440 (o texto inteiro do atalho, o nome de quem está com as não lidas) e
+   a partir de 1600 (a previsão do mês) */
+@media (min-width: 900px) and (max-width: 1439px) {
+  .dvd-soLargo {
+    display: none;
+  }
+}
+
+@media (max-width: 1599px) {
+  .dvd-soMuitoLargo {
+    display: none;
+  }
+}
+
+.dvd-linkCompacto {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: -4px -10px -4px 0;
+  padding: 0 10px;
+  border-radius: var(--sb-r-pilula);
+  color: var(--sb-azul-texto);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--app-t-state);
+}
+
+.dvd-linkCompacto:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.dvd-linkCompacto:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* O pé dos 3 cartões da fileira 2: a linha de apoio à esquerda e o atalho à direita, sempre no mesmo lugar. */
+.dvd-pe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.dvd-pe > p {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  line-height: var(--sb-lh-ui);
+}
+
+/* ---------- números, variação, info, faixa ---------- */
+
+.dvd-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  animation: dvd-troca 0.26s var(--via-ease-out) both;
+}
+
+@keyframes dvd-troca {
+  from {
+    opacity: 0.2;
+    transform: translateY(4px);
+  }
+}
+
+.dvd-var {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 7px;
+  border-radius: var(--sb-r-pilula);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* o sucesso puro sobre a menta é só para ícone (4,1:1); misturado com navy passa de 5,5:1 */
+.dvd-var[data-tom='melhor'] {
+  background: var(--sb-menta);
+  color: color-mix(in srgb, var(--sb-sucesso) 78%, var(--sb-navy));
+}
+
+.dvd-var[data-tom='pior'] {
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+}
+
+.dvd-var[data-tom='custo'] {
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.dvd-var[data-tom='neutro'] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+}
+
+.dvd-varSeta {
+  font-size: 0.9em;
+}
+
+.dvd-info {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.dvd-infoBotao {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -2px -6px -2px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-3);
+  cursor: help;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.dvd-infoBotao:hover,
+.dvd-infoBotao[aria-expanded='true'] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.dvd-infoBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.dvd-infoBalao {
+  position: absolute;
+  right: -6px;
+  bottom: calc(100% + 8px);
+  z-index: var(--via-z-tooltip);
+  width: max-content;
+  max-width: 260px;
+  padding: 8px 12px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-regular);
+  line-height: var(--sb-lh-ui);
+  text-align: left;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity var(--app-t-state),
+    transform var(--app-t-state),
+    visibility var(--app-t-state);
+}
+
+/* aberta, a dica recebe o ponteiro: dá para levar o mouse até ela (WCAG 1.4.13; a saída espera 140 ms) */
+.dvd-infoBalao[data-aberta] {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* no cartão do funil, a dica abre embaixo do botão */
+.dvd-info[data-abaixo] .dvd-infoBalao {
+  top: calc(100% + 8px);
+  bottom: auto;
+  transform: translateY(-2px);
+}
+
+.dvd-info[data-abaixo] .dvd-infoBalao[data-aberta] {
+  transform: translateY(0);
+}
+
+.dvd-faixa {
+  display: block;
+  overflow: visible;
+}
+
+.dvd-faixaArea {
+  fill: var(--sb-azul-claro);
+}
+
+.dvd-faixaLinha {
+  fill: none;
+  stroke: var(--sb-azul);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dvd-faixaLinha2 {
+  fill: none;
+  stroke: var(--sb-navy);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+
+.dvd-faixaPonto {
+  fill: var(--sb-azul);
+}
+
+.dvd-barrinhas {
+  display: block;
+}
+
+.dvd-barrinhas rect {
+  fill: var(--sb-azul);
+}
+
+/* as barrinhas com eixo: o gráfico cresce para preencher o cartão; embaixo, a data inicial, o pico e a
+   data final */
+.dvd-barrinhasCaixa {
+  display: grid;
+  grid-template-rows: minmax(72px, 1fr) auto;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.dvd-barrinhasCaixa > svg {
+  width: 100%;
+  height: 100%;
+  min-height: 72px;
+}
+
+.dvd-barrinhasEixo {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+.dvd-barrinhasEixo > span:nth-child(2) {
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvd-barrinhasFrase {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+}
+
+.dvd-barrinhasFrase b {
+  font-size: var(--sb-fs-secao);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- cartão escuro: Precisa de você ---------- */
+
+.dvd-escuro {
+  color: var(--sb-palco-tinta);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-acao);
+}
+
+.dvd-escuro .dvd-rotulo {
+  color: var(--sb-palco-tinta-2);
+}
+
+/* o pé do escuro é só a linha secundária, numa linha só (reticências como rede de segurança) */
+.dvd-escuro .dvd-pe > p {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--sb-palco-tinta-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* o número e o apoio em 2 linhas curtas ao lado dele, centradas na altura dos 44 px (sem min-height
+   explícita: ela desligava o mínimo pelo conteúdo e o bloco encolhia na fileira fixa) */
+.dvd-precisaNum {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dvd-precisaNum .dvd-num {
+  flex: none;
+  font-size: 2.75rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+}
+
+.dvd-precisaApoio {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-palco-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.35;
+}
+
+.dvd-precisaApoio > span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvd-precisaLista {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dvd-precisaItem {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 36px;
+  padding-right: 4px;
+}
+
+.dvd-precisaNome {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.dvd-precisaNome b {
+  overflow: hidden;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvd-precisaNome span {
+  overflow: hidden;
+  color: var(--sb-palco-tinta-2);
+  font-size: var(--sb-fs-micro);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvd-precisaEspera {
+  color: var(--sb-palco-tinta-2);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* a espera longa fica em branco e forte (as normais em --sb-palco-tinta-2): nada de cor nova */
+.dvd-precisaEspera[data-longa] {
+  color: var(--sb-palco-tinta);
+  font-weight: var(--sb-peso-forte);
+}
+
+/* O botão claro sobre o navy (o Botao do AI PRO é para fundo claro): a pílula compacta do topo. */
+.dvd-botaoClaro {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  margin: -3px 0;
+  padding: 0 12px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--app-t-state);
+}
+
+.dvd-botaoClaro:hover {
+  background: var(--sb-azul-claro);
+}
+
+.dvd-botaoClaro:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel-escuro);
+}
+
+.dvd-precisaCalmo {
+  display: grid;
+  gap: 6px;
+  margin: auto 0;
+}
+
+.dvd-precisaCalmo p {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-ui);
+}
+
+.dvd-precisaCalmo p + p {
+  color: var(--sb-palco-tinta-2);
+  font-size: var(--sb-fs-apoio);
+}
+
+/* ---------- o lugar da Janete: o anel do Kanban agora ---------- */
+
+.dvd-hub {
+  --dvd-anel: 144px;
+  gap: 8px;
+}
+
+/* a Janete no centro exato da fileira: o anel no meio, uma pilha de legenda de cada lado (cada pilha
+   com pelo menos 84 px: "Em qualificação" e "Em negociação" cabem numa linha em 1440) */
+.dvd-hubCorpo {
+  display: grid;
+  grid-template-columns: minmax(84px, 1fr) auto minmax(84px, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: auto 0;
+}
+
+.dvd-anel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--dvd-anel);
+  height: var(--dvd-anel);
+}
+
+/* começa no topo e corre no sentido anti-horário (o espelho vertical inverte o sentido do traço): as 3
+   primeiras etapas varrem o lado esquerdo, onde está a legenda delas */
+.dvd-anelSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg) scaleY(-1);
+}
+
+.dvd-anelSvg circle {
+  fill: none;
+  stroke-width: 8;
+  transition: stroke-dasharray 0.5s var(--via-ease-out);
+}
+
+.dvd-anelTrilho {
+  stroke: var(--sb-linha);
+}
+
+/* no celular a Janete mora no herói: o centro do anel fica com o ícone do Kanban */
+.dvd-anelCentro {
+  display: grid;
+  place-items: center;
+  color: var(--sb-tinta-3);
+}
+
+/* O botão da Janete: do tamanho do símbolo (nunca abaixo de 44), sem moldura; o símbolo some até o pouso. */
+.dvd-janete {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dvd-janete:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* o alvo do voo: o invólucro do tamanho exato do símbolo */
+.dvd-janeteLugar {
+  display: grid;
+  place-items: center;
+}
+
+.dvd-janeteSimbolo {
+  visibility: hidden;
+}
+
+.dvd-janeteSimbolo[data-visivel] {
+  visibility: visible;
+}
+
+/* O assentar do pouso: parte de 1, comprime de leve e volta, sem passar de 1 (nada de bounce). */
+.dvd-janeteSimbolo[data-pousou] {
+  animation: dvd-assenta 0.5s var(--via-ease-out) both;
+}
+
+.dvd-janete::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--sb-azul) 35%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dvd-janete[data-pousou]::after {
+  animation: dvd-halo 0.9s var(--via-ease-out) 0.05s both;
+}
+
+@keyframes dvd-assenta {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.97);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dvd-halo {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--sb-azul) 35%, transparent);
+  }
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 0 26px color-mix(in srgb, var(--sb-azul) 0%, transparent);
+  }
+}
+
+/* a legenda: duas pilhas de 3, o número (15 px) em cima do nome (11,5 px), o ponto do lado do anel */
+.dvd-hubLegenda {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  list-style: none;
+}
+
+.dvd-hubItem {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  grid-template-areas:
+    'ponto n'
+    '. nome';
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 1px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.dvd-hubLegenda[data-lado='esq'] .dvd-hubItem {
+  grid-template-columns: minmax(0, 1fr) 10px;
+  grid-template-areas:
+    'n ponto'
+    'nome .';
+  text-align: right;
+}
+
+.dvd-hubItem[data-discreto] {
+  color: var(--sb-tinta-3);
+}
+
+.dvd-hubPonto {
+  grid-area: ponto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cor);
+}
+
+.dvd-hubN {
+  grid-area: n;
+  font-family: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* O nome é um bloco comum, sem recorte nenhum (o recorte de 2 linhas comia a última letra: "Novc"):
+   em 1440 os nomes cabem numa linha; mais estreito, quebram com hífen (a página é pt-BR) */
+.dvd-hubNome {
+  grid-area: nome;
+  display: block;
+  min-width: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.dvd-hubItem[data-discreto] .dvd-hubNome {
+  color: var(--sb-tinta-3);
+}
+
+/* o rodapé em uma linha só: nada de parágrafo apertado contra o "Abrir o Kanban" (o texto inteiro fica
+   no title do trecho da Janete, que corta com reticências quando falta espaço) */
+.dvd-hubPe {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+}
+
+.dvd-hubPe > span {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.dvd-hubPe > .dvd-hubPeJanete {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- a chegada da Janete no anel (ajuste 3 do equipe) ----------
+   Enquanto ela voa, as partes do anel, as etapas e o rodapé esperam invisíveis (só a opacidade: os
+   textos continuam na árvore); o trilho claro fica, marcando o lugar do pouso. No pouso, o anel se
+   desenha em volta dela, parte por parte e na ordem do traço (uma parte a cada 60 ms, 0,36 s cada), as
+   etapas acendem na mesma ordem (a pilha da esquerda de cima para baixo, a da direita de baixo para
+   cima, como o anel corre), vindo 6 px do lado do anel, e o rodapé entra por último. ~0,8 s no total. */
+.dvd-hub[data-chegada='esperando'] :is(.dvd-anelSvg circle[data-parte], .dvd-hubItem, .dvd-hubPe) {
+  opacity: 0;
+}
+
+/* `backwards`: o 1º quadro vale durante o atraso; no fim, cada parte volta ao valor dela (e a transição
+   do traço continua valendo quando os números mudam depois) */
+.dvd-hub[data-chegada='entrando'] .dvd-anelSvg circle[data-parte] {
+  animation: dvd-anelDesenha 0.36s var(--via-ease-out) backwards;
+  animation-delay: calc(var(--k, 0) * 60ms);
+}
+
+.dvd-hub[data-chegada='entrando'] .dvd-hubItem {
+  --dx: -6px;
+  animation: dvd-etapaAcende 0.34s var(--via-ease-out) backwards;
+  animation-delay: calc(100ms + var(--k, 0) * 60ms);
+}
+
+.dvd-hub[data-chegada='entrando'] .dvd-hubLegenda[data-lado='esq'] .dvd-hubItem {
+  --dx: 6px;
+}
+
+.dvd-hub[data-chegada='entrando'] .dvd-hubPe {
+  animation: dvd-peAcende 0.32s var(--via-ease-out) 0.48s backwards;
+}
+
+@keyframes dvd-anelDesenha {
+  from {
+    stroke-dasharray: 0 460px;
+  }
+  to {
+    stroke-dasharray: var(--traco, 0px) var(--vao, 460px);
+  }
+}
+
+@keyframes dvd-etapaAcende {
+  from {
+    opacity: 0;
+    transform: translateX(var(--dx, 0px));
+  }
+}
+
+@keyframes dvd-peAcende {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* o frio na linguagem do Kanban: o cinza do card esfriando */
+.dvd-frio {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: 50%;
+  background: var(--sb-linha-forte);
+}
+
+/* ---------- saúde ---------- */
+
+/* a frase de estado (a resposta de 5 segundos), com o ponto colorido, numa linha própria embaixo do
+   rótulo; a cor do texto segue o estado */
+.dvd-saudeEstado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+}
+
+.dvd-saudeEstado[data-estado='atencao'] {
+  color: var(--sb-atencao);
+}
+
+.dvd-saudeEstado[data-estado='parado'] {
+  color: var(--sb-erro);
+}
+
+.dvd-saudeEstado .dvd-saudePonto {
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin: 0;
+}
+
+/* a lista centra no espaço que sobra (o cartão folgado do atendente tem 4 itens) */
+.dvd-saudeLista {
+  display: grid;
+  gap: 0;
+  margin: auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* um item: ponto | título + detalhe curto | ação à direita, numa linha de 22 px. Com o detalhe
+   inteiro (parado, atenção, cartão folgado), ele ganha a 2ª linha, na largura toda */
+.dvd-saudeItem {
+  display: grid;
+  grid-template-columns: 10px auto minmax(0, 1fr) auto;
+  grid-template-areas: 'ponto titulo detalhe acao';
+  align-items: baseline;
+  column-gap: 8px;
+  min-height: 22px;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.35;
+}
+
+.dvd-saudeItem[data-inteiro] {
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  grid-template-areas:
+    'ponto titulo acao'
+    '. detalhe detalhe';
+}
+
+.dvd-saudePonto {
+  position: relative;
+  top: -1px;
+  grid-area: ponto;
+  width: 8px;
+  height: 8px;
+  margin-left: 1px;
+  border-radius: 50%;
+  background: var(--sb-sucesso);
+}
+
+/* o ponto é só ícone (3:1 basta): um âmbar mais vivo que o --sb-atencao do texto, que ao lado dos
+   verdes lia como marrom */
+.dvd-saudePonto[data-estado='atencao'] {
+  background: color-mix(in srgb, var(--sb-atencao) 70%, #f5a524);
+}
+
+.dvd-saudePonto[data-estado='parado'] {
+  background: var(--sb-erro);
+}
+
+.dvd-saudeTitulo {
+  grid-area: titulo;
+  font-weight: var(--sb-peso-forte);
+  white-space: nowrap;
+}
+
+.dvd-saudeDetalhe {
+  position: relative;
+  grid-area: detalhe;
+  min-width: 0;
+  color: var(--sb-tinta-2);
+}
+
+.dvd-saudeDetalhe:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: var(--sb-anel);
+}
+
+.dvd-saudeCurto {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* o resto do detalhe, numa dica no hover e no foco (sem title cru) */
+.dvd-saudeDica {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 4;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 10px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-wrap: pretty;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity var(--app-t-state),
+    transform var(--app-t-state),
+    visibility var(--app-t-state);
+}
+
+.dvd-saudeDetalhe:hover .dvd-saudeDica,
+.dvd-saudeDetalhe:focus-visible .dvd-saudeDica {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dvd-saudeLink,
+.dvd-saudeBotao {
+  grid-area: acao;
+  justify-self: end;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-weight: var(--sb-peso-forte);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* dentro do painel dos problemas o link volta a ser um link em fluxo */
+.dvd-problema .dvd-saudeLink {
+  grid-area: auto;
+  justify-self: start;
+}
+
+.dvd-saudeLink:hover,
+.dvd-saudeBotao:hover {
+  text-decoration: underline;
+}
+
+.dvd-saudeLink:focus-visible,
+.dvd-saudeBotao:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: var(--sb-anel);
+}
+
+/* os problemas num painel sobreposto dentro do cartão: rolagem própria, Esc fecha, nada muda de altura */
+.dvd-problemas {
+  position: absolute;
+  top: 54px;
+  right: 16px;
+  left: 16px;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  max-height: calc(100% - 70px);
+  padding: 12px 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  overflow-y: auto;
+}
+
+.dvd-problemasTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--sb-fs-meta);
+}
+
+.dvd-problemas ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dvd-problema {
+  display: grid;
+  gap: 2px;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.35;
+}
+
+.dvd-problema b {
+  font-weight: var(--sb-peso-forte);
+}
+
+.dvd-problema small {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+}
+
+.dvd-problema p {
+  margin: 0;
+  color: var(--sb-tinta-2);
+}
+
+/* ---------- os 4 números ---------- */
+
+.dvd-numCartao {
+  gap: 6px;
+  padding: 16px 20px;
+}
+
+/* o corpo do cartão: o número à esquerda (nunca encolhe), o mini gráfico à direita na mesma linha de
+   base (até 88 × 28; só encolhe quando o número é largo) e a linha de apoio embaixo, na largura toda.
+   A linha de apoio não define a largura das colunas (contain: inline-size): ela usa a largura do
+   cartão e corta com reticências, e o gráfico fica com a sobra inteira, até os 88 px. */
+.dvd-numCorpo {
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, 88px);
+  grid-template-areas:
+    'valor grafico'
+    'apoio apoio';
+  align-items: end;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.dvd-numCorpo > .dvd-numValor,
+.dvd-numCorpo > .dvd-numDuplo {
+  grid-area: valor;
+}
+
+.dvd-numCorpo > .dvd-numApoio {
+  grid-area: apoio;
+  contain: inline-size;
+}
+
+.dvd-numCorpo > .dvd-numValor {
+  justify-self: start;
+}
+
+.dvd-numGrafico {
+  grid-area: grafico;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  margin-bottom: 3px;
+}
+
+.dvd-numGrafico > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mensagens: o gráfico embaixo das duas colunas, na largura inteira */
+.dvd-numCorpo[data-grafico-embaixo] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'valor'
+    'grafico';
+}
+
+.dvd-numCorpo[data-grafico-embaixo] .dvd-numGrafico {
+  height: 18px;
+  margin-bottom: 0;
+}
+
+/* a barra dividida da autonomia (a Janete em azul, a equipe em navy) */
+.dvd-numBarra {
+  display: block;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--sb-navy);
+  overflow: hidden;
+}
+
+.dvd-numBarra > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--sb-azul);
+}
+
+.dvd-numValor {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.dvd-numValor .dvd-num {
+  flex: none;
+  font-size: 1.875rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.1;
+}
+
+/* Mensagens: em cada metade, o rótulo micro em cima e o número com a pílula ao lado (a pílula desce
+   quando não cabe) */
+.dvd-numValor[data-duplo] {
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+
+.dvd-numValor[data-duplo] .dvd-num {
+  font-size: 1.375rem;
+}
+
+.dvd-numDuplo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.dvd-numDuplo > div {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.dvd-numDuplo small {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+  line-height: 1.2;
+}
+
+/* a linha de apoio: UMA linha, a pílula e o texto, com reticências como rede de segurança */
+.dvd-numApoio {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+}
+
+.dvd-numApoio > .dvd-var {
+  flex: none;
+}
+
+.dvd-numApoio > span:not(.dvd-var) {
+  flex: 0 1 auto;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+/* a mesma frase nos 4 cartões, centrada e com a mesma largura máxima: quebra igual em todos */
+.dvd-numVazio {
+  max-width: 17ch;
+  margin: auto;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ---------- carregando ---------- */
+
+.dvd-ossoNumero {
+  display: grid;
+  gap: 8px;
+}
+
+/* ---------- a região viva ---------- */
+
+.dvd-vivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- larguras médias (900 a 1439): a mesma grade, mais apertada ---------- */
+
+@media (min-width: 900px) and (max-width: 1439px) {
+  .dvd-raiz {
+    --dvd-gap: 16px;
+    --dvd-f2: 272px;
+    --dvd-f3: 128px;
+    --dvd-hero: 72px;
+  }
+
+  .dvd-hero {
+    gap: 12px 20px;
+    padding-top: 4px;
+  }
+
+  .dvd-seg {
+    padding: 0 11px;
+  }
+
+  .dvd-cartao {
+    gap: 8px;
+  }
+
+  .dvd-hub {
+    --dvd-anel: 116px;
+  }
+
+  .dvd-numValor .dvd-num {
+    font-size: 1.625rem;
+  }
+
+  .dvd-precisaNum .dvd-num {
+    font-size: 2.5rem;
+  }
+
+  .dvd-precisaItem {
+    min-height: 34px;
+  }
+
+  .dvd-hubLegenda {
+    gap: 6px;
+  }
+
+  .dvd-numCorpo {
+    grid-template-columns: minmax(max-content, 1fr) minmax(0, 72px);
+  }
+
+  /* Mensagens: a pílula fica na mesma linha do número (o cartão tem 128 px fixos: nada de quebra que
+     empurre o gráfico até a borda de baixo) */
+  .dvd-numValor[data-duplo] {
+    flex-wrap: nowrap;
+  }
+
+  .dvd-numValor[data-duplo] .dvd-num {
+    font-size: 1.125rem;
+  }
+
+  .dvd-numGrafico {
+    height: 24px;
+  }
+}
+
+/* janela baixa (1366 × 768): as fileiras encolhem mais, para o funil espiar e o seletor de versão não cobrir os Perdidos */
+@media (min-width: 900px) and (max-height: 799px) {
+  .dvd-raiz {
+    --dvd-gap: 12px;
+    --dvd-f3: 120px;
+    --dvd-hero: 68px;
+  }
+
+  .dvd-hero {
+    padding-top: 0;
+  }
+}
+
+/* 1024: 8 colunas, cartões de resumo 2 por linha (as fileiras voltam a ser do tamanho do conteúdo). */
+@media (min-width: 900px) and (max-width: 1079px) {
+  .dvd-grade2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: minmax(var(--dvd-f2), auto);
+  }
+
+  .dvd-grade2 > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .dvd-grade4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: minmax(var(--dvd-f3), auto);
+  }
+
+  .dvd-hero {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: var(--dvd-hero);
+  }
+
+  .dvd-periodo {
+    justify-items: start;
+  }
+
+  .dvd-datas {
+    right: auto;
+    left: 0;
+  }
+
+  .dvd-periodoMeta {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+/* ---------- celular ---------- */
+
+@media (max-width: 899px) {
+  .dvd-raiz {
+    --dvd-topo-fixo: 0px;
+    --dvd-gap: 16px;
+  }
+
+  .dvd-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    height: auto;
+    min-height: 0;
+    padding-top: 4px;
+  }
+
+  .dvd-h1 {
+    font-size: 1.625rem;
+  }
+
+  .dvd-heroJanete {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-top: -2px;
+  }
+
+  .dvd-periodo {
+    justify-items: start;
+    max-width: 100%;
+  }
+
+  /* a fileira do período rola para o lado: a borda direita esmaece em 24 px (o "Personalizado" cortado
+     no meio parecia erro) */
+  .dvd-segmentos {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .dvd-segmentos:not(:has(.dvd-datas)) {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+
+  /* o rótulo dos cartões pode quebrar em 2 linhas ("Tempo de resposta" inteiro) */
+  .dvd-rotulo {
+    white-space: normal;
+  }
+
+  .dvd-segmentos::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* alvo de toque de 44 px (seção 11) */
+  .dvd-seg {
+    min-height: 44px;
+  }
+
+  .dvd-periodoMeta {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  /* o painel das datas fica em fluxo no celular (não há dobra a preservar) */
+  .dvd-datas {
+    position: static;
+    min-width: 0;
+    padding: 8px 0 0;
+    box-shadow: none;
+  }
+
+  .dvd-datasCampos {
+    justify-content: flex-start;
+  }
+
+  .dvd-datasCampos input {
+    min-height: 44px;
+  }
+
+  .dvd-datasErro {
+    text-align: left;
+  }
+
+  /* a ordem é a do DOM (seção 11): a tela só empilha; os 4 números viram a grade 2 × 2 */
+  .dvd-grade4 {
+    display: contents;
+  }
+
+  .dvd-numeros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dvd-numCartao {
+    padding: 14px 16px;
+  }
+
+  /* só o número, a variação e o mini gráfico (seção 11): o texto de apoio e o complemento do rótulo
+     somem; a variação (também um <span> no mesmo <p>) fica */
+  .dvd-numCartao p.dvd-numApoio > span:not(.dvd-var) {
+    display: none;
+  }
+
+  .dvd-numCartao p.dvd-numApoio:not(:has(.dvd-var)) {
+    display: none;
+  }
+
+  .dvd-rotuloExtra {
+    display: none;
+  }
+
+  /* o mini gráfico embaixo do número, na largura inteira */
+  .dvd-numCorpo,
+  .dvd-numCorpo[data-grafico-embaixo] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'valor'
+      'apoio'
+      'grafico';
+  }
+
+  .dvd-numGrafico,
+  .dvd-numCorpo[data-grafico-embaixo] .dvd-numGrafico {
+    height: 20px;
+    margin-bottom: 0;
+  }
+
+  .dvd-numDuplo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .dvd-hub {
+    --dvd-anel: 120px;
+  }
+
+  .dvd-hubCorpo {
+    gap: 8px;
+  }
+
+  .dvd-linkCompacto,
+  .dvd-botaoClaro,
+  .dvd-saudeBotao {
+    min-height: 44px;
+  }
+
+  .dvd-infoBotao {
+    width: 44px;
+    height: 44px;
+    margin: -8px -14px -8px 0;
+  }
+
+  .dvd-problemas {
+    position: static;
+    max-height: none;
+    padding: 10px 12px;
+    background: var(--sb-canvas);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dvd-num,
+  .dvd-janeteSimbolo[data-pousou],
+  .dvd-janete[data-pousou]::after,
+  .dvd-hub[data-chegada] :is(.dvd-anelSvg circle[data-parte], .dvd-hubItem, .dvd-hubPe) {
+    animation: none;
+  }
+
+  /* sem voo não há espera; se houver, nada fica escondido */
+  .dvd-hub[data-chegada='esperando'] :is(.dvd-anelSvg circle[data-parte], .dvd-hubItem, .dvd-hubPe) {
+    opacity: 1;
+  }
+
+  .dvd-seg,
+  .dvd-infoBalao,
+  .dvd-anelSvg circle {
+    transition: none;
+  }
+}

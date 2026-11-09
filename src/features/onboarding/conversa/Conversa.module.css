@@ -1,0 +1,859 @@
+/* =============================================================================
+   4 · Conversa (E4): duas colunas, o chat abre a partir do avatar onde a Janete pousou.
+   Copiado de F-Final.dc.html (.pagina, .t4-grade, .chat*, .msg*, .resumo*, .pontos,
+   .compositor, .entrada, .enviar, .montar, .saber*, .barra, .passo28 e
+   os keyframes), com as curvas locais do F trocadas pelos tokens:
+     --e-out → --via-ease-out   --e-snap → --via-ease-snap   --e-via → --via-ease
+     --e-trav → --sb-ease-travessia   --sh-card → --sb-sombra-card   --anel → --sb-anel
+   ============================================================================= */
+
+.pagina {
+  width: min(100%, 1344px);
+  margin: 0 auto;
+  padding: 32px 32px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  color: var(--sb-tinta);
+  animation: tela-entra 0.5s var(--via-ease-out) backwards;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(320px, 30%, 420px);
+  gap: 24px;
+  align-items: start;
+}
+
+/* ---------- o painel do chat ---------- */
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  height: min(48rem, calc(100vh - var(--onb-nav-h, 4.5rem) - 6rem));
+  height: min(48rem, calc(100dvh - var(--onb-nav-h, 4.5rem) - 6rem));
+  min-height: 32rem;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.painel[data-chat="espera"] {
+  clip-path: circle(0px at var(--o));
+}
+
+.painel[data-chat="abrindo"] {
+  animation: chat-abre 0.66s var(--via-ease-out) both;
+}
+
+/* "Pode montar" (E6): o chat se recolhe no avatar antes de a Janete partir para o preparo */
+.painel[data-chat="fechando"] {
+  animation: chat-fecha 0.5s var(--sb-ease-travessia) both;
+}
+
+.cab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 12px 20px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+
+/* enquanto a Janete pousa, o avatar fica vazio; ao abrir, a troca é instantânea */
+.avatar[data-oculto] {
+  opacity: 0;
+}
+
+.id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.id h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+}
+
+.estado {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.estado[data-ativo] {
+  color: var(--sb-azul-texto);
+}
+
+.contador {
+  margin-left: auto;
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+}
+
+.rolo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* reserva o espaço da barra de rolagem: quando a conversa passa da altura, os balões não andam (5a) */
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 24px 24px 16px;
+  /* o fundo do chat, como o papel de parede do WhatsApp: os balões brancos da Janete se destacam nele */
+  background: var(--sb-canvas);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  /* dentro de um grupo (mensagens seguidas do mesmo autor), os balões ficam colados */
+  gap: 3px;
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(88%, 40rem);
+  /* a pontinha sai 10 px para fora do balão: a margem guarda o lugar dela em todos os balões do
+     grupo, para que fiquem alinhados entre si */
+  padding: 0 10px;
+  animation: msg-entra 0.45s var(--via-ease-out) both;
+}
+
+.msg[data-turno] {
+  margin-top: 14px;
+}
+
+.msg[data-turno]:first-child {
+  margin-top: 0;
+}
+
+.msg[data-de="eu"] {
+  align-self: flex-end;
+  align-items: flex-end;
+  animation-name: msg-entra-eu;
+}
+
+/* ---------- balões no formato do WhatsApp (decisão 3a) ----------
+   A Janete à esquerda, em branco com borda suave; a pessoa à direita, em azul-marinho.
+   Sem horário e sem "vistos". O primeiro balão de cada grupo (data-turno) tem a pontinha no
+   canto de cima, do lado de quem fala; os seguintes, não. */
+
+.bolha {
+  --bolha-fundo: var(--sb-branco);
+  --bolha-borda: var(--sb-linha);
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--bolha-borda);
+  border-radius: 14px;
+  background: var(--bolha-fundo);
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--sb-navy) 6%, transparent);
+}
+
+.msg[data-de="eu"] .bolha {
+  --bolha-fundo: var(--sb-navy);
+  --bolha-borda: var(--sb-navy);
+  color: var(--sb-branco);
+}
+
+.msg[data-turno][data-de="janete"] .bolha,
+.msg[data-turno][data-de="resumo"] .bolha {
+  border-top-left-radius: 0;
+}
+
+.msg[data-turno][data-de="eu"] .bolha {
+  border-top-right-radius: 0;
+}
+
+/* a pontinha: um triângulo na cor da borda e, por cima, um menor na cor do fundo */
+.msg[data-turno] .bolha::before,
+.msg[data-turno] .bolha::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.msg[data-turno] .bolha::before {
+  top: -1px;
+  left: -10px;
+  width: 10px;
+  height: 14px;
+  background: var(--bolha-borda);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.msg[data-turno] .bolha::after {
+  top: 0;
+  left: -8px;
+  width: 9px;
+  height: 12px;
+  background: var(--bolha-fundo);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.msg[data-turno][data-de="eu"] .bolha::before {
+  left: auto;
+  right: -10px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.msg[data-turno][data-de="eu"] .bolha::after {
+  left: auto;
+  right: -8px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.texto {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--sb-tinta);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.msg[data-de="eu"] .texto {
+  color: var(--sb-branco);
+}
+
+/* o "digitando" também vem num balão */
+.bolha[data-digitando] {
+  padding: 6px 14px;
+}
+
+/* o resumo: largura fixa, para que abrir ou fechar uma linha não mexa no balão (decisão 5a) */
+.bolha[data-resumo] {
+  width: min(30rem, 100%);
+  padding: 12px 8px 8px;
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resumoCab {
+  margin: 0;
+  padding: 0 8px 6px;
+  font-size: 0.78125rem;
+  font-weight: 500;
+  color: var(--sb-tinta-3);
+}
+
+.resumoLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resumoLinha {
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* cada linha é um botão: clicar troca a linha por uma caixa de texto (decisão 3b) */
+.resumoBotao {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) 14px;
+  grid-template-areas: "rotulo valor icone";
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--sb-fonte);
+  font-size: 0.84375rem;
+  line-height: 1.45;
+  text-align: left;
+  color: var(--sb-tinta);
+  cursor: pointer;
+  transition: background-color 140ms var(--via-ease-snap);
+}
+
+.resumoBotao:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.resumoBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.resumoBotao:disabled {
+  cursor: default;
+}
+
+.resumoRotulo {
+  grid-area: rotulo;
+  color: var(--sb-tinta-2);
+}
+
+.resumoValor {
+  grid-area: valor;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.resumoIcone {
+  grid-area: icone;
+  margin-top: 3px;
+  color: var(--sb-tinta-3);
+  opacity: 0;
+  transition: opacity 140ms var(--via-ease-snap);
+}
+
+.resumoBotao:hover:not(:disabled) .resumoIcone,
+.resumoBotao:focus-visible .resumoIcone {
+  opacity: 1;
+}
+
+.resumoBotao:disabled .resumoIcone {
+  display: none;
+}
+
+/* a caixa de texto que entra no lugar da linha, com Salvar e Cancelar */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 8px;
+}
+
+.editor textarea {
+  min-height: 0;
+  /* ao abrir, a caixa rola até a vista com folga: em cima, o rótulo do campo; embaixo, Salvar e Cancelar */
+  scroll-margin-top: 2.25rem;
+  scroll-margin-bottom: 4rem;
+}
+
+.editorAcoes {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pontos {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+}
+
+.pontos i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-tinta-3);
+  animation: ponto 1.1s var(--via-ease) infinite;
+}
+
+.pontos i:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.pontos i:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+/* ---------- a base: montar ou compositor ---------- */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+.montar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: sb-entrada 0.5s var(--via-ease-out) both;
+}
+
+.ajuda {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.montar .ajuda {
+  text-align: center;
+}
+
+.compositor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 60px;
+  padding: 6px 6px 6px 22px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: 30px;
+  background: var(--sb-branco);
+  transition:
+    border-color 140ms var(--via-ease-snap),
+    box-shadow 140ms var(--via-ease-snap);
+}
+
+.compositor:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.compositor:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.entrada {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  text-overflow: ellipsis;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--sb-fonte);
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--sb-tinta);
+}
+
+.entrada::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.entrada:focus,
+.entrada:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.enviar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  cursor: pointer;
+  transition: background-color 140ms var(--via-ease-snap);
+}
+
+/* o clique se marca só pela cor: o botão não muda de tamanho (decisão 5a) */
+.enviar:hover:not(:disabled),
+.enviar:active:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.enviar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.enviar:disabled {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+/* ---------- "O que eu já sei" ---------- */
+
+.saber {
+  /* no DOM o painel vem antes do chat (ordem do Tab no celular); no largo, fica na coluna da direita */
+  order: 1;
+  position: sticky;
+  top: calc(var(--onb-nav-h, 4.5rem) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  /* Só fade (decisão do equipe, 29/10): o painel não desliza para o lado ao aparecer nem ao sumir. */
+  transition: opacity 0.5s var(--via-ease-out);
+}
+
+.saber[data-oculto] {
+  opacity: 0;
+}
+
+.saberTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.saberTopo h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.saberConta {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  color: var(--sb-tinta-2);
+}
+
+.barra {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sb-azul-claro);
+  overflow: hidden;
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--sb-azul);
+  transform-origin: left center;
+  transition: transform 0.7s var(--via-ease-out);
+}
+
+.saberUltimo {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.meta {
+  font-size: 0.78125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--sb-tinta-3);
+}
+
+.saberUltimoValor {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 500;
+}
+
+.saberLista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saberLinha {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 2px;
+  padding: 10px 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.saberLinha:first-child {
+  border-top: 0;
+}
+
+.saberLinha[data-nova] {
+  animation: linha-flash 1.8s var(--via-ease-out);
+}
+
+.passo {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  font-weight: 600;
+  color: var(--sb-tinta-3);
+  transition:
+    background-color 0.4s,
+    color 0.4s;
+}
+
+.passo svg {
+  display: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.saberLinha[data-situacao="atual"] .passo {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.saberLinha[data-situacao="cheia"] .passo {
+  background: var(--sb-menta);
+  color: var(--sb-sucesso);
+}
+
+.saberLinha[data-situacao="cheia"] .passo span {
+  display: none;
+}
+
+.saberLinha[data-situacao="cheia"] .passo svg {
+  display: block;
+}
+
+.saberRotulo {
+  font-size: 0.78125rem;
+  font-weight: 500;
+  color: var(--sb-tinta-3);
+}
+
+.saberValor {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  animation: valor-entra 0.6s var(--via-ease-out) both;
+}
+
+.saberVazio {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-3);
+}
+
+.saberLinha[data-situacao="atual"] .saberVazio {
+  color: var(--sb-azul-texto);
+}
+
+@keyframes tela-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sb-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes chat-abre {
+  from {
+    clip-path: circle(20px at var(--o));
+  }
+  to {
+    clip-path: circle(150% at var(--o));
+  }
+}
+
+@keyframes chat-fecha {
+  from {
+    clip-path: circle(150% at var(--o));
+  }
+  to {
+    clip-path: circle(20px at var(--o));
+  }
+}
+
+@keyframes msg-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes msg-entra-eu {
+  from {
+    opacity: 0;
+    transform: translate(8px, 6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ponto {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+/* Cada valor novo entra só com fade, sem vir do lado (decisão do equipe, 29/10). */
+@keyframes valor-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes linha-flash {
+  0% {
+    background-color: var(--sb-azul-nevoa);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* ---------- responsivo (os cortes do F) ---------- */
+
+@media (max-width: 1279px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+@media (max-width: 899px) {
+  .pagina {
+    padding: 20px 16px 64px;
+    gap: 24px;
+  }
+
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .saber {
+    position: static;
+    order: 0;
+  }
+
+  .saberLista {
+    display: none;
+  }
+
+  /* no celular o painel mostra só a barra e o "Acabei de aprender", também no fim: a edição é no chat */
+  .saberUltimo {
+    display: flex;
+  }
+
+  .painel {
+    height: calc(100vh - var(--onb-nav-h-celular, 7.25rem) - 15rem);
+    height: calc(100dvh - var(--onb-nav-h-celular, 7.25rem) - 15rem);
+    min-height: 26rem;
+  }
+}
+
+@media (max-width: 599px) {
+  /* no fim, o estado já diz "pronta para montar": o contador sai e o cabeçalho fica em uma linha */
+  .estado {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cab[data-fim] .contador {
+    display: none;
+  }
+
+  .resumoBotao {
+    grid-template-columns: minmax(0, 1fr) 14px;
+    grid-template-areas:
+      "rotulo icone"
+      "valor icone";
+    row-gap: 0;
+  }
+
+  /* no toque não há hover: o lápis fica sempre à vista */
+  .resumoBotao:not(:disabled) .resumoIcone {
+    opacity: 1;
+  }
+
+  .rolo {
+    padding: 16px 12px 12px;
+  }
+
+  .msg {
+    max-width: 92%;
+  }
+
+  .saber {
+    padding: 20px;
+  }
+}
+
+/* movimento reduzido: estado final no primeiro quadro */
+@media (prefers-reduced-motion: reduce) {
+  .pagina,
+  .pagina *,
+  .pagina *::before,
+  .pagina *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}

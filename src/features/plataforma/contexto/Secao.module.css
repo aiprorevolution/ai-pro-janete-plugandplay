@@ -1,0 +1,656 @@
+/* =========================================================
+   A seção da área (Contexto 6, .ctx-sec): o palco troca o mapa por 3 colunas, sem linha nenhuma.
+   Esquerda: o Voltar, o disco da área, o nome e os outros 2 discos pequenos.
+   Meio: a lista da área. Direita: o editor de um item por vez (Editor.module.css).
+   A seção ocupa a altura que o palco der (flex: 1 num pai em coluna, ou 100% de um pai com altura);
+   só a lista e o editor rolam por dentro.
+   ========================================================= */
+.secao {
+  --sc1: clamp(216px, 22%, 260px);
+  --sc2: clamp(240px, 24%, 300px);
+  --ds: clamp(140px, min(13.5vw, 22vh), 200px);
+  --dm: 60px;
+  position: relative;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--sc1) var(--sc2) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: 28px;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  animation: sec-aparece 0.22s var(--via-ease-out) backwards;
+}
+
+.secao:focus {
+  outline: none;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- esquerda: só o disco ---------- */
+.esq {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.voltar {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  min-height: var(--sb-controle);
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  cursor: pointer;
+  flex: none;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.voltar:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.voltar:active {
+  transform: scale(0.98);
+}
+
+.voltar svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-canvas);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-medio);
+  color: var(--sb-tinta-3);
+}
+
+.atual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* o disco grande: a caixa tem o tamanho do disco e desenha o chão embaixo dele */
+.discoCaixa {
+  --d: var(--ds);
+  position: relative;
+  display: block;
+  flex: none;
+  width: var(--d);
+  height: calc(var(--d) * 0.98);
+}
+
+.discoCaixa::before {
+  content: "";
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: calc(var(--d) * 0.9);
+  height: calc(var(--d) * 0.16);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-navy) 20%, transparent), transparent);
+}
+
+/* o Disco (Pilha.tsx) põe o --d em linha; o !important deixa o tamanho seguir a tela */
+.discoG {
+  --d: var(--ds) !important;
+  --t: calc(var(--d) * 0.028) !important;
+}
+
+.nome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.nomeIn {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: 2px;
+  min-width: 0;
+  animation: sec-troca 0.26s var(--via-ease-out) backwards;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--sb-fs-secao);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.2;
+  letter-spacing: -0.014em;
+  text-wrap: balance;
+}
+
+.titulo:focus {
+  outline: none;
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+  color: var(--sb-tinta-3);
+}
+
+.outros {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 28px;
+}
+
+.troca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 88px;
+  padding: 8px 10px 10px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font: inherit;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-cartao);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.troca:hover {
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+.troca:active {
+  transform: scale(0.98);
+}
+
+.troca:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.trocaCaixa {
+  --d: var(--dm);
+  position: relative;
+  display: block;
+  flex: none;
+  width: var(--d);
+  height: calc(var(--d) * 0.98);
+  transition: transform 0.25s var(--via-ease-snap);
+}
+
+.trocaCaixa::before {
+  content: "";
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: calc(var(--d) * 0.9);
+  height: calc(var(--d) * 0.16);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-navy) 20%, transparent), transparent);
+}
+
+.discoP {
+  --d: var(--dm) !important;
+  --t: calc(var(--d) * 0.06) !important;
+}
+
+.troca:hover .trocaCaixa {
+  transform: translateY(-2px);
+}
+
+/* a face do disco pequeno acende no hover e no foco (a face tem o id ctx-sd-face-<grupo>) */
+.secao .troca:hover [id^="ctx-sd-face-"],
+.secao .troca:focus-visible [id^="ctx-sd-face-"] {
+  background: color-mix(in srgb, var(--sb-navy) 86%, var(--sb-azul));
+  box-shadow:
+    0 0 0 1.5px var(--sb-azul),
+    0 0 12px color-mix(in srgb, var(--sb-azul) 40%, transparent);
+}
+
+.trocaRot {
+  white-space: nowrap;
+}
+
+/* computador largo: o bloco do disco, do nome e dos pequenos fica centrado abaixo do Voltar */
+@media (min-width: 1280px) {
+  .secao:not([data-estreita]) .atual {
+    margin-top: auto;
+    padding-top: 16px;
+  }
+
+  .secao:not([data-estreita]) .outros {
+    margin-bottom: auto;
+  }
+}
+
+/* ---------- meio: a lista da área, no estilo das linhas do mapa, com o nome à esquerda ---------- */
+.lista {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: -4px -8px 0;
+  padding: 4px 8px 16px;
+}
+
+.listaIn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: sec-troca 0.28s var(--via-ease-out) backwards;
+}
+
+.li {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 14px 8px 8px;
+  border: 0;
+  border-radius: var(--sb-r-item);
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  flex: none;
+  transition:
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.li:hover {
+  background: var(--sb-esqueleto);
+}
+
+.li[aria-current="true"] {
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  font-weight: var(--sb-peso-forte);
+}
+
+/* o anel só com teclado; o foco que vem de um clique não desenha anel */
+.li:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.li[data-sem-anel]:focus-visible {
+  box-shadow: none;
+}
+
+.li[data-sem-anel][aria-current="true"]:focus-visible {
+  box-shadow: var(--sb-sombra-card);
+}
+
+.liNome {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+.liVazio .liNome {
+  color: var(--sb-tinta-2);
+}
+
+.liNovo .liNome {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-forte);
+}
+
+.liNovo .ico {
+  color: var(--sb-azul-texto);
+}
+
+.liMuda .liNome {
+  color: var(--sb-atencao);
+}
+
+/* no teto de 50 perguntas: o "Novo item livre" fica apagado e mostra o motivo embaixo do nome */
+.li[data-desligado] {
+  cursor: not-allowed;
+}
+
+.li[data-desligado]:hover {
+  background: transparent;
+}
+
+.li[data-desligado] .liNome,
+.li[data-desligado] .ico {
+  color: var(--sb-tinta-2);
+}
+
+.liMotivo {
+  grid-column: 2;
+  min-width: 0;
+  margin-top: 2px;
+  font-size: 0.78125rem;
+  line-height: 1.35;
+  color: var(--sb-tinta-2);
+}
+
+/* ---------- o círculo do ícone: o contorno conta a situação ----------
+   contorno azul (a Janete sabe), cinza tracejado (ainda vazio) ou anel azul claro (não salvo) */
+.ico {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1.5px var(--sb-azul);
+  color: var(--sb-tinta);
+  transition:
+    box-shadow 0.35s var(--via-ease-out),
+    color 0.35s var(--via-ease-out),
+    background-color 0.35s var(--via-ease-out);
+}
+
+.ico svg {
+  width: 17px;
+  height: 17px;
+}
+
+.icoVazio {
+  background: transparent;
+  box-shadow: none;
+  color: var(--sb-tinta-2);
+}
+
+.icoVazio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--sb-borda-campo);
+}
+
+.icoRasc {
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--sb-azul) 55%, var(--sb-branco)),
+    0 0 0 3px var(--sb-azul-nevoa);
+}
+
+.icoAntiga {
+  box-shadow: inset 0 0 0 1.5px var(--sb-borda-campo);
+}
+
+.g36 {
+  width: 36px;
+  height: 36px;
+}
+
+.g36 svg {
+  width: 18px;
+  height: 18px;
+}
+
+.g40 {
+  width: 40px;
+  height: 40px;
+}
+
+.g40 svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- o aviso de versão salva ---------- */
+.toast {
+  position: fixed;
+  left: calc(50% + 120px);
+  bottom: 28px;
+  z-index: var(--via-z-toast);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 12px 18px 12px 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  box-shadow: var(--sb-sombra-flutuante);
+  pointer-events: none;
+  animation: sec-toast 0.42s var(--via-ease-spring) backwards;
+}
+
+.toastIc {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--sb-azul);
+}
+
+/* ---------- até 1279 px: o disco numa faixa no alto, a lista e o editor embaixo ---------- */
+@media (min-width: 900px) and (max-width: 1279px) {
+  .secao:not([data-estreita]) {
+    --ds: 76px;
+    --dm: 42px;
+    grid-template-columns: minmax(220px, 36%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    row-gap: 14px;
+    column-gap: 20px;
+  }
+
+  .secao:not([data-estreita]) .esq {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .secao:not([data-estreita]) .voltar {
+    align-self: center;
+  }
+
+  .secao:not([data-estreita]) .atual {
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 0;
+    width: auto;
+  }
+
+  .secao:not([data-estreita]) .nome {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .secao:not([data-estreita]) .outros {
+    margin: 0 0 0 auto;
+    width: auto;
+    gap: 4px;
+  }
+
+  .secao:not([data-estreita]) .troca {
+    min-width: 72px;
+    padding: 4px 8px 6px;
+  }
+}
+
+/* ---------- celular: uma folha em tela cheia; no alto o disco e os outros 2 ao lado; a lista embaixo ---------- */
+.secao[data-estreita] {
+  --ds: 92px;
+  --dm: 46px;
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-overlay);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 16px calc(32px + env(safe-area-inset-bottom));
+  background: var(--sb-canvas);
+  animation: sec-folha 0.36s var(--via-ease-out) backwards;
+}
+
+.secao[data-estreita] .esq {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "voltar nome"
+    "disco outros";
+  align-items: center;
+  column-gap: 14px;
+  row-gap: 12px;
+  flex: none;
+}
+
+.secao[data-estreita] .voltar {
+  grid-area: voltar;
+}
+
+.secao[data-estreita] .atual {
+  display: contents;
+}
+
+.secao[data-estreita] .discoCaixa {
+  grid-area: disco;
+  justify-self: center;
+}
+
+.secao[data-estreita] .nome {
+  grid-area: nome;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.secao[data-estreita] .titulo {
+  font-size: 1.1875rem;
+}
+
+.secao[data-estreita] .outros {
+  grid-area: outros;
+  justify-content: flex-start;
+  gap: 4px;
+  margin-top: 0;
+}
+
+.secao[data-estreita] .troca {
+  min-width: 76px;
+  padding: 6px 6px 8px;
+}
+
+.secao[data-estreita] .lista {
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+  flex: none;
+}
+
+.secao[data-estreita] .li {
+  min-height: 56px;
+}
+
+.secao[data-estreita] .li:hover {
+  background: transparent;
+}
+
+.secao[data-estreita] .toast {
+  left: 50%;
+  bottom: 96px;
+}
+
+/* ---------- keyframes ---------- */
+@keyframes sec-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sec-troca {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes sec-folha {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+
+@keyframes sec-toast {
+  from {
+    opacity: 0;
+    translate: -50% 12px;
+  }
+  to {
+    opacity: 1;
+    translate: -50% 0;
+  }
+}
+
+/* ---------- movimento reduzido: tudo já no estado final ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .secao,
+  .secao *,
+  .secao *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}

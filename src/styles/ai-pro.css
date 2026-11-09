@@ -1,0 +1,127 @@
+/* Identidade AI PRO Janete. Os nomes --sb-* continuam
+   compatíveis com os componentes existentes; os valores visuais vêm desta camada. */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html:root {
+  --aipro-carbon: #0a0a0a;
+  --aipro-carbon-raised: #1b1b20;
+  --aipro-orange: #ff4d14;
+  --aipro-orange-hover: #f0440d;
+  /* Variante mais escura para textos pequenos e foco sobre superfícies claras. */
+  --aipro-orange-text: #ad310b;
+
+  --sb-azul: var(--aipro-orange);
+  --sb-azul-texto: var(--aipro-orange-text);
+  --sb-azul-claro: #ffede6;
+  --sb-azul-nevoa: #fff6f2;
+  --sb-navy: var(--aipro-carbon-raised);
+  --sb-navy-2: #303036;
+  --sb-palco: var(--aipro-carbon);
+  --sb-tinta: var(--aipro-carbon-raised);
+  --sb-tinta-2: #525258;
+  --sb-tinta-3: #66666e;
+  --sb-canvas: #f5f5f6;
+  --sb-linha: #e7e7eb;
+  --sb-linha-forte: #d6d6dc;
+  --sb-borda-campo: #85858e;
+  --sb-grafite: var(--aipro-carbon-raised);
+  --sb-palco-tinta-2: #c4c4cc;
+  --sb-esqueleto: #ececef;
+  --sb-esqueleto-brilho: #f7f7f9;
+  --sb-fonte: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sb-fonte-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --sb-anel: 0 0 0 2px var(--sb-branco), 0 0 0 4px var(--aipro-orange-text);
+
+  /* A superfície genérica de erros/404 usa os tokens Tailwind em OKLCH. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.22 0.009 285);
+  --primary: oklch(0.22 0.009 285);
+  --primary-foreground: oklch(1 0 0);
+  --ring: oklch(0.5 0.17 36);
+}
+
+body {
+  font-family: var(--sb-fonte);
+}
+
+.aipro-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--sb-tinta);
+  text-align: left;
+}
+
+.aipro-brand--inverse {
+  color: #fff;
+}
+
+.aipro-brand__symbol {
+  display: block;
+  flex: none;
+  border-radius: 22%;
+  object-fit: contain;
+}
+
+.aipro-brand__name {
+  display: grid;
+  gap: 3px;
+}
+
+.aipro-brand__maker {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 10px/1 var(--sb-fonte);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.aipro-brand__maker::before {
+  content: '';
+  width: 12px;
+  height: 3px;
+  background: var(--aipro-orange);
+}
+
+.aipro-brand__product {
+  font: 650 20px/1 var(--sb-fonte);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+/* Ação principal laranja da AI PRO Janete. Texto grafite garante contraste. */
+[data-identidade='aipro'] [data-variante='principal']:not(:disabled) {
+  background: var(--aipro-orange);
+  color: var(--aipro-carbon);
+}
+
+[data-identidade='aipro'] [data-variante='principal']:not(:disabled):hover,
+[data-identidade='aipro'] [data-variante='principal']:not(:disabled):active {
+  background: var(--aipro-orange-hover);
+}
+
+@media (max-width: 599px) {
+  .aipro-brand {
+    gap: 8px;
+  }
+
+  .aipro-brand__product {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,24 @@
+/* Alinhada à esquerda, como a trilha e o título: uma coluna de leitura centrada num
+   canvas largo desalinharia o h1 da trilha "Você está em" logo acima. */
+.pagina {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--sb-gap-pagina);
+  width: min(100%, var(--sb-conteudo-max));
+  min-width: 0;
+}
+
+.pagina[data-largura='leitura'] {
+  width: min(100%, var(--sb-leitura-max));
+}
+
+.pagina[data-largura='lista'] {
+  width: min(100%, var(--sb-lista-max));
+}
+
+/* Dentro do shell, `.shell:has([data-largura='ampla'])` já troca --sb-conteudo-max pelo
+   amplo; esta regra vale fora dele (bancadas) para a tela medir igual. */
+.pagina[data-largura='ampla'] {
+  width: min(100%, var(--sb-conteudo-amplo));
+}

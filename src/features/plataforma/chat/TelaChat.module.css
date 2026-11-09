@@ -1,0 +1,299 @@
+/* A página do Chat final: a "torre" de 3 colunas (`.torre`, `.col`, `.col-chat`, `.col-ficha` do
+   protótipo), a conversa em tela cheia e a folha da ficha no celular, e o aviso curto (`.toast`).
+
+   Larguras (plano das telas): a partir de 1280 px, lista | conversa | ficha (a lista com pelo menos
+   ~300 px em 1280); de 900 a 1279, lista | conversa e a ficha vira gaveta; abaixo de 900, a lista é a
+   1ª tela e a conversa abre em tela cheia. */
+
+/* A VistaArea dá o h1 da área (alvo do tour e dos atalhos da Janete). No Chat, o título visível é o
+   da lista, como no protótipo: o cabeçalho da vista fica só para o leitor de tela. */
+.tcRaiz > section {
+  gap: 0;
+}
+
+.tcRaiz > section > div:first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A torre ocupa a altura da tela, menos o topo (76 px) e as margens; a sobra de baixo da casca
+   (140 px, para a página rolar acima do canto da Janete) não vale aqui: a torre não rola, as colunas sim.
+   A conta fecha em 100dvh: 76 + 4 (padding) + (100dvh - 100) - 120 + 140 (padding) = 100dvh. */
+/* A lista: 248 px em 900 (a conversa não encolhe), ~272 px em 1024 e 300 px um pouco antes de 1280,
+   emendando com a faixa de 1280 a 1359. */
+.tcTorre {
+  display: grid;
+  grid-template-columns: clamp(248px, calc(26vw + 6px), 300px) minmax(0, 1fr);
+  gap: var(--sb-esp-3);
+  height: calc(100dvh - var(--sb-topo) - 24px);
+  min-height: 520px;
+  margin-bottom: -120px;
+}
+
+/* De 900 a 1279 px, a ficha é a gaveta presa à torre (Gaveta `ancorada`), do fim do cabeçalho da
+   conversa até o fundo, como o `.col-ficha.gaveta` do protótipo ("para nunca cobrir o bastão"). O
+   topo é medido pela tela e vai em --gv-topo; 108 px (o cabeçalho de ~100 px + 8) é o padrão até medir.
+   Preso ao data-largura que a tela escreve (e não a uma media query), para o CSS e o JS concordarem
+   até nas larguras fracionadas do zoom (1279,5 px). */
+.tcTorre[data-largura='media'] {
+  --gv-topo: 108px;
+  position: relative;
+}
+
+/* De 1280 a 1359 px, as 3 colunas apertadas: a lista fixa nos 300 px do plano e só a ficha cresce
+   com a janela, mais devagar que ela; assim a conversa nunca encolhe quando a tela aumenta. */
+@media (min-width: 1280px) and (max-width: 1359px) {
+  .tcTorre {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .tcTorre[data-ficha] {
+    grid-template-columns:
+      300px
+      minmax(0, 1fr)
+      clamp(264px, calc(100vw - 1040px), 320px);
+  }
+}
+
+/* A partir de 1360 px (rodada 2), as 3 colunas ocupam a largura toda: a lista e a ficha crescem com a
+   janela (20% dela, as duas entre 300 e 400 px, com a ficha a partir de 320) e a conversa fica com o
+   resto. A lista segue com os 300 px de 1280 até 1500 px, e só cresce daí em diante (384 px em 1920):
+   assim ela nunca fica mais estreita que em 1280, e a conversa nunca encolhe quando a tela aumenta. */
+@media (min-width: 1360px) {
+  .tcTorre {
+    grid-template-columns: clamp(300px, 20vw, 400px) minmax(0, 1fr);
+  }
+
+  .tcTorre[data-ficha] {
+    grid-template-columns: clamp(300px, 20vw, 400px) minmax(0, 1fr) clamp(320px, 20vw, 400px);
+  }
+}
+
+.tcColChat,
+.tcColFicha {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+/* a conversa da C2 ocupa a coluna inteira */
+.tcColChat > *,
+.tcCheia > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------- sem conversa aberta ---------- */
+
+.tcVazio {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sb-esp-3);
+  padding: var(--sb-esp-8);
+  text-align: center;
+}
+
+.tcVazioTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.tcVazioTexto {
+  max-width: 40ch;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ---------- celular ---------- */
+
+.tcCheia {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .tcTorre {
+    display: block;
+    height: auto;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+
+  /* a conversa aberta ocupa a tela cheia, como no WhatsApp; a entrada usa "backwards" para não
+     quebrar o position: fixed dos véus lá dentro */
+  .tcCheia {
+    position: fixed;
+    inset: 0;
+    z-index: var(--via-z-overlay);
+    display: flex;
+    flex-direction: column;
+    background: var(--sb-branco);
+    animation: tc-entra 320ms var(--via-ease-out) backwards;
+  }
+
+  /* a ficha numa folha que sobe de baixo (a Gaveta, com outra moldura) */
+  .tcFolha.tcFolha {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-height: 86dvh;
+    border-radius: var(--sb-r-painel) var(--sb-r-painel) 0 0;
+    box-shadow: var(--sb-sombra-flutuante);
+    animation: tc-folha 420ms var(--via-ease-out) backwards;
+  }
+}
+
+/* ---------- o aviso curto ---------- */
+
+.tcAviso {
+  position: fixed;
+  right: var(--sb-esp-6);
+  bottom: var(--sb-esp-6);
+  z-index: var(--via-z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  max-width: min(26rem, calc(100% - 48px));
+  padding: var(--sb-esp-3) var(--sb-esp-2) var(--sb-esp-3) var(--sb-esp-4);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.875rem;
+  line-height: var(--sb-lh-ui);
+  animation: tc-aviso 420ms var(--via-ease-out) backwards;
+}
+
+/* No computador, o aviso sobe para cima da caixa de escrever: logo depois de assumir, o foco está no
+   campo, e o aviso não pode cobrir enviar, anexar nem o microfone. */
+@media (min-width: 900px) {
+  .tcAviso {
+    bottom: 160px;
+  }
+}
+
+.tcAviso > svg {
+  flex: none;
+  color: var(--sb-azul);
+}
+
+/* No aviso de erro, o ícone em coral claro, legível no navy (o coral de sempre some no fundo escuro). */
+.tcAviso[data-tom='erro'] > svg {
+  color: var(--sb-erro-no-escuro);
+}
+
+.tcAvisoTexto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.tcAvisoFechar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+}
+
+.tcAvisoFechar:hover {
+  background: var(--sb-navy-2);
+}
+
+.tcAvisoFechar:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+@media (max-width: 899px) {
+  .tcAviso {
+    right: var(--sb-esp-3);
+    bottom: 96px;
+    left: var(--sb-esp-3);
+    max-width: none;
+  }
+
+  .tcAvisoFechar {
+    width: var(--sb-controle);
+    height: var(--sb-controle);
+  }
+
+  /* Com a conversa em tela cheia, o aviso desce para baixo do cabeçalho e não cobre a caixa de escrever. */
+  .tcRaiz[data-cheia] .tcAviso {
+    top: 111px;
+    bottom: auto;
+  }
+
+  /* Com a folha da ficha aberta (ela começa em 14dvh), o aviso fica no véu, acima dela, e não cobre
+     o título nem o X da folha. */
+  .tcRaiz[data-folha] .tcAviso {
+    top: var(--sb-esp-3);
+    bottom: auto;
+  }
+}
+
+.tcSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tcCheia,
+  .tcFolha.tcFolha,
+  .tcAviso {
+    animation: none;
+  }
+}
+
+@keyframes tc-entra {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes tc-folha {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes tc-aviso {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

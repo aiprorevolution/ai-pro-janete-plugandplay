@@ -1,0 +1,635 @@
+/* =========================================================
+   A tela do Contexto (Contexto 6, .ctx-vista): o cabeçalho (os números, "+ Ensinar algo novo" e a
+   legenda), a faixa da versão antiga, o palco (o mapa ou a seção da área) e o rodapé.
+
+   O título e a frase são os da VistaArea (o h1 #area-contexto). No computador, a vista do Contexto
+   vira uma grade: o título à esquerda e os números à direita, na mesma linha, como no protótipo; a
+   raiz desta tela some da caixa (display: contents) e cada parte vira uma linha da grade.
+
+   O palco ocupa o que sobra até o pé da janela: a altura vem do TelaContexto.tsx (--palco-h). A
+   altura mínima é a da pilha (2,11 d mais a legenda), com o d do Mapa.
+   ========================================================= */
+
+.tela {
+  --ctx-d: clamp(170px, min(17.5vw, 28vh), 264px);
+  --ctx-rasc: color-mix(in srgb, var(--sb-azul) 55%, var(--sb-branco));
+  --ctx-apagada: color-mix(in srgb, var(--sb-borda-campo) 50%, var(--sb-linha-forte));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  color: var(--sb-tinta);
+}
+
+/* o foco que a tela devolve depois de um clique com o mouse não desenha anel (com teclado, desenha) */
+.tela [data-sem-anel] {
+  --sb-anel: 0 0 0 0 transparent;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  /* a vista da área (AreaVazia.tsx) com esta tela dentro: a grade do cabeçalho do protótipo. O título
+     nunca fica mais estreito que 20rem (como o .ctx-tit do protótipo, flex 1 1 20rem). */
+  :global(section[data-area="contexto"]):has(> .tela) {
+    display: grid;
+    grid-template-columns: minmax(min(20rem, 100%), 1fr) auto;
+    align-items: end;
+    column-gap: 32px;
+    row-gap: 12px;
+  }
+
+  /* o vão do fim da página: os 16 px do protótipo (VAO_FIM no TelaContexto.tsx), fixados no recheio de
+     quem contém a vista (o .platConteudo, pai direto da section), sem depender do valor da casca. Os
+     140 px dela reservam lugar para o botão do canto, que fica escondido nesta tela. */
+  div:has(> section[data-area="contexto"] > .tela) {
+    padding-bottom: 16px;
+  }
+
+  :global(section[data-area="contexto"]):has(> .tela) > :first-child {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 32rem;
+    padding-top: 4px;
+  }
+
+  .tela {
+    display: contents;
+  }
+
+  .cabDir {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .faixa,
+  .palco,
+  .rodape {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- o lado direito do cabeçalho: números e botão numa linha, a legenda embaixo ---------- */
+.cabDir {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "nums btn"
+    "leg leg";
+  align-items: center;
+  justify-items: end;
+  row-gap: 10px;
+}
+
+.cabDir:not(:has(.btnEns)) {
+  grid-template-columns: auto;
+  grid-template-areas:
+    "nums"
+    "leg";
+}
+
+.nums {
+  grid-area: nums;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.num {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  white-space: nowrap;
+}
+
+.num b {
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sb-peso-forte);
+  color: var(--sb-tinta);
+}
+
+/* o aviso de campo fraco (decisão 7): discreto, numa linha própria embaixo da legenda, sem bloquear nada */
+.fraco {
+  grid-column: 1 / -1;
+  max-width: 28rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-align: end;
+  text-wrap: pretty;
+}
+
+.btnEns {
+  grid-area: btn;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--sb-controle);
+  margin-left: 22px;
+  padding: 8px 22px 8px 18px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.3;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--sb-sombra-card);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.btnEnsIc {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--sb-azul);
+}
+
+.btnEns:hover {
+  background: var(--sb-azul-nevoa);
+  border-color: var(--sb-tinta-3);
+}
+
+.btnEns:active {
+  transform: scale(0.98);
+}
+
+.btnEns:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel), var(--sb-sombra-card);
+}
+
+.btnEns[aria-expanded="true"] {
+  background: var(--sb-azul-claro);
+  border-color: transparent;
+  color: var(--sb-azul-texto);
+}
+
+.btnEns[aria-expanded="true"] .btnEnsIc {
+  color: var(--sb-azul-texto);
+}
+
+@media (min-width: 900px) and (max-width: 1365px) {
+  .cabDir {
+    grid-template-columns: auto;
+    grid-template-areas:
+      "btn"
+      "nums"
+      "leg";
+    row-gap: 8px;
+  }
+
+  .btnEns {
+    margin-left: 0;
+  }
+}
+
+/* janelas estreitas do computador: o cabeçalho quebra, e os números e a legenda descem para baixo do
+   título (o flex-wrap do protótipo), em vez de espremer o título */
+@media (min-width: 900px) and (max-width: 999px) {
+  :global(section[data-area="contexto"]):has(> .tela) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cabDir {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    justify-items: start;
+  }
+
+  .cabDir .nums,
+  .cabDir .legenda {
+    justify-content: flex-start;
+  }
+
+  .cabDir .fraco {
+    text-align: start;
+  }
+}
+
+/* a legenda: os 3 traços das curvas do mapa */
+.legenda {
+  grid-area: leg;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px 22px;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legTr {
+  display: block;
+  width: 26px;
+  height: 8px;
+  flex: none;
+  overflow: visible;
+}
+
+.legTr path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.legTr .tOn {
+  stroke: var(--sb-azul);
+}
+
+.legTr .tOff {
+  stroke: var(--ctx-apagada);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+}
+
+.legTr .tRasc {
+  stroke: var(--ctx-rasc);
+}
+
+/* ---------- o palco: o mapa ou a seção ---------- */
+.palco {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: var(--palco-h, auto);
+  min-height: calc(var(--ctx-d) * 2.11 + 56px + 24px);
+}
+
+@media (max-height: 860px) {
+  .palco {
+    min-height: calc(var(--ctx-d) * 2.11 + 26px + 24px);
+  }
+}
+
+/* a seção fica por cima do mapa, no mesmo palco (na passagem, os dois estão montados) */
+.palcoSecao {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* a passagem para a seção: os discos de verdade somem e quem anda são as cópias (.v3) */
+.mapaSai,
+.mapaChega {
+  pointer-events: none;
+}
+
+.mapaOculto {
+  visibility: hidden;
+}
+
+.mapaSai :global(#ctx-pilha),
+.mapaChega :global(#ctx-pilha) {
+  visibility: hidden;
+}
+
+/* as colunas e as curvas (tudo menos a camada da Janete, [data-ctx-janete], que no DOM fica entre as colunas) */
+.mapaSai[id] > :not([data-ctx-janete]) {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.1s var(--via-ease-out),
+    transform 0.1s var(--via-ease-out);
+}
+
+/* a legenda embaixo da pilha (o único [data-visivel] do mapa) */
+.mapaSai[id] [data-visivel],
+.mapaChega[id] [data-visivel] {
+  opacity: 0;
+  transition: opacity 0.1s var(--via-ease-out);
+  transition-delay: 0s;
+}
+
+/* na volta, as colunas só aparecem depois que as cópias saíram da esquerda */
+.mapaChega[id] > :not([data-ctx-janete]) {
+  animation: tela-aparece 0.16s var(--via-ease-out) 0.24s backwards;
+}
+
+/* a seção espera as cópias: os discos dela ficam escondidos até elas pousarem */
+.secaoVoando [data-disco] {
+  visibility: hidden;
+}
+
+/* a lista e o editor só entram quando as cópias já saíram da coluna do meio (uns 430 ms no total) */
+.secaoVoo > :global(#ctx-secao) {
+  animation: none;
+}
+
+.secaoVoo :global(#ctx-sec-voltar),
+.secaoVoo :global(#ctx-sec-tit),
+.secaoVoo :global([data-trocar]) > :last-child {
+  animation: tela-aparece 0.14s var(--via-ease-out) 0.26s backwards;
+}
+
+.secaoVoo :global(#ctx-secao) > :nth-child(2) {
+  animation: tela-lista 0.14s var(--via-ease-out) 0.26s backwards;
+}
+
+.secaoVoo :global(#ctx-editor) {
+  animation: tela-editor 0.16s var(--via-ease-out) 0.27s backwards;
+}
+
+.secaoSai {
+  pointer-events: none;
+}
+
+.secaoSai :global(#ctx-secao) > * {
+  opacity: 0;
+  transition: opacity 0.12s var(--via-ease-out);
+}
+
+/* as cópias que andam: presas no centro da face, de onde estavam até onde vão (uns 300 ms) */
+.v3 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--via-z-overlay);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: tela-v3 var(--vt, 300ms) var(--sb-ease-travessia) var(--vd, 0ms) both;
+}
+
+/* na ida, os 2 que não foram clicados encolhem logo no começo: cruzam já pequenos, por baixo */
+.v3[data-outro] {
+  animation-name: tela-v3-outro;
+}
+
+/* a face do Disco fica a 0,70 d do topo da caixa */
+.v3Disco {
+  position: absolute;
+  left: calc(var(--dv) * -0.5);
+  top: calc(var(--dv) * -0.7);
+}
+
+/* ---------- rodapé: a versão na tela e o histórico ---------- */
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.rodEsq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.rodEsq b {
+  font-size: 1rem;
+  font-weight: var(--sb-peso-forte);
+  color: var(--sb-tinta);
+}
+
+.rodDiv {
+  width: 1px;
+  height: 20px;
+  background: var(--sb-linha-forte);
+}
+
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 12px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.3;
+}
+
+.pilula[data-antiga] {
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.rodHist {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 8px 0 14px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.rodHist:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.rodHist:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.rodHist[aria-expanded="true"] {
+  background: var(--sb-azul-claro);
+}
+
+.rodHistIc {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* ---------- o aviso de restaurar ("Versão 7 salva, igual à versão 3.") ---------- */
+.toast {
+  position: fixed;
+  left: calc(50% + 120px);
+  bottom: 28px;
+  z-index: var(--via-z-toast);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 12px 18px 12px 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.4;
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: tela-toast 0.42s var(--via-ease-spring) backwards;
+}
+
+.toastIc {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--sb-azul);
+}
+
+/* ---------- celular: o cabeçalho em coluna, o palco do tamanho do mapa ---------- */
+@media (max-width: 899px) {
+  .cabDir {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .btnEns {
+    order: -1;
+    margin-left: 0;
+  }
+
+  .nums,
+  .legenda {
+    justify-content: flex-start;
+    gap: 4px 14px;
+  }
+
+  .legenda {
+    font-size: var(--sb-fs-meta);
+  }
+
+  .fraco {
+    text-align: start;
+  }
+
+  .palco {
+    height: auto;
+    min-height: 0;
+    flex: none;
+  }
+
+  /* a seção vira uma folha em tela cheia (Secao.module.css): o invólucro não ocupa lugar */
+  .palcoSecao {
+    display: contents;
+  }
+
+  .toast {
+    left: 50%;
+    bottom: 96px;
+  }
+}
+
+@media (max-width: 599px) {
+  .rodDiv {
+    display: none;
+  }
+
+  .rodHist {
+    margin-left: -14px;
+  }
+}
+
+/* ---------- keyframes ---------- */
+@keyframes tela-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tela-lista {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@keyframes tela-editor {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes tela-v3 {
+  from {
+    transform: translate(var(--x0), var(--y0)) scale(var(--s0));
+  }
+  to {
+    transform: translate(var(--x1), var(--y1)) scale(var(--s1));
+  }
+}
+
+@keyframes tela-v3-outro {
+  from {
+    transform: translate(var(--x0), var(--y0)) scale(var(--s0));
+  }
+  45% {
+    transform: translate(calc((var(--x0) + var(--x1)) / 2), calc((var(--y0) + var(--y1)) / 2)) scale(calc(var(--s1) * 1.25));
+  }
+  to {
+    transform: translate(var(--x1), var(--y1)) scale(var(--s1));
+  }
+}
+
+@keyframes tela-toast {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+/* ---------- movimento reduzido: tudo já no estado final, sem passagem (o .tsx nem cria as cópias) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tela *,
+  .tela *::before,
+  .tela *::after,
+  .v3,
+  .toast {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}

@@ -1,0 +1,87 @@
+.pilha {
+  display: grid;
+  gap: 0.6em;
+  width: var(--esq-largura, 100%);
+}
+
+.osso {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: var(--esq-largura, 100%);
+  background: var(--sb-esqueleto);
+}
+
+/* A faixa que corre: ambiente, 1,6s, só transform. */
+.osso::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--sb-esqueleto-brilho) 50%, transparent);
+  transform: translateX(-100%);
+  /* token-ok: ambiente (ESPEC_DS 1.2), laço contínuo fora da escala de interação */
+  animation: sb-brilho 1.6s linear infinite;
+}
+
+/* O keyframe mora AQUI, não em aipro.css. O CSS Modules (Lightning CSS) escopa
+   todo nome usado em `animation`: com o keyframe global, o uso virava
+   `Esqueleto-module__…__sb-brilho`, que não existe, e o brilho nunca correu em
+   tela nenhuma (medido no navegador em 22/10/2026). Definido no módulo, definição
+   e uso recebem o mesmo nome escopado. */
+@keyframes sb-brilho {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.osso[data-forma='texto'] {
+  height: var(--esq-altura, 0.75em);
+  border-radius: var(--sb-r-chip);
+}
+
+/* A última linha de um parágrafo nunca vai até o fim. */
+.pilha > .osso:last-child:not(:first-child) {
+  width: 62%;
+}
+
+.osso[data-forma='bloco'] {
+  height: var(--esq-altura, 96px);
+  border-radius: var(--sb-r-item);
+}
+
+.osso[data-raio='card'] {
+  border-radius: var(--sb-r-card);
+}
+
+.osso[data-raio='mini'] {
+  border-radius: var(--sb-r-mini);
+}
+
+.osso[data-raio='pilula'] {
+  border-radius: var(--sb-r-pilula);
+}
+
+.osso[data-forma='circulo'] {
+  width: var(--esq-largura, var(--sb-controle));
+  height: var(--esq-altura, var(--esq-largura, var(--sb-controle)));
+  border-radius: 50%;
+}
+
+.osso[data-forma='linha'] {
+  height: var(--esq-altura, 1px);
+  background: var(--sb-linha);
+}
+
+.osso[data-forma='linha']::after {
+  content: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .osso::after {
+    animation: none;
+    content: none;
+  }
+}

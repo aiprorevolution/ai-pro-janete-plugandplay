@@ -1,0 +1,188 @@
+/* A gaveta "Convidar pessoa" da Equipe (o `.gv-cab`, `.gv-corpo`, `.pp`, `.gv-nota` e `.gv-pe` do
+   Equipe B). O painel, o véu e a tela cheia no celular são da `comum/Gaveta`; aqui fica só o conteúdo. */
+
+.cvCab {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: var(--sb-esp-3);
+  padding: var(--sb-esp-4) var(--sb-esp-4) var(--sb-esp-4) var(--sb-esp-6);
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.cvCabTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+  padding-top: var(--sb-esp-2);
+}
+
+.cvTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-secao);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.cvApoio {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cvCorpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sb-esp-5);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sb-esp-5) var(--sb-esp-6);
+}
+
+.cvGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+}
+
+.cvRotulo {
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.cvPapeis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+}
+
+/* O cartão de rádio (o `.pp`): o rádio nativo à esquerda, ocupando as duas linhas, e o nome sobre o texto. */
+.cvPapel {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 2px var(--sb-esp-3);
+  align-items: start;
+  padding: 14px var(--sb-esp-4);
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.cvPapel:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.cvPapel:has(input:checked) {
+  border-color: var(--sb-navy);
+  box-shadow: inset 0 0 0 1px var(--sb-navy);
+}
+
+.cvPapel:has(input:focus-visible) {
+  box-shadow:
+    inset 0 0 0 1px var(--sb-navy),
+    var(--sb-anel);
+}
+
+.cvPapel input {
+  grid-row: span 2;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--sb-navy);
+  cursor: pointer;
+}
+
+/* O anel fica no cartão inteiro, não no rádio. */
+.cvPapel input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.cvPapelNome {
+  font-size: var(--sb-fs-corpo);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cvPapelTexto {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cvNota {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: var(--sb-esp-3) 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+}
+
+.cvNotaIcone {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sb-tinta-3);
+}
+
+.cvPe {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--sb-esp-2);
+  padding: var(--sb-esp-4) var(--sb-esp-6) var(--sb-esp-5);
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* A região de alerta do erro: só para o leitor de tela (fora do fluxo, não ganha o vão do corpo). */
+.cvSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* "Enviar convite" ocupa a sobra; no celular, os dois dividem a linha. */
+.cvEnviar {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 899px) {
+  .cvCab {
+    padding: var(--sb-esp-3) var(--sb-esp-2) var(--sb-esp-3) var(--sb-esp-4);
+  }
+
+  .cvCorpo {
+    padding: var(--sb-esp-4);
+  }
+
+  .cvPe {
+    padding: var(--sb-esp-3) var(--sb-esp-4) var(--sb-esp-4);
+  }
+
+  .cvCancelar {
+    flex: 1 1 auto;
+  }
+}

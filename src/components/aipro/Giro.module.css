@@ -1,0 +1,55 @@
+.envoltorio {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* O traço acompanha o tamanho: 2px até 18, 2,5px no de 24 (o mesmo peso visual). */
+.giro {
+  display: inline-block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  /* token-ok: ambiente (ESPEC_DS 1.2), laço contínuo fora da escala de interação */
+  animation: sb-girar 700ms linear infinite;
+}
+
+/* O keyframe mora AQUI, não em aipro.css: o CSS Modules escopa o nome usado em
+   `animation`, e com o keyframe global o giro pedia `Giro-module__…__sb-girar`,
+   que não existe. O indicador não girava (medido em 22/10/2026). */
+@keyframes sb-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.giro[data-tamanho='16'] {
+  width: 16px;
+  height: 16px;
+}
+
+.giro[data-tamanho='24'] {
+  width: 24px;
+  height: 24px;
+  border-width: 2.5px;
+}
+
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Parado, o giro vira um arco fixo: continua dizendo "em andamento" sem girar. */
+@media (prefers-reduced-motion: reduce) {
+  .giro {
+    animation: none;
+    border-right-color: currentColor;
+    border-bottom-color: transparent;
+  }
+}

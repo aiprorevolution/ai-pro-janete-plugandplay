@@ -1,0 +1,786 @@
+/* =============================================================================
+   A caixa de escrever (o `.escrever`, `.faixa`, `.caixa` e companhia do
+   Chat-Final.dc.html, desenho da opção A): grande, com a faixa leve em cima, que
+   diz quem atende e o que acontece ao enviar, e mostra os bloqueios.
+   ============================================================================= */
+
+.ceRaiz {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ---------- a faixa ---------- */
+
+.ceFaixa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 8px;
+  padding: 9px 18px 22px;
+  border-radius: 22px 22px 0 0;
+  background: var(--sb-canvas);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-align: center;
+  text-wrap: balance;
+  transition: background-color 0.4s var(--via-ease-out);
+}
+
+/* O ícone corre na frase, como o 1º caractere: quando ela quebra, ele fica na 1ª linha, colado nela. */
+.ceFaixaIc {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: -3px;
+  line-height: 0;
+  color: var(--sb-tinta-3);
+}
+
+/* No computador, a frase (com o ícone) e a ação ficam numa linha só; a frase quebra por dentro. Com
+   o wrap, a faixa dobrava de altura e tirava espaço das mensagens. */
+@media (min-width: 900px) {
+  .ceFaixa {
+    flex-wrap: nowrap;
+  }
+
+  .ceFaixaTxt {
+    min-width: 0;
+  }
+
+  .ceFaixaAcao {
+    flex: none;
+  }
+}
+
+.ceFaixa[data-tom='espera'],
+.ceFaixa[data-tom='janela_fechada'] {
+  background: var(--sb-areia);
+  color: var(--sb-tinta);
+}
+
+.ceFaixa[data-tom='espera'] .ceFaixaIc,
+.ceFaixa[data-tom='janela_fechada'] .ceFaixaIc {
+  color: var(--sb-atencao);
+}
+
+.ceFaixa[data-tom='falha'],
+.ceFaixa[data-tom='sem_conexao'] {
+  background: var(--sb-erro-claro);
+  color: var(--sb-tinta);
+}
+
+.ceFaixa[data-tom='falha'] .ceFaixaIc,
+.ceFaixa[data-tom='sem_conexao'] .ceFaixaIc {
+  color: var(--sb-erro);
+}
+
+.ceFaixa[data-tom='sucesso'] {
+  background: var(--sb-menta);
+  color: var(--sb-tinta);
+}
+
+.ceFaixa[data-tom='sucesso'] .ceFaixaIc {
+  color: var(--sb-sucesso);
+}
+
+.ceFaixaAcao {
+  min-height: var(--sb-controle);
+  margin: -10px 0;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--sb-r-chip);
+  background: none;
+  color: var(--sb-azul-texto);
+  font-size: var(--sb-fs-apoio);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.ceFaixaAcao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- a caixa ---------- */
+
+.ceCaixa {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+/* Com a faixa, a caixa sobe por cima da borda de baixo dela. */
+.ceCaixa[data-com-faixa] {
+  margin-top: -14px;
+}
+
+.ceCaixa:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.ceCaixa:has(.ceCampo:focus) {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.ceCaixa[data-estado='bloqueado'] {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-canvas);
+}
+
+.ceCaixa[data-estado='gravando'] {
+  border-color: var(--sb-erro);
+  box-shadow: 0 0 0 3px var(--sb-erro-claro);
+}
+
+.ceCampo {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  max-height: 12rem;
+  padding: 16px 20px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-leitura);
+  line-height: 1.5;
+  resize: none;
+  field-sizing: content;
+}
+
+.ceCampo::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.ceCampo:focus,
+.ceCampo:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.ceCampo:disabled {
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+/* ---------- citação e anexos, em cima do campo ---------- */
+
+.ceCita {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 10px 0;
+  padding: 6px 6px 6px 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  animation: ce-surge 0.25s var(--via-ease-out) backwards;
+}
+
+.ceCita > svg {
+  color: var(--sb-azul-texto);
+}
+
+.ceCitaTxt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.ceCitaTxt b {
+  font-size: var(--sb-fs-meta);
+  font-weight: 600;
+  color: var(--sb-azul-texto);
+}
+
+.ceCitaTxt span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sb-fs-apoio);
+  color: var(--sb-tinta-2);
+}
+
+.ceAnexos {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ceAnexo {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 10px 0;
+  padding: 8px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  animation: ce-surge 0.25s var(--via-ease-out) backwards;
+}
+
+.ceAnexoMini {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 54px;
+  overflow: hidden;
+  border-radius: var(--sb-r-mini);
+  background: #d9e7f5;
+}
+
+.ceAnexoMini[data-tipo='imagem'] > svg,
+.ceAnexoMini[data-tipo='video'] > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* A prévia da foto escolhida (o arquivo de verdade); sem prévia, o ícone pequeno no centro. */
+.ceAnexoMini > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ceAnexoMini[data-sem-previa] {
+  color: var(--sb-azul-texto);
+}
+
+.ceAnexoMini[data-sem-previa] > svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* O aviso do que não deu certo antes de enviar (microfone, arquivo grande demais), em cima do campo. */
+.ceAviso {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 10px 0;
+  padding: 6px 6px 6px 12px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+}
+
+.ceAnexoMini[data-tipo='documento'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.ceAnexoPlay {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.ceAnexoTxt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.ceAnexoTxt b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ceAnexoTxt span {
+  font-size: var(--sb-fs-meta);
+  color: var(--sb-tinta-2);
+}
+
+.ceIconeX {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.ceIconeX:hover {
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+.ceIconeX:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- gravando e ouvindo ---------- */
+
+.ceGrav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  padding: 14px 20px 4px;
+  overflow: hidden;
+}
+
+.ceGravPonto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sb-erro);
+  animation: ce-pulsa 1.2s var(--via-ease) infinite;
+}
+
+.ceGravTempo {
+  min-width: 3em;
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-leitura);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta);
+}
+
+.ceGravOndas {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 28px;
+}
+
+.ceGravOndas i {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--sb-erro);
+  transform: scaleY(0.3);
+  animation: ce-onda 0.9s var(--via-ease) infinite;
+}
+
+.ceGravOndas i:nth-child(2) { animation-delay: 0.12s; }
+.ceGravOndas i:nth-child(3) { animation-delay: 0.3s; }
+.ceGravOndas i:nth-child(4) { animation-delay: 0.05s; }
+.ceGravOndas i:nth-child(5) { animation-delay: 0.22s; }
+.ceGravOndas i:nth-child(6) { animation-delay: 0.4s; }
+.ceGravOndas i:nth-child(7) { animation-delay: 0.17s; }
+.ceGravOndas i:nth-child(8) { animation-delay: 0.33s; }
+.ceGravOndas i:nth-child(9) { animation-delay: 0.08s; }
+.ceGravOndas i:nth-child(10) { animation-delay: 0.27s; }
+
+.ceGravDica {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sb-fs-apoio);
+  font-weight: 500;
+  color: var(--sb-tinta-2);
+  transition: transform 0.1s linear;
+}
+
+.cePlayer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cePlay {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.cePlay:hover {
+  background: var(--sb-navy-2);
+}
+
+.cePlay:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.ceTempo {
+  flex: none;
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-2);
+}
+
+/* ---------- o pé: ferramentas à esquerda, microfone e enviar à direita ---------- */
+
+.cePe {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px 8px;
+}
+
+.ceAncora {
+  position: relative;
+}
+
+.ceFerr {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.ceFerr:hover:not(:disabled) {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.ceFerr[aria-expanded='true'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.ceFerr:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.ceFerr:disabled {
+  color: var(--sb-borda-campo);
+  cursor: not-allowed;
+}
+
+.ceMic {
+  touch-action: none;
+}
+
+.ceMic[data-gravando],
+.ceMic[data-gravando]:hover:not(:disabled) {
+  background: var(--sb-erro);
+  color: var(--sb-tinta-inversa);
+  animation: ce-pulso-erro 1.4s var(--via-ease-out) infinite;
+}
+
+.ceMic[data-gravando]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-erro) 82%, var(--sb-navy));
+}
+
+/* A pulsação anima a sombra e esconderia o anel de foco do botão de parar. */
+.ceMic[data-gravando]:focus-visible {
+  animation: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* A dica de teclado ("Enter envia · Shift+Enter nova linha") saiu na rodada 2 do Chat (30/10):
+   ela continua só no rótulo do leitor de tela do campo. */
+
+.cePeDir {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.ceEnviar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.ceEnviar:hover:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.ceEnviar:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.ceEnviar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.ceEnviar:disabled {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+.ceBotaoTexto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sb-controle);
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.ceBotaoTexto:hover {
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+}
+
+.ceBotaoTexto:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- menus que abrem para cima (anexar e emoji) ---------- */
+
+.cePop {
+  position: absolute;
+  z-index: 30;
+  bottom: calc(100% + 8px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 14rem;
+  padding: 8px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  animation: ce-pop 0.22s var(--via-ease-out) backwards;
+}
+
+/* O de emoji começa na borda do botão de anexar, para caber com a conversa estreita. */
+.cePop[data-emoji] {
+  left: -46px;
+  min-width: 0;
+}
+
+.cePopItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--sb-controle);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  color: var(--sb-tinta);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cePopItem:hover {
+  background: var(--sb-canvas);
+}
+
+.cePopItem:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.cePopItem svg {
+  color: var(--sb-azul-texto);
+}
+
+.ceEmojis {
+  display: grid;
+  grid-template-columns: repeat(6, var(--sb-controle));
+  gap: 2px;
+}
+
+.ceEmojis button {
+  display: grid;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ceEmojis button:hover {
+  background: var(--sb-canvas);
+}
+
+.ceEmojis button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes ce-surge {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes ce-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@keyframes ce-pulsa {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.7);
+    opacity: 0.55;
+  }
+}
+
+@keyframes ce-onda {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ce-pulso-erro {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--sb-erro) 38%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+
+/* Celular (até 899 px, como no Chat final): faixa menor e a gravação sem as ondas, para a dica
+   "Deslize para cancelar" caber em 390 px. */
+@media (max-width: 899px) {
+  .ceFaixa {
+    padding: 8px 14px 20px;
+    font-size: 0.78125rem;
+  }
+
+  /* No celular, o ícone fica em cima da frase, no meio. */
+  .ceFaixaIc {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 2px;
+  }
+
+  .ceFaixaAcao {
+    font-size: 0.78125rem;
+  }
+
+  .ceGrav {
+    gap: 10px;
+    padding: 14px 16px 4px;
+  }
+
+  .ceGravOndas {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ceCita,
+  .ceAnexo,
+  .cePop,
+  .ceMic[data-gravando],
+  .ceGravOndas i {
+    animation: none;
+  }
+
+  .ceGravOndas i {
+    transform: scaleY(0.6);
+  }
+
+  .ceGravPonto {
+    animation-duration: 2.4s;
+  }
+}

@@ -1,0 +1,81 @@
+/* O símbolo em trânsito entre telas (`.sobrevoo` e `.voo` do F-Final.dc.html).
+   `[data-voo-janete]` dá peso para esta `transition` vencer a do `.janete` do JaneteSimbolo.
+   As durações vêm no style (o voo comum é 840 ms, o longo 950 ms; pousar é 0 ms). */
+
+.voo[data-voo-janete] {
+  position: fixed;
+  z-index: 80;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 22px 36px -22px color-mix(in srgb, var(--sb-navy) 60%, transparent);
+  transition-property: left, top, width, height, background-color, border-radius, opacity;
+  transition-timing-function:
+    var(--sb-ease-travessia), var(--sb-ease-travessia), var(--sb-ease-travessia), var(--sb-ease-travessia),
+    var(--via-ease-out), var(--sb-ease-travessia), var(--via-ease-out);
+}
+
+/* Login (E6): a sombra do símbolo que sobe chega aos poucos, sem tranco na troca com o símbolo do
+   cartão (`.sobrevoo.metamorfose` do F). Só na passagem do login: o voo comum mostra a sombra direto. */
+.voo[data-voo-janete][data-metamorfose] {
+  animation: sombra-entra 0.5s var(--via-ease-out) backwards;
+}
+
+.voo[data-voo-janete].some {
+  opacity: 0;
+}
+
+/* "Preparando o seu espaço": o `.meta-texto` do F, que acompanha o símbolo. */
+.legenda {
+  position: fixed;
+  z-index: 80;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: min(24rem, calc(100vw - 32px));
+  text-align: center;
+  pointer-events: none;
+  transition-property: left, top, opacity;
+  transition-timing-function: var(--sb-ease-travessia), var(--sb-ease-travessia), var(--via-ease-snap);
+  animation: entra 0.45s var(--via-ease-out) 0.2s backwards;
+}
+
+.legenda b {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--sb-tinta);
+}
+
+.legenda span {
+  font-size: 0.84375rem;
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+}
+
+.legenda.sai {
+  opacity: 0;
+}
+
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+}
+
+@keyframes sombra-entra {
+  from {
+    box-shadow: 0 22px 36px -22px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voo[data-voo-janete],
+  .voo[data-voo-janete][data-metamorfose],
+  .legenda {
+    transition-duration: 1ms !important;
+    animation: none;
+  }
+}

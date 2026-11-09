@@ -1,0 +1,719 @@
+/* A gaveta do lead (o `.gaveta` do Kanban-2.dc.html): infos à esquerda, em canvas; a conversa à
+   direita, maior, em branco. As duas metades também servem à etapa que vira chat (EtapaChat), onde
+   ficam "encaixadas" (a conversa primeiro, as infos numa coluna estreita à direita). */
+
+/* O painel da Gaveta (comum) já tem o raio, a sombra e a largura; aqui só o conteúdo. */
+.glGaveta {
+  border-radius: 28px;
+}
+
+.glCorpo {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  min-height: 0;
+}
+
+/* Encaixada, a conversa ganha o espaço primeiro: as infos ficam entre 240 e 290 px (36% do painel:
+   290 em 1440, cerca de 252 em 1280, para Nome, Empresa e E-mail não quebrarem palavra por palavra). */
+.glCorpo[data-encaixada] {
+  grid-template-columns: minmax(0, 1fr) clamp(240px, 36%, 290px);
+  height: 100%;
+}
+
+.glCorpo[data-estreita] {
+  display: flex;
+  flex-direction: column;
+}
+
+.glCorpo[data-estreita] > .glInfo,
+.glCorpo[data-estreita] > .glChat {
+  flex: 1;
+}
+
+/* ---------- as abas do celular ---------- */
+
+.glAbas {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+/* O `.btn-icone` do protótipo: o círculo cinza. */
+.glVoltar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+  cursor: pointer;
+}
+
+.glVoltar:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.glVoltar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* O `.seg` do protótipo: branco com contorno, e a aba ativa em navy. */
+.glSeg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.glSeg button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  font-size: var(--sb-fs-apoio);
+  font-weight: 500;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+}
+
+.glSeg button[aria-pressed="true"] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  box-shadow: none;
+}
+
+.glSeg button:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- as infos ---------- */
+
+.glInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--sb-canvas);
+}
+
+.glId {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* A bolinha de 48 px e, ao lado, o nome e o "No WhatsApp". */
+.glIdLinha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.glIdTexto {
+  min-width: 0;
+  /* um "No WhatsApp" sem espaço ("CarlaPaoDeMel_Oficial") quebra em vez de vazar da coluna */
+  overflow-wrap: anywhere;
+}
+
+.glNome {
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+  overflow-wrap: anywhere;
+}
+
+/* Encaixada (a etapa que vira chat), a coluna das infos tem de 240 a 290 px: o nome ao lado da bolinha
+   fica menor para caber numa linha (em 1280 px, "Juliana Prado" quebrava). */
+.glCorpo[data-encaixada] .glNome {
+  font-size: 1.125rem;
+}
+
+.glApoio {
+  margin-top: 2px;
+  font-size: var(--sb-fs-apoio);
+  color: var(--sb-tinta-2);
+}
+
+.glContato {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.glContato p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta);
+  overflow-wrap: anywhere;
+}
+
+.glContato svg {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.glMono {
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.glDescobriu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--sb-azul-claro);
+}
+
+.glDescobriuCab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.glDescobriuCab h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.glResumo {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.glCampos {
+  display: flex;
+  flex-direction: column;
+}
+
+.glCampo {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid color-mix(in srgb, var(--sb-azul) 20%, var(--sb-azul-claro));
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.glCampo dt {
+  color: var(--sb-tinta-2);
+}
+
+.glCampo dd {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.glCampo dd.glVazio {
+  font-weight: 400;
+  color: var(--sb-tinta-2);
+}
+
+.glBloco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.glBlocoTit {
+  font-size: 0.84375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--sb-tinta);
+}
+
+.glMeta {
+  font-size: 0.78125rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+/* A etapa num menu suspenso (o MenuSuspenso do Filtro): o botão na largura do bloco, com a bolinha da
+   cor e o nome da etapa atual, e a seta na ponta. O menu abre com a mesma largura (alinhar="largura"). */
+.glEtapaMenu {
+  display: flex;
+  width: 100%;
+}
+
+.glEtapaMenu > button {
+  width: 100%;
+  min-height: var(--sb-controle);
+  font-weight: var(--sb-peso-forte);
+}
+
+.glEtapaMenu > button > svg:last-child {
+  margin-left: auto;
+}
+
+.glPonto {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 14%, transparent);
+}
+
+.glSitu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--sb-branco);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.glSitu[data-alerta] {
+  background: var(--sb-areia);
+}
+
+.glHist {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.glHist li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  padding: 0 0 12px;
+}
+
+.glHist li::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 2px;
+  left: 9.5px;
+  width: 1px;
+  background: var(--sb-linha-forte);
+}
+
+.glHist li:last-child::before {
+  display: none;
+}
+
+.glHistIc {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  color: var(--sb-tinta-2);
+}
+
+.glHistTxt b {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.glHistTxt span {
+  font-size: 0.75rem;
+  color: var(--sb-tinta-2);
+}
+
+/* "Desfazer: voltar para…" no movimento mais recente da Janete. */
+.glHistTxt .glLink {
+  display: block;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.glObs {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 14px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: 16px;
+  background: var(--sb-branco);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--sb-tinta);
+  resize: vertical;
+}
+
+.glObs:focus {
+  outline: none;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.glCusto {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.glCusto .glMono {
+  font-weight: 600;
+}
+
+.glConfirma {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--sb-erro-claro);
+  font-size: 0.84375rem;
+  line-height: 1.45;
+}
+
+.glConfirmaBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- a conversa ---------- */
+
+/* A conversa mede a si mesma (container): estreita (a etapa em chat em 1280, ou o celular), os botões
+   do cabeçalho descem para uma linha própria e a situação (com o nome, no celular) fica com a largura
+   toda. */
+.glChat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--sb-branco);
+  container-type: inline-size;
+}
+
+.glCab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 12px 20px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.glCabId {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 8rem;
+  line-height: 1.3;
+}
+
+.glCabNome {
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glEstado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--sb-tinta-2);
+}
+
+.glEstado > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glEstado[data-tom="ativo"] {
+  color: var(--sb-azul-texto);
+}
+
+.glEstado[data-tom="alerta"] {
+  font-weight: 500;
+  color: var(--sb-atencao);
+}
+
+.glAcoes {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.glFecharD {
+  margin-left: 4px;
+}
+
+/* O bastão do Chat (chat/Bastao) no topo da conversa: quem conduz e a ação de trocar de mãos. */
+.glBastao {
+  min-width: 0;
+}
+
+/* Conversa estreita (até 600 px): "Assumir" e "Devolver" descem para uma linha só deles. */
+@container (max-width: 600px) {
+  .glCab {
+    flex-wrap: wrap;
+  }
+
+  .glAcoes {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .glAcoes > :not(.glFecharD) {
+    flex: 1;
+  }
+}
+
+/* Fundo branco, como a área de mensagens do Chat final: o balão do lead (Bolha) é cinza (canvas). */
+.glRolo {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 20px 12px;
+  background: var(--sb-branco);
+  scrollbar-gutter: stable;
+}
+
+.glLista {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* "Ver mensagens mais antigas": a conversa chega em páginas de 50, a mais recente primeiro. */
+.glMais {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+
+.glDigitando {
+  display: flex;
+  align-self: flex-end;
+  margin-top: 10px;
+  padding: 0 10px;
+}
+
+.glBase {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.glAviso {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--sb-azul-claro);
+  font-size: 0.84375rem;
+  line-height: 1.45;
+  color: var(--sb-tinta);
+}
+
+.glLink {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--sb-azul-texto);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.glLink:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: var(--sb-anel);
+}
+
+.glDica {
+  font-size: 0.75rem;
+  color: var(--sb-tinta-2);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- larguras ---------- */
+
+@media (max-width: 1279px) {
+  .glCorpo {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+}
+
+/* No celular a Gaveta (comum) já ocupa a tela toda; as abas trocam entre conversa e infos. */
+@media (max-width: 899px) {
+  .glGaveta {
+    border-radius: 0;
+  }
+
+  .glCab {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  .glAcoes {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Os botões do topo com a mesma altura e no mínimo 44 px, o tamanho bom para o toque. */
+  .glAcoes {
+    align-items: stretch;
+  }
+
+  .glAcoes > * {
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .glBastao > button {
+    flex: 1 1 auto;
+    height: 44px;
+    min-width: 44px;
+    max-width: none;
+  }
+
+  .glRolo {
+    padding: 16px 12px 10px;
+  }
+
+  .glBase {
+    padding: 10px 12px 12px;
+  }
+
+  .glLink {
+    min-height: 44px;
+  }
+}
+
+/* ---------- a confirmação de devolver depois de uma falha (a mesma do Chat) ---------- */
+
+.glVeu {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--via-z-modal) + 10);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--sb-veu);
+  animation: gl-aparece 0.24s var(--via-ease-out) both;
+}
+
+.glDialogo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(420px, 100%);
+  padding: 24px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: gl-dialogo 0.42s var(--via-ease-out) backwards;
+}
+
+.glDialogo:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel), var(--sb-sombra-flutuante);
+}
+
+.glDialogoTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  color: var(--sb-tinta);
+}
+
+.glDialogoTexto {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.glDialogoAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@keyframes gl-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes gl-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glVeu,
+  .glDialogo {
+    animation: none;
+  }
+}

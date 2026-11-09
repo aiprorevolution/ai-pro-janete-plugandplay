@@ -1,0 +1,164 @@
+/* O evento e o separador de dia na linha do tempo da conversa (o `.evento` e o `.dia` do
+   Chat-Final.dc.html): centralizados, pequenos, sem balão. */
+
+.evEvento {
+  align-self: center;
+  max-width: min(92%, 34rem);
+  margin: 6px auto;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--sb-tinta-2);
+  text-align: center;
+  text-wrap: balance;
+  animation: ev-entra 0.45s var(--via-ease-out) backwards;
+}
+
+.evHora {
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-3);
+}
+
+.evDia {
+  align-self: center;
+  margin: 18px auto 4px;
+  font-size: var(--sb-fs-apoio);
+  font-weight: 600;
+  color: var(--sb-tinta);
+  text-align: center;
+}
+
+@keyframes ev-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .evEvento {
+    animation: none;
+  }
+}
+
+/* A passagem (os eventos de conversa_eventos, decisão 8), no desenho do Chat (rodada 2): a conversa
+   troca de mãos. Sem cartão (sem fundo, borda ou sombra): uma linha centrada e pequena, com a rota
+   (quem passa → quem recebe, com uma setinha), o texto curto e a hora em mono. Na falha da IA, o
+   texto fica vermelho. A forma compacta (o perfil do contato) usa avatares de 18 px. */
+
+.evPassagem {
+  position: relative;
+  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 8px;
+  max-width: 94%;
+  margin: 10px auto;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-align: center;
+  animation: ev-surge 0.45s var(--via-ease-out) backwards;
+}
+
+.evRota {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+.evSeta {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+/* Quem recebe sem nome: a pessoa que ainda não chegou (areia) ou o celular da empresa (cinza). */
+.evPessoa {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.evPessoa[data-celular] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+}
+
+.evPassagem[data-tom='falha'] .evPessoa {
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+}
+
+/* A pessoa da equipe: o avatar navy com as iniciais. */
+.evMembro {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+  line-height: 1;
+}
+
+.evPassagem[data-forma='compacta'] .evPessoa,
+.evPassagem[data-forma='compacta'] .evMembro {
+  width: 18px;
+  height: 18px;
+}
+
+.evPassagem[data-forma='compacta'] .evMembro {
+  font-size: 0.5rem;
+}
+
+.evTexto {
+  min-width: 0;
+  font-weight: var(--sb-peso-medio);
+}
+
+.evPassagem[data-tom='falha'] .evTexto {
+  color: var(--sb-erro);
+}
+
+.evPasHora {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+}
+
+/* A frase inteira, só para o leitor de tela (o que se vê fica com aria-hidden). */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes ev-surge {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .evPassagem {
+    animation: none;
+  }
+}

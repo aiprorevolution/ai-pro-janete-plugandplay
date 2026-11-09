@@ -1,0 +1,22 @@
+/* =============================================================================
+   A página da versão final: a grade e as medidas da D (Topo.module.css, .dvd-raiz) e, aqui, o que o
+   funil da B precisa na raiz.
+
+   A dobra 1 em 1440 × 900 (área visível de ~820 px abaixo do topo de 76 px), a conta da D:
+     herói 80 · gap 20 · fileira 2 (284: o "Precisa de você" e o Contexto com 132 cada, o anel e a
+     Saúde) · gap 20 · fileira 3 (132) · gap 20 = 556
+     → o cartão do funil começa em ~556; o título, os nomes e os números vão até ~140 px dele, e o
+       começo das barras espia nos últimos ~100 px da tela.
+   ============================================================================= */
+
+.raiz {
+  /* Um código só para as partes de cada etapa, na página toda (o funil, o Fluxo dos capítulos, as
+     barras dos que saíram e todas as legendas): avançaram em azul; ainda estão em azul claro
+     (--dvb-ainda); perdidos no cinza sólido (--dvb-perdido, 3:1 contra o branco); sem resposta na
+     hachura (--dvb-hachura: um ladrilho de 5 px com o fio diagonal, em pixel inteiro, sem moiré). */
+  --dvb-ainda: color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco));
+  --dvb-perdido: var(--sb-borda-campo);
+  --dvb-hachura: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Cpath d='M-1 1L1 -1M0 5L5 0M4 6L6 4' stroke='%239aa2b2' stroke-width='1.1'/%3E%3C/svg%3E");
+  /* nada da página alarga o documento (o celular em 390 px nunca rola para o lado) */
+  max-width: 100%;
+}

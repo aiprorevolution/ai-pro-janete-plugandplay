@@ -1,0 +1,150 @@
+/* A prévia flutuante do card (o `.previa` do Kanban-2.dc.html). Vai para o `body` (NoCorpo), presa à
+   janela; a TelaKanban calcula `left` e `top` a partir do card. */
+
+.kpPrevia {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-height: min(28rem, calc(100vh - 24px));
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  animation: kp-entra 0.26s var(--sb-ease-assentar) backwards;
+}
+
+.kpCab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.kpId {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.kpId b {
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+}
+
+.kpId span {
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: 0.78125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A rolagem de baixo para cima: a mensagem mais nova fica à vista. */
+.kpRolo {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px;
+  background: var(--sb-canvas);
+}
+
+.kpLista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpBolha {
+  max-width: 86%;
+  margin: 0;
+  padding: 7px 12px;
+  border-radius: 16px;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.kpBolha[data-de='lead'] {
+  align-self: flex-start;
+  border-bottom-left-radius: 6px;
+}
+
+.kpBolha[data-de='janete'],
+.kpBolha[data-de='equipe'] {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--sb-azul-claro);
+  box-shadow: none;
+}
+
+.kpDigitando {
+  align-self: flex-end;
+  padding: 4px 6px;
+}
+
+.kpPe {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.kpSit {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.78125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.kpSit[data-tom='alerta'] {
+  color: var(--sb-atencao);
+}
+
+.kpSit[data-tom='falha'] {
+  color: var(--sb-erro);
+}
+
+.kpSit[data-tom='ativo'] {
+  color: var(--sb-azul-texto);
+}
+
+.kpBtns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Só no computador com mouse: no toque e no celular, o card abre direto a gaveta. */
+@media (max-width: 899px), (hover: none) {
+  .kpPrevia {
+    display: none;
+  }
+}
+
+@keyframes kp-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpPrevia {
+    animation: none;
+  }
+}

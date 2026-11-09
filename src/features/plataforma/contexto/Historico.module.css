@@ -1,0 +1,344 @@
+/* =========================================================
+   O histórico do Contexto 6: a gaveta das versões (.ctx-gaveta), a faixa da versão antiga
+   (.vendo) e a confirmação de restaurar (.dlg). A gaveta e o véu vivem no <body> (portal).
+   ========================================================= */
+
+/* ---------- a gaveta: à direita, abaixo da barra do topo ---------- */
+.gaveta {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: var(--via-z-overlay);
+  display: flex;
+  flex-direction: column;
+  width: min(400px, calc(100vw - 24px));
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  color: var(--sb-tinta);
+  animation: gaveta-entra 0.42s var(--via-ease-out) backwards;
+}
+
+@media (min-width: 900px) {
+  .gaveta {
+    top: calc(var(--sb-topo) + 12px);
+  }
+}
+
+.cab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px 14px 22px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.cab > :last-child {
+  margin-left: auto;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.titulo:focus {
+  outline: none;
+}
+
+.sub {
+  margin: 0;
+  font-size: var(--sb-fs-meta);
+  color: var(--sb-tinta-3);
+}
+
+.rolo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 14px 24px;
+}
+
+/* a linha do tempo: um fio vertical ligando os pontos das versões */
+.versoes {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.versoes::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--sb-linha);
+}
+
+.ver {
+  position: relative;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  column-gap: 14px;
+  padding: 12px 12px 12px 15px;
+  border-radius: 16px;
+  transition: background-color var(--app-t-state);
+}
+
+.ver > :not(.ponto) {
+  grid-column: 2;
+}
+
+.naTela {
+  background: var(--sb-azul-nevoa);
+}
+
+.ponto {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 2px var(--sb-borda-campo);
+}
+
+.uso .ponto {
+  background: var(--sb-navy);
+  box-shadow: 0 0 0 3px var(--sb-azul-claro);
+}
+
+.restauracao .ponto {
+  box-shadow: inset 0 0 0 2px var(--sb-atencao);
+}
+
+.n {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.pilulaUso,
+.pilulaVendo {
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.71875rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.pilulaUso {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.pilulaVendo {
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.45;
+  color: var(--sb-tinta-3);
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ---------- a faixa: "Você está vendo a versão N" (fica no fluxo, abaixo do cabeçalho) ---------- */
+.faixa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 20px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  animation: faixa-entra 0.35s var(--via-ease-out) backwards;
+}
+
+.faixaIc {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.faixaTxt {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+  min-width: 16rem;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.faixaTxt b {
+  font-size: var(--sb-fs-corpo);
+  font-weight: 600;
+  color: var(--sb-tinta);
+}
+
+.faixaTxt b:focus {
+  outline: none;
+}
+
+.faixaAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- a confirmação ---------- */
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--sb-veu);
+  animation: veu-aparece 0.2s var(--via-ease-out) backwards;
+}
+
+.dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, 100%);
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: dlg-entra 0.42s var(--via-ease-out) backwards;
+}
+
+.dlgTit {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.dlgTxt {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.dlgAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@keyframes gaveta-entra {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes folha-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+
+@keyframes faixa-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes veu-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dlg-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* no celular, a gaveta vira uma folha que sobe de baixo */
+@media (max-width: 899px) {
+  .gaveta {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 88dvh;
+    border-radius: 28px 28px 0 0;
+    animation-name: folha-sobe;
+  }
+}
+
+@media (max-width: 599px) {
+  .faixaTxt {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gaveta,
+  .faixa,
+  .veu,
+  .dlg {
+    animation: none;
+  }
+}

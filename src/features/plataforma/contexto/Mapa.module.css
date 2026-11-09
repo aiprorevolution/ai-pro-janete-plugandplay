@@ -1,0 +1,867 @@
+/* =========================================================
+   O mapa do Contexto (Contexto 6, .ctx-mapa): a Janete no centro, "Sobre a oferta" e "Como
+   conversar" à esquerda, "Perguntas livres" à direita, e as curvas dos hubs dos discos até o
+   círculo do ícone de cada item.
+
+   --d é o diâmetro do disco (vem do Mapa.tsx); --lh é a altura da legenda embaixo da pilha (numa
+   linha só nas telas mais baixas). --cy é o centro do disco do meio, posto para que a pilha inteira
+   (a peça 1,235 d acima e a legenda 0,84 d abaixo, mais 12 px e --lh) fique centrada no mapa.
+
+   Os estados vêm por atributo, postos pelo Mapa.tsx:
+   - na raiz: data-antes (a entrada antes das curvas), data-desenha (as curvas se desenhando),
+     data-antiga (versão antiga na tela), data-ensina (o balão de ensinar aberto), data-muitos
+     (6 cartões ou mais) e data-estreita (celular);
+   - nas linhas, nos cartões e nos ícones: data-situacao ("sabe", "vazio" ou "nao_salvo"),
+     data-aceso (o vínculo com o disco) e data-muda (diferente da versão atual);
+   - nas curvas: data-situacao, data-aceso ("grupo" ou "item") e data-esmaecido.
+
+   Duas cores locais, sem token próprio: o azul claro do "Não salvo" e o cinza das curvas vazias
+   (as do protótipo), feitas com color-mix dos tokens.
+   ========================================================= */
+
+.mapa {
+  --lh: 56px;
+  --col: max(13rem, 22%);
+  --cy: calc(50% + var(--d) * 0.19 - var(--lh) / 2 - 6px);
+  --mapa-rasc: color-mix(in srgb, var(--sb-azul) 55%, var(--sb-branco));
+  --mapa-apagada: color-mix(in srgb, var(--sb-borda-campo) 50%, var(--sb-linha-forte));
+  position: relative;
+  flex: 1 1 0;
+  min-height: calc(var(--d) * 2.11 + var(--lh) + 24px);
+}
+
+@media (max-height: 860px) {
+  .mapa {
+    --lh: 26px;
+  }
+}
+
+@media (max-width: 1279px) {
+  .mapa {
+    --col: max(12rem, 23%);
+  }
+}
+
+/* ---------- a camada da Janete: a pilha, a legenda e o balão ---------- */
+.janete {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* o lugar da pilha sem a transformação do ensinar: o mapa mede por ele */
+.ancora {
+  position: absolute;
+  left: calc(50% - var(--d) / 2);
+  top: calc(var(--cy) - var(--d) / 2);
+  width: var(--d);
+  height: var(--d);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mover {
+  position: absolute;
+  left: 50%;
+  top: var(--cy);
+  width: 0;
+  height: 0;
+  transition: transform 0.62s var(--sb-ease-travessia);
+}
+
+/* ensinar: a pilha encolhe e desce; o balão sai da peça, sem cobrir as colunas (ENS_S e ENS_DY) */
+.mapa[data-ensina] .mover {
+  transform: translateY(calc(var(--d) * 0.45)) scale(0.62);
+}
+
+.lugar {
+  position: absolute;
+  left: calc(var(--d) * -0.5);
+  top: calc(var(--d) * -0.5);
+  pointer-events: auto;
+}
+
+/* antes do pouso, a pilha não aparece (o voo mira na caixa dela) */
+.lugar[data-escondida] {
+  visibility: hidden;
+}
+
+/* "Conhecimento da Janete" e a versão, embaixo da pilha. A caixa vai de uma borda à outra do mapa e
+   centraliza o conteúdo (a pilha fica no meio do mapa). Não use `translate` para centralizar aqui: a
+   regra tem `transform` (a entrada), e o CSS servido perde o `translate` quando os dois estão juntos. */
+.leg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--cy) + var(--d) * 0.84 + 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.45s var(--via-ease-out),
+    transform 0.45s var(--via-ease-out);
+}
+
+.leg[data-visivel] {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.4s;
+}
+
+.mapa[data-ensina] .leg {
+  opacity: 0;
+  transform: translateY(8px);
+  transition-delay: 0s;
+}
+
+@media (max-height: 860px) {
+  .leg {
+    flex-direction: row;
+    gap: 10px;
+  }
+}
+
+.legTit {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  color: var(--sb-tinta);
+}
+
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 12px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.mapa[data-antiga] .pilula {
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+/* o balão de ensinar: a ponta fica uns 7 px acima da peça já encolhida; se faltar altura, rola por dentro */
+.balao {
+  position: absolute;
+  left: 50%;
+  bottom: calc(50% + var(--d) * 0.136 + var(--lh) / 2 + 20px);
+  z-index: 8;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  width: min(24rem, calc(100% - 2 * var(--col) - 24px));
+  max-height: calc(50% - var(--d) * 0.136 - var(--lh) / 2 - 20px);
+  pointer-events: auto;
+}
+
+.balao > * {
+  min-height: 0;
+}
+
+/* ---------- as colunas ---------- */
+.col {
+  position: absolute;
+  z-index: 2;
+  width: var(--col);
+  display: flex;
+  flex-direction: column;
+}
+
+/* à esquerda: o meio entre os 2 grupos fica na altura do meio entre os 2 hubs */
+.colEsq {
+  left: 0;
+  top: max(0px, calc(var(--cy) - var(--d) * 0.266 - 212px));
+  gap: 16px;
+}
+
+/* à direita: os cartões centrados no hub do disco de baixo; se faltar altura, o espaço de cima
+   encolhe primeiro e a coluna sobe, sem nunca passar do mapa */
+.colDir {
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.colDir::before {
+  content: "";
+  flex: 1 1 calc(var(--d) * 1.5 - var(--lh) - 48px);
+}
+
+.colDir::after {
+  content: "";
+  flex: 1 1 0px;
+}
+
+.colDir > .grupo {
+  flex: none;
+}
+
+.mapa[data-muitos] .colDir {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 6px 4px 4px;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.grupoTit {
+  display: block;
+  margin: 0;
+}
+
+.grupoBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--app-t-state), background-color var(--app-t-state);
+}
+
+.grupoBtn:hover,
+.grupoBtn[data-aceso] {
+  color: var(--sb-azul-texto);
+}
+
+.grupoBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.colEsq .grupoBtn {
+  flex-direction: row-reverse;
+  padding: 0 10px 0 6px;
+}
+
+.colDir .grupoBtn {
+  padding: 0 6px 0 12px;
+}
+
+/* o glifo de cada grupo: as 3 camadas, com a do grupo cheia */
+.glifo {
+  width: 24px;
+  height: 22px;
+  flex: none;
+  overflow: visible;
+}
+
+.glifo ellipse {
+  fill: var(--sb-canvas);
+  stroke: var(--sb-borda-campo);
+  stroke-width: 1.3;
+}
+
+.glifo .ativa {
+  fill: var(--sb-navy);
+  stroke: var(--sb-navy);
+}
+
+/* ---------- o círculo do ícone: o contorno conta a situação ----------
+   contorno azul (a Janete sabe), cinza tracejado (ainda vazio) ou anel azul claro (não salvo) */
+.ico {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1.5px var(--sb-azul);
+  color: var(--sb-tinta);
+  transition:
+    box-shadow 0.35s var(--via-ease-out),
+    color 0.35s var(--via-ease-out),
+    background-color 0.35s var(--via-ease-out);
+}
+
+.icoSvg {
+  width: 17px;
+  height: 17px;
+}
+
+.ico[data-situacao="vazio"] {
+  background: transparent;
+  box-shadow: none;
+  color: var(--sb-tinta-2);
+}
+
+.ico[data-situacao="vazio"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--sb-borda-campo);
+}
+
+.ico[data-situacao="nao_salvo"] {
+  box-shadow:
+    inset 0 0 0 2px var(--mapa-rasc),
+    0 0 0 3px var(--sb-azul-nevoa);
+}
+
+.mapa[data-antiga] .ico[data-situacao="sabe"] {
+  box-shadow: inset 0 0 0 1.5px var(--sb-borda-campo);
+}
+
+/* na entrada, o contorno só acende quando a curva chega nele */
+.mapa[data-antes] .ico:not([data-situacao="vazio"]) {
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.mapa[data-desenha] .ico:not([data-situacao="vazio"]) {
+  animation: ctx-ico-liga 0.7s var(--via-ease-out) var(--chega, 0ms) backwards;
+}
+
+/* ---------- a linha de cada campo: o nome e o ícone na ponta virada para a Janete ---------- */
+.linhas {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.linha {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  height: 38px;
+  padding: 0 6px 0 8px;
+  border: 0;
+  border-bottom: 1px solid var(--sb-linha);
+  border-radius: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--via-ease-out),
+    border-radius 0.25s var(--via-ease-out);
+}
+
+.linha:hover {
+  background: var(--sb-branco);
+  border-radius: 12px;
+}
+
+.linha:focus-visible {
+  outline: none;
+  border-radius: 12px;
+  box-shadow: var(--sb-anel);
+}
+
+.linha[data-aceso] {
+  background: var(--sb-azul-nevoa);
+}
+
+.nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.006em;
+  transition: color 0.25s var(--via-ease-out);
+}
+
+.linha[data-situacao="vazio"] .nome {
+  font-weight: 500;
+  color: var(--sb-tinta-2);
+}
+
+.linha[data-muda] .nome,
+.cartao[data-muda] .cartaoP {
+  color: var(--sb-atencao);
+}
+
+/* ---------- as perguntas livres: um cartão por item, com o ícone virado para o disco ---------- */
+.cartoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 12px 8px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  color: var(--sb-tinta);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    box-shadow 0.25s var(--via-ease-out),
+    background-color 0.25s var(--via-ease-out),
+    transform var(--app-t-touch);
+}
+
+.cartao:hover {
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.cartao:active {
+  transform: scale(0.995);
+}
+
+.cartao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel), var(--sb-sombra-card);
+}
+
+.cartaoP {
+  min-width: 0;
+  font-size: 0.84375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: balance;
+}
+
+.cartao[data-novo] {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cartao[data-novo]:hover,
+.cartao[data-novo][data-aceso] {
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.cartao[data-novo]:focus-visible {
+  box-shadow: var(--sb-anel);
+}
+
+.cartao[data-novo] .ico,
+.cartao[data-novo] .cartaoP {
+  color: var(--sb-azul-texto);
+}
+
+/* no teto de 50 perguntas: o cartão fica apagado e mostra o motivo embaixo do nome */
+.cartao[data-novo][data-desligado] {
+  cursor: not-allowed;
+}
+
+.cartao[data-novo][data-desligado]:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cartao[data-novo][data-desligado] .ico,
+.cartao[data-novo][data-desligado] .cartaoP {
+  color: var(--sb-tinta-2);
+}
+
+.cartaoMotivo {
+  grid-column: 2;
+  min-width: 0;
+  margin-top: 2px;
+  font-size: 0.78125rem;
+  line-height: 1.35;
+  color: var(--sb-tinta-2);
+}
+
+.cartao[data-aceso]:not([data-novo]) {
+  box-shadow:
+    var(--sb-sombra-card),
+    inset 0 0 0 1.5px var(--sb-azul),
+    0 0 0 4px color-mix(in srgb, var(--sb-azul) 12%, transparent);
+}
+
+.mapa[data-muitos] .cartoes {
+  gap: 8px;
+}
+
+.mapa[data-muitos] .cartao {
+  min-height: 46px;
+}
+
+.mapa[data-muitos] .cartaoP {
+  -webkit-line-clamp: 1;
+}
+
+/* na entrada, cada cartão acende quando a curva dele chega */
+.mapa[data-antes] .cartao:not([data-novo]) {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+
+.mapa[data-desenha] .cartao:not([data-novo]) {
+  animation: ctx-acende 0.8s var(--via-ease-out) var(--chega, 0ms) backwards;
+}
+
+/* ---------- as ligações: um SVG do tamanho do mapa, por cima das colunas, sem receber clique ---------- */
+.fios {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+.fio {
+  --sw: 2px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--sw);
+  transition:
+    stroke 0.45s var(--via-ease-out),
+    stroke-width 0.25s var(--via-ease-snap),
+    d 0.62s var(--sb-ease-travessia),
+    opacity 0.16s var(--via-ease-out);
+}
+
+.fio[data-situacao="sabe"] {
+  stroke: var(--sb-azul);
+}
+
+.fio[data-situacao="nao_salvo"] {
+  stroke: var(--mapa-rasc);
+}
+
+.fio[data-situacao="vazio"] {
+  --sw: 1.5px;
+  stroke: var(--mapa-apagada);
+  stroke-dasharray: 4 5;
+}
+
+.mapa[data-antiga] .fio[data-situacao="sabe"] {
+  stroke: var(--sb-borda-campo);
+}
+
+/* o vínculo: as curvas do grupo engrossam, a do item mais; as outras esmaecem (opacidade, sem trocar
+   de cor: nada lembra o "Não salvo") */
+.fio[data-aceso="grupo"]:not([data-situacao="vazio"]) {
+  stroke-width: calc(var(--sw) + 0.75px);
+}
+
+.fio[data-aceso="item"] {
+  stroke-width: calc(var(--sw) + 1.6px);
+}
+
+.fio[data-esmaecido],
+.porta[data-esmaecido] {
+  opacity: 0.25;
+}
+
+/* a borracha: uma cópia da curva vazia, na cor do fundo, que sai do caminho e revela o tracejado */
+.borracha {
+  display: none;
+  fill: none;
+  stroke: var(--sb-canvas);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: d 0.62s var(--sb-ease-travessia);
+}
+
+.mapa[data-desenha] .borracha {
+  display: inline;
+  stroke-dasharray: var(--len) var(--len);
+  animation: ctx-apaga var(--dur, 0.56s) var(--sb-ease-travessia) var(--atraso, 0ms) both;
+}
+
+.mapa[data-desenha] .fio[data-situacao="sabe"],
+.mapa[data-desenha] .fio[data-situacao="nao_salvo"] {
+  animation: ctx-desenha var(--dur, 0.56s) var(--sb-ease-travessia) var(--atraso, 0ms) backwards;
+}
+
+/* o raio do "Ensinar algo novo": corre do disco pela curva até o campo descoberto */
+.raio {
+  fill: none;
+  stroke: var(--sb-azul);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 30px var(--len);
+  stroke-dashoffset: 30px;
+  opacity: 0;
+  animation: ctx-raio 1.05s var(--sb-ease-travessia) both;
+}
+
+/* o hub de cada disco: na borda dele, na linha do centro (a curva termina no círculo do ícone) */
+.porta {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  box-shadow:
+    0 0 0 3px var(--sb-canvas),
+    0 3px 10px color-mix(in srgb, var(--sb-azul) 40%, transparent);
+  transition:
+    opacity 0.25s var(--via-ease-out),
+    translate 0.3s var(--via-ease-snap),
+    left 0.62s var(--sb-ease-travessia),
+    top 0.62s var(--sb-ease-travessia),
+    background-color 0.4s var(--via-ease-out),
+    box-shadow 0.4s var(--via-ease-out);
+}
+
+.porta[data-vazio] {
+  background: var(--mapa-apagada);
+  box-shadow: 0 0 0 3px var(--sb-canvas);
+}
+
+.mapa[data-antiga] .porta {
+  background: var(--sb-borda-campo);
+  box-shadow: 0 0 0 3px var(--sb-canvas);
+}
+
+.porta[data-aceso] {
+  translate: 0 calc(var(--d) * -0.017);
+}
+
+.mapa[data-desenha] .porta {
+  animation: ctx-pop 0.42s var(--sb-ease-mola) var(--chega, 0ms) backwards;
+}
+
+/* =========================================================
+   Celular (a prop `estreita`): a Janete pequena no alto, com a legenda ao lado, e os 3 grupos em
+   coluna, sem curvas. O ícone vai para a esquerda da linha.
+   ========================================================= */
+.mapa[data-estreita] {
+  flex: none;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  --cy: calc(50% + 20px);
+}
+
+.mapa[data-estreita] .janete {
+  position: relative;
+  inset: auto;
+  height: 15rem;
+}
+
+.mapa[data-estreita] .ancora {
+  left: calc(30% - var(--d) / 2);
+}
+
+.mapa[data-estreita] .mover {
+  left: 30%;
+}
+
+.mapa[data-estreita][data-ensina] .mover {
+  transform: none;
+}
+
+.mapa[data-estreita] .leg {
+  left: 58%;
+  right: auto;
+  top: 50%;
+  translate: 0 -50%;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  white-space: normal;
+}
+
+.mapa[data-estreita][data-ensina] .leg {
+  opacity: 1;
+  transform: none;
+}
+
+.mapa[data-estreita] .balao {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 100px;
+  z-index: var(--via-z-overlay);
+  width: auto;
+  translate: none;
+  max-height: calc(100dvh - 180px);
+}
+
+.mapa[data-estreita] .col {
+  position: static;
+  width: auto;
+  overflow: visible;
+  padding: 0;
+  gap: 22px;
+}
+
+.mapa[data-estreita] .colDir::before,
+.mapa[data-estreita] .colDir::after {
+  display: none;
+}
+
+.mapa[data-estreita] .grupoBtn {
+  flex-direction: row;
+  min-height: 44px;
+  padding: 0 6px 0 4px;
+  font-size: 1.0625rem;
+}
+
+.mapa[data-estreita] .linha {
+  grid-template-columns: 32px minmax(0, 1fr);
+  height: auto;
+  min-height: 50px;
+  padding: 0 8px 0 4px;
+  text-align: left;
+}
+
+.mapa[data-estreita] .linha .ico {
+  order: -1;
+}
+
+.mapa[data-estreita] .nome {
+  font-size: 0.9375rem;
+}
+
+.mapa[data-estreita] .cartao {
+  min-height: 56px;
+}
+
+.mapa[data-estreita] .fios {
+  display: none;
+}
+
+/* ---------- movimento reduzido: tudo já no estado final ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .mapa,
+  .mapa * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .mapa .raio {
+    display: none;
+  }
+}
+
+@keyframes ctx-desenha {
+  from {
+    stroke-dasharray: var(--len) var(--len);
+    stroke-dashoffset: var(--len);
+  }
+  to {
+    stroke-dasharray: var(--len) var(--len);
+    stroke-dashoffset: 0px;
+  }
+}
+
+@keyframes ctx-apaga {
+  from {
+    stroke-dashoffset: 0px;
+  }
+  to {
+    stroke-dashoffset: calc(var(--len) * -1);
+  }
+}
+
+@keyframes ctx-raio {
+  0% {
+    stroke-dashoffset: 30px;
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: calc(var(--len) * -1);
+    opacity: 0;
+  }
+}
+
+@keyframes ctx-pop {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ctx-ico-liga {
+  0% {
+    box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  }
+  40% {
+    box-shadow:
+      inset 0 0 0 2px var(--sb-azul),
+      0 0 0 5px color-mix(in srgb, var(--sb-azul) 18%, transparent);
+  }
+}
+
+@keyframes ctx-acende {
+  0% {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--sb-linha);
+  }
+  45% {
+    background-color: var(--sb-branco);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--sb-azul) 16%, transparent),
+      0 0 22px color-mix(in srgb, var(--sb-azul) 34%, transparent);
+  }
+  100% {
+    background-color: var(--sb-branco);
+    box-shadow: var(--sb-sombra-card);
+  }
+}

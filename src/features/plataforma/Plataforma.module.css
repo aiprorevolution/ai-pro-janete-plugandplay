@@ -1,0 +1,1147 @@
+/* =============================================================================
+   6 · Plataforma (abre a partir do canto da Janete, E6): o `.plat`, `.lado`, `.item`, o
+   tour (`.moldura`, `.guia`, `.balao`) e o botão do canto (`.gatilho`) do F-Final.dc.html.
+   Curvas do F trocadas pelos tokens: --e-trav → --sb-ease-travessia, --e-out → --via-ease-out,
+   --e-snap → --via-ease-snap, --e-mola → --via-ease-spring. Sem a barra do onboarding aqui:
+   a plataforma ocupa a altura toda da tela.
+   ============================================================================= */
+
+/* Token da plataforma que o aipro.css não tem: o erro sobre fundo escuro (o aviso navy das telas).
+   O --sb-erro (#b42318) some no navy; este coral claro dá 7,8:1 sobre o --sb-navy (#0e1531). Coral
+   só para erro e destrutivo, como manda a paleta. Fica no :root (e não no .raiz) porque os avisos e
+   as gavetas de algumas telas vão por portal para o <body>. */
+:global(:root) {
+  --sb-erro-no-escuro: #ff8a7a;
+}
+
+.raiz {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+/* No computador a casca tem a altura da tela e não rola o documento (a área rola por dentro do
+   .platMain). O `html { scrollbar-gutter: stable }` do aipro.css reservaria 15 px de barra que nunca
+   aparece: uma faixa branca na borda direita e 15 px a menos para o Chat e o Kanban. Aqui, enquanto
+   a plataforma está aberta, o html não reserva nada, e o body pinta o mesmo fundo da casca. No
+   celular a casca rola o documento e a barra flutua: nada muda lá. */
+@media (min-width: 900px) {
+  :global(html):has(.raiz) {
+    scrollbar-gutter: auto;
+  }
+
+  :global(body):has(.raiz) {
+    background: var(--sb-canvas);
+  }
+}
+
+.plat {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-columns: 240px minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(to right, var(--sb-branco) 240px, var(--sb-canvas) 240px);
+}
+
+/* fechada: só o círculo do canto, onde a Janete pousa */
+.rev0 {
+  clip-path: circle(30px at 42px calc(100% - 42px));
+}
+
+.revAbre {
+  clip-path: circle(160% at 42px calc(100% - 42px));
+  transition: clip-path 1.05s var(--sb-ease-travessia);
+}
+
+.ic {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- menu lateral ---------- */
+
+.lado {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  padding: 16px 12px 84px;
+  animation: aparece 0.5s var(--via-ease-out) both;
+}
+
+.ladoTopo {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding-left: 12px;
+}
+
+.marca {
+  display: block;
+  flex: none;
+}
+
+.marca circle {
+  fill: var(--sb-navy);
+}
+
+.marca path {
+  fill: var(--sb-azul);
+}
+
+.ladoNome {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.ladoNav {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ladoGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ladoTitulo {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  color: var(--sb-tinta-3);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.ladoLista {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ladoLista > li {
+  display: block;
+}
+
+.item {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+  animation: item-entra 0.32s var(--via-ease-out) backwards;
+}
+
+.item:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.item:focus-visible,
+.pilula:focus-visible,
+.botaoIcone:focus-visible,
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.itemIcone {
+  display: inline-grid;
+  place-items: center;
+}
+
+.item .ic {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.5;
+  color: var(--sb-tinta-3);
+  transition: color var(--app-t-state);
+}
+
+.item[aria-current='page'] {
+  color: var(--sb-tinta);
+  font-weight: 600;
+}
+
+.item[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--sb-azul-claro);
+}
+
+.item[aria-current='page'] .ic {
+  color: var(--sb-azul);
+}
+
+.ladoPe {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.ladoStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0 12px;
+  color: var(--sb-tinta-2);
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ladoStatus .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.ladoStatus[data-ok] .ic {
+  color: var(--sb-sucesso);
+}
+
+/* WhatsApp desconectado ou com erro: o ícone de alerta em vermelho (o `.lado-status.erro`). */
+.ladoStatus[data-erro] .ic {
+  color: var(--sb-erro);
+}
+
+/* O contador do Chat (o `.item-conta` do protótipo): as conversas que precisam de alguém. Sai pelo
+   ::after para ficar fora do texto do link; só no computador (no dock do celular o ::after é o rótulo
+   curto, e o protótipo esconde o contador). */
+@media (min-width: 900px) {
+  .item[data-conta]::after {
+    content: attr(data-conta);
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    margin-left: auto;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--sb-navy);
+    color: var(--sb-branco);
+    font-family: var(--sb-fonte-mono);
+    font-size: 0.71875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ---------- área principal e topo ---------- */
+
+.platMain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  /* A área rola aqui dentro: sem o espaço reservado, a barra aparece ao trocar para uma área mais
+     alta e o conteúdo centralizado anda para o lado ("sai do eixo"). */
+  scrollbar-gutter: stable;
+}
+
+/* Chat e Kanban cabem na altura da tela (as colunas rolam por dentro): o .platMain não rola, e a
+   barra reservada só tiraria largura deles. Em janela baixa, a barra aparece só quando precisa. */
+.platMain[data-area-aberta='chat'],
+.platMain[data-area-aberta='kanban'] {
+  scrollbar-gutter: auto;
+}
+
+/* O topo tem sempre uma linha de 76 px (--sb-topo): a saúde presa da Configuração e a altura do Chat
+   contam com ele. Ele não encolhe (flex: none; senão, com a área mais alta que a tela, a 2ª linha
+   vazava por cima do conteúdo) e não quebra: o caminho é que encolhe, e as faixas de largura abaixo
+   tiram o que não cabe (texto da pílula do tour, nome da conta). */
+.platTopo {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px 16px;
+  min-height: 76px;
+  padding: 12px 32px;
+  background: var(--sb-canvas);
+}
+
+.platTopoM {
+  display: none;
+}
+
+.trilha {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.trilha .ic {
+  width: 15px;
+  height: 15px;
+  color: var(--sb-linha-forte);
+}
+
+.trilha b {
+  color: var(--sb-tinta);
+  font-weight: 500;
+}
+
+.trilhaEmp {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topoDir {
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px 0 14px;
+  border: 1px solid var(--sb-linha);
+  border-radius: 999px;
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.pilula:hover {
+  background: var(--sb-azul-nevoa);
+  border-color: var(--sb-linha-forte);
+}
+
+.pilula .ic {
+  color: var(--sb-azul);
+}
+
+.contaTopo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contaTopoTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+  text-align: right;
+}
+
+/* Nome e empresa longos não empurram o topo para 2 linhas: cortam com reticências. */
+.contaTopoNome,
+.contaTopoTexto .meta {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contaTopoNome {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* O osso do nome enquanto a conta carrega, alinhado à direita como o nome. */
+.contaTopoOsso {
+  align-self: flex-end;
+}
+
+.meta {
+  color: var(--sb-tinta-3);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  font-size: 0.84375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* sair: discreto, ao lado da conta */
+.sair {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-3);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.sair:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.botaoIcone {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  color: var(--sb-tinta);
+  cursor: pointer;
+}
+
+/* O conteúdo das áreas fica no limite de 1.344 px, centralizado. */
+.platConteudo {
+  width: min(100%, 1344px);
+  margin: 0 auto;
+  padding: 4px 32px 140px;
+}
+
+/* A troca de área que demora (o roteador ainda espera o acesso de /app ou o código da área nova):
+   fica o esqueleto da área nova, e a anterior some da vista sem desmontar (useEsperaDaTroca, em
+   Layout.tsx). O aviso da casca continua. */
+.platConteudo[data-esperando] > :not([data-carregando-area]):not([data-aviso-casca]) {
+  display: none;
+}
+
+/* O Kanban, o Chat e os Contatos ocupam a largura inteira (decisões de 30/10; o Chat entrou na rodada 2
+   dele, com o "Largura toda" do equipe; os Contatos em 31/10, com o "a página não tá ocupando o tamanho
+   total"): o quadro tem colunas para o lado, o Chat tem 3 colunas e a tabela dos Contatos, várias, e
+   os três usam o espaço que sobra em telas largas. As outras áreas ficam no limite de 1.344 px. O
+   recheio lateral continua o mesmo (no computador, os 24 px do bloco do Chat e do Kanban, mais abaixo,
+   e os 32 px das outras áreas, os Contatos inclusive; no celular, os 16 px de todas). */
+.platMain[data-area-aberta='kanban'] > .platConteudo {
+  width: 100%;
+}
+
+.platMain[data-area-aberta='chat'] > .platConteudo {
+  width: 100%;
+}
+
+.platMain[data-area-aberta='contatos'] > .platConteudo {
+  width: 100%;
+}
+
+/* Faixas do topo no computador (de 900 a 1439 px), para ele caber numa linha só:
+   - abaixo de 1440, a pílula "Ver o tour de novo" fica só com o ícone (44 px). O texto continua no
+     botão, só para o leitor de tela, e na dica (title);
+   - abaixo de 1280, sai também o nome da conta (fica o avatar). */
+@media (min-width: 900px) and (max-width: 1439px) {
+  .pilula {
+    position: relative;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+
+  .pilula > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1279px) {
+  .contaTopoTexto {
+    display: none;
+  }
+}
+
+/* Chat e Kanban, no computador: as margens de 24 px do `.plat-conteudo` do protótipo (as 3 colunas e
+   as 4 colunas do quadro cabem como lá). O Kanban, além disso, preenche a altura que sobra embaixo do
+   topo (o quadro vai até 20 px do fim) em vez de calcular a altura com números fixos; o Chat já fecha
+   a conta da altura pela TelaChat. */
+@media (min-width: 900px) {
+  .platMain[data-area-aberta='chat'] > .platConteudo {
+    padding-inline: 24px;
+  }
+
+  .platMain[data-area-aberta='kanban'] > .platConteudo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 4px 24px 20px;
+  }
+}
+
+/* ---------- tour: moldura, bolinha e balão ---------- */
+
+.moldura {
+  position: absolute;
+  z-index: 5;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 2px var(--sb-azul),
+    0 0 0 6px color-mix(in srgb, var(--sb-azul) 12%, transparent);
+  pointer-events: none;
+  transition:
+    left 0.76s var(--sb-ease-travessia),
+    top 0.76s var(--sb-ease-travessia),
+    width 0.76s var(--sb-ease-travessia),
+    height 0.76s var(--sb-ease-travessia),
+    opacity 0.45s var(--via-ease-out);
+  animation: aparece 0.5s var(--via-ease-out) 0.6s backwards;
+}
+
+.sumir {
+  opacity: 0;
+}
+
+.guia {
+  position: absolute;
+  z-index: 8;
+  width: 44px;
+  height: 44px;
+  transition:
+    left 0.76s var(--sb-ease-travessia),
+    top 0.76s var(--sb-ease-travessia),
+    opacity 0.2s;
+}
+
+.guiaOculto {
+  opacity: 0;
+}
+
+.guiaWrap {
+  width: 100%;
+  height: 100%;
+}
+
+.ey1 {
+  animation: estica-y1 0.76s var(--sb-ease-travessia);
+}
+
+.ey2 {
+  animation: estica-y2 0.76s var(--sb-ease-travessia);
+}
+
+.ex1 {
+  animation: estica-x1 0.76s var(--sb-ease-travessia);
+}
+
+.ex2 {
+  animation: estica-x2 0.76s var(--sb-ease-travessia);
+}
+
+.guiaPonto {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.8s var(--sb-ease-travessia);
+}
+
+.guiaPonto > [data-estado] {
+  box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--sb-navy) 70%, transparent);
+}
+
+.guiaPonto:hover > [data-estado] {
+  background: var(--sb-navy-2);
+}
+
+.guiaPonto:focus-visible {
+  outline: none;
+}
+
+.guiaPonto:focus-visible > [data-estado] {
+  box-shadow: var(--sb-anel);
+}
+
+/* em casa (o canto), a bolinha tem o tamanho do botão da Janete: 44 × 1,1818 = 52 */
+.casa .guiaPonto {
+  transform: scale(1.1818);
+}
+
+.balao {
+  position: absolute;
+  left: 56px;
+  top: -10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(21rem, calc(100vw - 22rem));
+  padding: 16px 18px 14px;
+  border-radius: 16px;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha), var(--sb-sombra-flutuante);
+  transition:
+    opacity 0.32s var(--via-ease-out) 0.04s,
+    transform 0.45s var(--via-ease-out) 0.04s;
+}
+
+.balao::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 26px;
+  width: 12px;
+  height: 12px;
+  background: var(--sb-branco);
+  box-shadow: -1px 1px 0 var(--sb-linha);
+  transform: rotate(45deg);
+}
+
+.balaoOculto {
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition:
+    opacity 0.14s var(--via-ease-snap),
+    transform 0.14s var(--via-ease-snap);
+}
+
+.fim {
+  left: 50%;
+  top: 60px;
+  width: min(24rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+}
+
+.fim::before {
+  left: calc(50% - 6px);
+  top: -6px;
+  box-shadow: -1px -1px 0 var(--sb-linha);
+}
+
+.fim.balaoOculto {
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.olho {
+  margin: 0;
+  color: var(--sb-azul-texto);
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.balaoTexto {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.fim .balaoTexto {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+}
+
+.balaoAcoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.balaoBotoes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.balaoConta {
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- o botão da Janete: só o símbolo, no canto inferior esquerdo ----------
+   Sem animação de entrada: o botão sempre substitui o guia ou o painel no mesmo ponto. */
+
+.gatilho {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.gatilho > [data-estado] {
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.gatilho:hover > [data-estado] {
+  background: var(--sb-navy-2);
+}
+
+/* Ao apertar, só a cor muda: sem escala, o símbolo não sai do lugar dele (decisão 5b). */
+.gatilho:active > [data-estado] {
+  background: var(--sb-navy-2);
+}
+
+.gatilho:focus-visible {
+  outline: none;
+}
+
+.gatilho:focus-visible > [data-estado] {
+  box-shadow: var(--sb-anel), var(--sb-sombra-flutuante);
+}
+
+.gatilhoPonto {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  box-shadow: 0 0 0 2px var(--sb-branco);
+  animation: selo-entra 0.5s var(--via-ease-spring) 0.5s both;
+}
+
+/* ---------- keyframes (os do F) ---------- */
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes item-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes selo-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes estica-y1 {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: scale(0.94, 1.06);
+  }
+  66% {
+    transform: scale(1.03, 0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes estica-y2 {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: scale(0.94, 1.06);
+  }
+  66% {
+    transform: scale(1.03, 0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes estica-x1 {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: scale(1.06, 0.94);
+  }
+  66% {
+    transform: scale(0.97, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes estica-x2 {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: scale(1.06, 0.94);
+  }
+  66% {
+    transform: scale(0.97, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- responsivo ---------- */
+
+@media (max-width: 899px) {
+  .plat {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 100dvh;
+    /* o aside fica com 0 px (o dock é fixo): sem isto, o grid divide a sobra da tela entre a linha
+       vazia dele e a do conteúdo, e aparece uma faixa vazia no topo (no F o .lado some) */
+    align-content: start;
+    overflow: visible;
+    background: var(--sb-canvas);
+  }
+
+  .rev0,
+  .revAbre {
+    clip-path: none;
+  }
+
+  /* o menu vira o dock de baixo: some a marca, o rodapé e os títulos dos grupos */
+  .lado {
+    display: block;
+    padding: 0;
+    animation: none;
+  }
+
+  .ladoTopo,
+  .ladoPe,
+  .ladoTitulo {
+    display: none;
+  }
+
+  .ladoNav {
+    position: fixed;
+    /* 6 ou 7 áreas, conforme o papel (o F tinha 5): margem e recheio menores para caber "Contatos" e "Contexto" */
+    left: 8px;
+    right: 8px;
+    bottom: 12px;
+    z-index: 10;
+    display: grid;
+    /* colunas automáticas: 6 ou 7 itens dividem a largura inteira, sem buraco */
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 8px 4px;
+    border-radius: 28px;
+    background: var(--sb-branco);
+    box-shadow: inset 0 0 0 1px var(--sb-linha), var(--sb-sombra-flutuante);
+  }
+
+  .ladoNav[data-realce] {
+    box-shadow:
+      inset 0 0 0 1px var(--sb-linha),
+      0 0 0 2px var(--sb-azul),
+      var(--sb-sombra-flutuante);
+  }
+
+  .ladoGrupo,
+  .ladoLista {
+    display: contents;
+  }
+
+  .item {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    height: auto;
+    min-height: 56px;
+    padding: 0;
+    border-radius: 20px;
+    color: var(--sb-tinta-3);
+    font-size: 0.625rem;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    animation: none;
+  }
+
+  .item:hover {
+    background: transparent;
+  }
+
+  .itemIcone {
+    width: 36px;
+    height: 30px;
+    border-radius: 999px;
+    transition: background-color var(--app-t-state);
+  }
+
+  .item .ic {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* no dock, o rótulo curto (o nome inteiro continua no aria-label) */
+  .itemNome {
+    display: none;
+  }
+
+  .item::after {
+    content: attr(data-curto);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .item[aria-current='page']::before {
+    display: none;
+  }
+
+  .item[aria-current='page'] .itemIcone {
+    background: var(--sb-azul-claro);
+  }
+
+  .item[aria-current='page'] .ic {
+    color: var(--sb-azul-texto);
+  }
+
+  .item[data-realce] .itemIcone {
+    box-shadow: 0 0 0 2px var(--sb-azul);
+  }
+
+  .platMain {
+    overflow: visible;
+  }
+
+  .platTopo {
+    display: none;
+  }
+
+  .platTopoM {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 64px;
+    padding: 0 16px;
+  }
+
+  .platTopoM :global(.aipro-brand) {
+    flex: none;
+  }
+
+  .platTopoM .ladoNome {
+    font-size: 0.9375rem;
+  }
+
+  .platTopoM .trilhaEmp {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--sb-tinta-2);
+    font-size: 0.84375rem;
+    white-space: nowrap;
+  }
+
+  .topoMAcoes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .platConteudo {
+    padding: 4px 16px 200px;
+  }
+
+  .moldura {
+    display: none;
+  }
+
+  .guia {
+    position: fixed;
+    left: 16px !important;
+    top: auto !important;
+    bottom: 100px;
+    width: 52px;
+    height: 52px;
+    transition: opacity 0.2s;
+  }
+
+  .casa .guiaPonto {
+    transform: none;
+  }
+
+  .balao,
+  .fim {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 168px;
+    width: auto;
+    transform: none;
+  }
+
+  .balao::before,
+  .fim::before {
+    /* a seta aponta para o item do dock: dock em 8 px + 4 px de recheio, balão em 16 px */
+    left: calc((100% + 8px) * (var(--i, 3) + 0.5) / 7 - 10px);
+    top: auto;
+    bottom: -6px;
+    box-shadow: 1px 1px 0 var(--sb-linha);
+  }
+
+  .balaoOculto,
+  .fim.balaoOculto {
+    transform: translateY(8px);
+  }
+
+  .gatilho {
+    position: fixed;
+    left: 16px;
+    bottom: 100px;
+    transition: opacity 0.2s var(--via-ease-out);
+  }
+
+  /* A44: some enquanto a lista desce. Com foco de teclado, aparece: o Tab nunca cai num botão invisível.
+     Só a opacidade muda: o voo da Janete (Dashboard e Contexto) mede este botão, e um deslocamento aqui o
+     faria pousar fora do lugar. */
+  .gatilho[data-escondido]:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .contaTopoTexto {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raiz *,
+  .raiz *::before,
+  .raiz *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* No celular a bolinha do tour tem 52 px, como o botão da Janete. */
+@media (max-width: 899px) {
+  .guiaPonto > [data-estado] {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}

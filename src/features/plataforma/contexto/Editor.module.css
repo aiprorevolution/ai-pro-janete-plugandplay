@@ -1,0 +1,888 @@
+/* =========================================================
+   O editor de um item (Contexto 6, .ctx-ed): o cartão branco da 3ª coluna da seção.
+   O cabeçalho e o pé ficam parados; só o miolo rola, e a caixa de mandar fica no pé,
+   fora da rolagem, para nunca esconder conteúdo.
+   ========================================================= */
+.ed {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-corpo);
+  animation: ed-entra-sec 0.2s var(--via-ease-out) 0.06s backwards;
+}
+
+:where(.ed) button,
+:where(.ed) input,
+:where(.ed) textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.edIn {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  animation: ed-troca 0.26s var(--via-ease-out) backwards;
+}
+
+/* ---------- o cabeçalho: o ícone, o nome, a situação e anterior/próximo ---------- */
+.cab {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 14px;
+  padding: 20px 16px 12px 24px;
+  flex: none;
+}
+
+.id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tit {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.tit:focus {
+  outline: none;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  color: var(--sb-tinta-2);
+}
+
+.estado svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.estadoSabe {
+  color: var(--sb-tinta);
+}
+
+.estadoSabe svg {
+  color: var(--sb-azul);
+}
+
+.estadoAzul {
+  color: var(--sb-azul-texto);
+}
+
+.estadoMuda {
+  color: var(--sb-atencao);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navBtn,
+.volta,
+.anexoX,
+.compBtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.navBtn svg,
+.volta svg,
+.compBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.navBtn:hover:not(:disabled),
+.volta:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.navBtn:disabled {
+  color: var(--sb-linha-forte);
+  cursor: default;
+}
+
+.navBtn:focus-visible,
+.volta:focus-visible,
+.anexoX:focus-visible,
+.compBtn:focus-visible,
+.enviar:focus-visible,
+.menuItem:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.volta {
+  width: 44px;
+  height: 44px;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.pos {
+  min-width: 3.25rem;
+  text-align: center;
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--sb-fs-meta);
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+}
+
+.aviso {
+  margin: 0 24px 6px;
+  flex: none;
+}
+
+/* ---------- o miolo: rola por dentro, com as bordas esmaecidas ---------- */
+.corpo {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 24px 24px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 10px, black calc(100% - 20px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, black 10px, black calc(100% - 20px), transparent 100%);
+}
+
+.sec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 36px;
+  margin: 0;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: var(--sb-ls-rotulo);
+  color: var(--sb-tinta-3);
+}
+
+.rotN {
+  margin-right: auto;
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.65;
+  text-wrap: pretty;
+  white-space: pre-line;
+}
+
+/* o que chegou pela caixa e ainda não foi salvo */
+.extra {
+  border-radius: 4px;
+  background: var(--sb-azul-nevoa);
+  box-shadow: 0 0 0 2px var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.vazio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: var(--sb-r-item);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--sb-tinta-2);
+}
+
+.vazio b {
+  font-weight: var(--sb-peso-forte);
+  color: var(--sb-tinta);
+}
+
+.fCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.campoRotulo {
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  color: var(--sb-tinta);
+}
+
+.entrada {
+  min-height: var(--sb-controle-campo);
+  padding: 0 20px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  font-size: var(--sb-fs-campo);
+  color: var(--sb-tinta);
+}
+
+.area {
+  min-height: 7.5rem;
+  padding: 12px 16px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  font-size: var(--sb-fs-campo);
+  line-height: 1.55;
+  color: var(--sb-tinta);
+  resize: vertical;
+}
+
+.entrada:hover,
+.area:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.entrada:focus,
+.area:focus {
+  outline: none;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.entrada::placeholder,
+.area::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.apoio {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+/* ---------- os anexos e links, cada um com "A Janete aprendeu" ---------- */
+.anexos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.anexos:empty {
+  display: none;
+}
+
+.anexo {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 12px 8px 12px 12px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  animation: ed-sobe 0.35s var(--via-ease-out) backwards;
+}
+
+.anexoNovo {
+  background: var(--sb-azul-nevoa);
+}
+
+.anexoTipo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: var(--sb-r-mini);
+  color: var(--sb-tinta);
+}
+
+.anexoTipo svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tPdf {
+  background: var(--sb-rosa);
+}
+
+.tPlan {
+  background: var(--sb-menta);
+}
+
+.tDoc {
+  background: var(--sb-azul-claro);
+}
+
+.tImg {
+  background: var(--sb-areia);
+}
+
+.tLink {
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.anexoId {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.anexoNome {
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anexoMeta {
+  font-size: var(--sb-fs-meta);
+  color: var(--sb-tinta-3);
+}
+
+.anexoX svg {
+  width: 18px;
+  height: 18px;
+}
+
+.anexoX:hover {
+  background: var(--sb-branco);
+  color: var(--sb-erro);
+}
+
+.anexoLinha {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--sb-linha);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+}
+
+.anexoLinha b {
+  font-weight: var(--sb-peso-forte);
+  color: var(--sb-tinta);
+}
+
+/* a Janete pequena: o símbolo pronto, ou girando enquanto lê */
+.janeteSvg {
+  display: block;
+  flex: none;
+  margin-top: 1px;
+}
+
+.janeteMini {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+}
+
+.janeteMiniV {
+  width: 46%;
+  height: 46%;
+  border-radius: 50% 50% 50% 0;
+  background: var(--sb-azul);
+  animation: ed-carrega 1.15s var(--via-ease) infinite;
+}
+
+.livreP {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.rem {
+  display: flex;
+  padding-top: 2px;
+}
+
+.remover {
+  color: var(--sb-erro) !important;
+}
+
+/* ---------- os arquivos de exemplo: abrem no fim do miolo, logo acima da caixa ---------- */
+.arqs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  animation: ed-sobe 0.25s var(--via-ease-out) backwards;
+}
+
+.menuTit {
+  margin: 0;
+  padding: 4px 8px 6px;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  color: var(--sb-tinta-3);
+}
+
+.menuItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.menuItem:hover {
+  background: var(--sb-branco);
+}
+
+.menuItem .anexoTipo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.menuTxt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.menuTxt b {
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuTxt span {
+  font-size: 0.75rem;
+  color: var(--sb-tinta-3);
+}
+
+.menuPc {
+  margin-top: 4px;
+  border-top: 1px solid var(--sb-linha);
+  border-radius: 0 0 var(--sb-r-mini) var(--sb-r-mini);
+}
+
+.menuPc:focus-within {
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- o pé: a Janete responde, a caixa de mandar e salvar ---------- */
+.pe {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 20px 20px;
+}
+
+.janeteDiz {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--sb-tinta);
+  animation: ed-sobe 0.35s var(--via-ease-out) backwards;
+}
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-azul-nevoa);
+  animation: ed-sobe 0.3s var(--via-ease-out) backwards;
+}
+
+.barraTxt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+}
+
+.barraPonto {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--sb-azul);
+}
+
+.barraAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.comp {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  min-height: 56px;
+  padding: 5px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-painel);
+  background: var(--sb-branco);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.comp:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.comp:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.compBtn {
+  width: 44px;
+  height: 44px;
+}
+
+.compBtn:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.compBtn[aria-pressed="true"],
+.compBtn[aria-expanded="true"] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.compIn {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 7.5rem;
+  padding: 11px 6px;
+  border: 0;
+  background: transparent;
+  font-size: var(--sb-fs-campo);
+  line-height: var(--sb-lh-ui);
+  color: var(--sb-tinta);
+  resize: none;
+}
+
+.compIn::placeholder {
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compIn:focus,
+.compIn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.enviar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.enviar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.enviar:hover:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+.enviar:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.enviar:disabled {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+/* ---------- a confirmação de remover uma pergunta ---------- */
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--sb-esp-4);
+  background: var(--sb-veu);
+  animation: ed-aparece 0.2s var(--via-ease-out) backwards;
+}
+
+.dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, 100%);
+  padding: var(--sb-esp-6);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  animation: ed-sobe 0.42s var(--via-ease-out) backwards;
+}
+
+.dlgTit {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.dlgTexto {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.55;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.dlgAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ---------- celular: o editor em tela cheia, com "←" para voltar à lista ---------- */
+.ed[data-estreita] {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--via-z-overlay) + 2);
+  border-radius: 0;
+  box-shadow: none;
+  animation: ed-entra 0.32s var(--via-ease-out) backwards;
+}
+
+.ed[data-estreita] .cab {
+  grid-template-columns: 44px 36px minmax(0, 1fr) auto;
+  column-gap: 10px;
+  padding: 10px 10px 12px 8px;
+}
+
+.ed[data-estreita] .cab > span:first-of-type {
+  width: 36px;
+  height: 36px;
+}
+
+.ed[data-estreita] .pos {
+  display: none;
+}
+
+.ed[data-estreita] .aviso {
+  margin: 0 16px 6px;
+}
+
+.ed[data-estreita] .corpo {
+  padding: 8px 16px 24px;
+}
+
+.ed[data-estreita] .pe {
+  padding: 6px 12px calc(12px + env(safe-area-inset-bottom));
+}
+
+/* ---------- keyframes ---------- */
+@keyframes ed-entra-sec {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes ed-entra {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+@keyframes ed-troca {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes ed-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes ed-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ed-carrega {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.86);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* ---------- o contador de letras (decisão 11d) e o texto do outro admin (11b) ---------- */
+.contador {
+  margin: 4px 0 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra .contador {
+  margin: 0;
+}
+
+.contadorPassou {
+  color: var(--sb-erro);
+  font-weight: var(--sb-peso-medio);
+}
+
+.textoNovo {
+  display: block;
+  margin: 6px 0;
+  padding: 8px 12px;
+  border-left: 3px solid currentColor;
+  border-radius: 4px;
+  background: var(--sb-erro-claro);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+/* ---------- movimento reduzido: tudo já no estado final ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ed,
+  .ed *,
+  .ed *::before,
+  .veu,
+  .veu * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

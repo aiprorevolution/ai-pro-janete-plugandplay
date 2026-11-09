@@ -1,0 +1,101 @@
+/* A casca da tela de Contatos: a tabela ou o perfil, e o aviso curto. A largura máxima (1.344 px) já
+   vem do .platConteudo da plataforma. */
+
+.tcoRaiz {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* O aviso curto no canto (o mesmo desenho do aviso do Chat): navy, sobe de baixo e some em 4 s. */
+.tcoAviso {
+  position: fixed;
+  right: var(--sb-esp-6);
+  bottom: var(--sb-esp-6);
+  z-index: var(--via-z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  max-width: min(26rem, calc(100% - 48px));
+  padding: var(--sb-esp-3) var(--sb-esp-2) var(--sb-esp-3) var(--sb-esp-4);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.875rem;
+  line-height: var(--sb-lh-ui);
+  animation: tco-aviso 420ms var(--via-ease-out) backwards;
+}
+
+.tcoAviso > svg {
+  flex: none;
+  color: var(--sb-azul);
+}
+
+.tcoAvisoTexto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.tcoAvisoFechar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+}
+
+.tcoAvisoFechar:hover {
+  background: var(--sb-navy-2);
+}
+
+.tcoAvisoFechar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* No celular, o aviso ocupa a largura (com a margem) e fica acima da barra de baixo; o X ganha o
+   tamanho de toque. */
+@media (max-width: 899px) {
+  .tcoAviso {
+    right: var(--sb-esp-3);
+    bottom: 96px;
+    left: var(--sb-esp-3);
+    max-width: none;
+  }
+
+  .tcoAvisoFechar {
+    width: var(--sb-controle);
+    height: var(--sb-controle);
+  }
+}
+
+.tcoSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tcoAviso {
+    animation: none;
+  }
+}
+
+@keyframes tco-aviso {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

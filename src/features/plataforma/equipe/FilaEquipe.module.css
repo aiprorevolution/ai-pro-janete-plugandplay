@@ -1,0 +1,226 @@
+/* A fila "Precisam de você" (o `.fila` do protótipo B): cartão branco com o contador navy no título e
+   uma linha por conversa. Abaixo de 1100 px a fila sobe para cima dos cartões e os itens viram uma
+   grade; no celular (até 899 px) voltam a ser uma lista. */
+
+.flFila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+  padding: var(--sb-esp-5) var(--sb-esp-5) var(--sb-esp-3);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.flCab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-1);
+  padding-bottom: var(--sb-esp-3);
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.flTitulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-2);
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.flContador {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.flContador[data-zero] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+}
+
+.flApoio {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.flLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flItem {
+  min-width: 0;
+  border-radius: var(--sb-r-mini);
+}
+
+.flItem + .flItem {
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* A conversa que acabou de voltar para a fila: o fundo azul-névoa some em 2,6 s. */
+.flItem[data-destaque] {
+  animation: fl-realce 2.6s var(--via-ease-out) backwards;
+}
+
+.flLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 10px;
+  align-items: center;
+  min-width: 0;
+  margin: 0 calc(-1 * var(--sb-esp-2));
+  padding: 10px var(--sb-esp-2);
+  border-radius: var(--sb-r-mini);
+  color: var(--sb-tinta);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+/* O avatar do lead na fila é o `.avl` do protótipo (32 px, letra de 11 px), e não o "p" de 36 px
+   do AvatarLead. Os seletores levam o data-tamanho para ganhar do `.alAvatar[data-tamanho='p']`. */
+.flLink > .flAvatar[data-tamanho] {
+  --al-d: 32px;
+  --al-fonte: 0.6875rem;
+}
+
+.flLink:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.flLink:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.flTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.flNome {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+}
+
+.flMotivo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flBolinha {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-atencao);
+}
+
+.flBolinha[data-longa] {
+  background: var(--sb-erro);
+}
+
+.flVazio {
+  margin: 0;
+  padding: var(--sb-esp-4) 0 var(--sb-esp-2);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+}
+
+/* Abaixo de 1100 px: a fila fica em cima dos cartões, com os itens em grade. */
+@media (max-width: 1099px) {
+  .flLista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    column-gap: var(--sb-esp-6);
+  }
+
+  .flItem + .flItem {
+    border-top: 0;
+  }
+
+  .flItem {
+    border-bottom: 1px solid var(--sb-linha);
+  }
+}
+
+/* Celular (até 899 px): lista de novo, com o cartão mais justo. */
+@media (max-width: 899px) {
+  .flFila {
+    padding: var(--sb-esp-4);
+    border-radius: 20px;
+  }
+
+  .flLista {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flItem {
+    border-bottom: 0;
+  }
+
+  .flItem + .flItem {
+    border-top: 1px solid var(--sb-linha);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flItem[data-destaque] {
+    animation: none;
+  }
+
+  .flLink {
+    transition: none;
+  }
+}
+
+@keyframes fl-realce {
+  0%,
+  35% {
+    background: var(--sb-azul-nevoa);
+  }
+
+  100% {
+    background: transparent;
+  }
+}

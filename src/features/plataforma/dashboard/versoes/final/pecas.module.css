@@ -1,0 +1,324 @@
+/* As peças pequenas da versão B (prefixo dvb). Só tokens --sb-*. */
+
+/* ---------- número com a unidade menor ---------- */
+
+.dvbNum {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  font-family: var(--sb-fonte);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dvbNumN {
+  letter-spacing: inherit;
+}
+
+/* A unidade (US$, %, s, min, dias): metade do corpo, mais leve, na tinta de apoio. */
+.dvbNumU {
+  margin: 0 0.06em;
+  color: var(--sb-tinta-2);
+  font-size: 0.5em;
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: 0;
+  white-space: pre;
+}
+
+.dvbNumU:first-child {
+  margin-left: 0;
+}
+
+.dvbNumU:last-child {
+  margin-right: 0;
+}
+
+/* Depois do "carregando": a transição curta, sem contar do zero. */
+.dvbNumSurge {
+  animation: dvbSurge 260ms var(--via-ease-out) backwards;
+}
+
+@keyframes dvbSurge {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- variação ---------- */
+
+.dvbVar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Verde 4,68:1 e âmbar 5,93:1 no branco. */
+.dvbVar[data-sentido='melhor'] {
+  color: var(--sb-sucesso);
+}
+
+.dvbVar[data-sentido='pior'] {
+  color: var(--sb-atencao);
+}
+
+.dvbVarSem {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.dvbSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- "como contamos" ---------- */
+
+.dvbComo {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.dvbComoBotao {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-3);
+  cursor: help;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.dvbComoBotao:hover,
+.dvbComo[data-aberto] .dvbComoBotao {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.dvbComoBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.dvbComo[data-escuro] .dvbComoBotao {
+  color: var(--sb-palco-tinta-2);
+}
+
+.dvbComo[data-escuro] .dvbComoBotao:hover,
+.dvbComo[data-escuro][data-aberto] .dvbComoBotao {
+  background: var(--sb-palco-superficie);
+  color: var(--sb-palco-tinta);
+}
+
+.dvbComo[data-escuro] .dvbComoBotao:focus-visible {
+  box-shadow: var(--sb-anel-escuro);
+}
+
+.dvbComoBalao {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -6px;
+  z-index: var(--via-z-tooltip);
+  width: max-content;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-regular);
+  line-height: 1.5;
+  letter-spacing: var(--sb-ls-corpo);
+  text-align: left;
+  text-wrap: pretty;
+  pointer-events: auto;
+  animation: dvbBalao 160ms var(--via-ease-out);
+}
+
+.dvbComo[data-alinhar='inicio'] .dvbComoBalao {
+  right: auto;
+  left: -6px;
+}
+
+.dvbComo[data-escuro] .dvbComoBalao {
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+@keyframes dvbBalao {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------- a mini linha ---------- */
+
+.dvbLinha {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+
+.dvbLinhaSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.dvbLinhaArea {
+  fill: color-mix(in srgb, var(--sb-azul) 10%, transparent);
+}
+
+.dvbLinhaTraco {
+  fill: none;
+  stroke: var(--sb-azul);
+  stroke-width: 1.75px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* O par (recebidas × enviadas), no dicionário de cores da página: as recebidas (o cliente) no cinza
+   tracejado, as enviadas (a Janete e a equipe) no azul cheio; diferem também na luminosidade e no traço. */
+.dvbLinha[data-par] .dvbLinhaTraco[data-tom='forte'] {
+  stroke: var(--sb-tinta-3);
+  stroke-dasharray: 3 3;
+}
+
+.dvbLinhaTraco[data-tom='clara'] {
+  stroke: var(--sb-azul);
+}
+
+.dvbLinhaPonto {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  box-shadow: 0 0 0 2px var(--sb-branco);
+  transform: translate(-50%, -50%);
+}
+
+.dvbLinha[data-par] .dvbLinhaPonto[data-tom='forte'] {
+  background: var(--sb-tinta-3);
+}
+
+/* ---------- barra dividida ---------- */
+
+.dvbPartes {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-canvas);
+}
+
+.dvbParte {
+  min-width: 3px;
+  flex-basis: 0;
+}
+
+.dvbParte:first-child {
+  border-radius: var(--sb-r-pilula) 0 0 var(--sb-r-pilula);
+}
+
+.dvbParte:last-child {
+  border-radius: 0 var(--sb-r-pilula) var(--sb-r-pilula) 0;
+}
+
+.dvbParte:only-child {
+  border-radius: var(--sb-r-pilula);
+}
+
+/* Um dicionário só de cores na página: o azul é a Janete (e quem avançou), o navy é a equipe, o verde é
+   o Ganho, o cinza claro é quem saiu (perdidos sólidos, sem resposta na hachura, os mesmos do funil).
+   Os tons que precisam ser distinguidos diferem também na luminosidade. */
+.dvbParte[data-tom='janete'] {
+  background: var(--sb-azul);
+}
+
+.dvbParte[data-tom='equipe'] {
+  background: var(--sb-navy);
+}
+
+.dvbParte[data-tom='celular'] {
+  background: var(--sb-borda-campo);
+}
+
+.dvbParte[data-tom='claro'] {
+  background: color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco));
+}
+
+.dvbParte[data-tom='perdido'] {
+  background: var(--dvb-perdido, var(--sb-borda-campo));
+}
+
+.dvbParte[data-tom='semResposta'] {
+  background-color: var(--sb-branco);
+  background-image: var(--dvb-hachura, none);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+/* O custo por tipo: as respostas são da Janete (o azul); a transcrição de áudio, o azul claro. */
+.dvbParte[data-tom='resposta'] {
+  background: var(--sb-azul);
+}
+
+.dvbParte[data-tom='transcricao'] {
+  background: color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco));
+}
+
+/* No celular, o "como contamos" tem o alvo de toque de 44 px (o ícone continua do mesmo tamanho). */
+@media (max-width: 899px) {
+  .dvbComoBotao {
+    width: 44px;
+    height: 44px;
+    margin: -10px;
+  }
+
+  .dvbComoBalao {
+    max-width: min(280px, calc(100vw - 48px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dvbNumSurge,
+  .dvbComoBalao {
+    animation: none;
+  }
+
+  .dvbComoBotao {
+    transition: none;
+  }
+}

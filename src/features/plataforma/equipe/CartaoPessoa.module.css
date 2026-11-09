@@ -1,0 +1,372 @@
+/* O cartão de cada pessoa (o `.pc` do protótipo B): branco com a sombra de card, o avatar de 48 px
+   com as iniciais, "Conversas agora" com os leads e os botões numa linha que quebra. O convite é
+   sem fundo, com uma linha fina por dentro. Nada passa da coluna: os textos longos terminam em reticências. */
+
+.pcCartao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: var(--sb-esp-5);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  color: var(--sb-tinta);
+  animation: pc-sobe 400ms var(--via-ease-out) backwards;
+}
+
+.pcCartao[data-convite] {
+  /* Sem fundo e sem sombra, só a linha fina por dentro (o `.pc.convite` do protótipo): a pessoa
+     ainda não entrou. A linha é sombra, não borda, para o conteúdo ficar alinhado com os outros cartões. */
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--sb-linha-forte);
+}
+
+/* O convite que acabou de ser feito: o anel azul some em 2,6 s. */
+.pcCartao[data-destaque] {
+  animation: pc-realce 2.6s var(--via-ease-out) backwards;
+}
+
+/* Desativado (decisão do equipe, 02/11): sem a transparência do protótipo, que deixava o e-mail e a
+   situação abaixo do contraste mínimo; o e-mail sobe para o cinza mais escuro. O avatar continua
+   apagado (o `.pcAvatar[data-tom='off']`). */
+.pcCartao[data-off] .pcEmail {
+  color: var(--sb-tinta-2);
+}
+
+.pcCab {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 0 14px;
+  align-items: center;
+}
+
+.pcAvatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--sb-azul-claro);
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  letter-spacing: var(--sb-ls-sigla);
+  user-select: none;
+}
+
+.pcAvatar[data-tom='eu'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.pcAvatar[data-tom='off'] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+}
+
+.pcAvatar[data-tom='convite'] {
+  background: var(--sb-branco);
+  color: var(--sb-tinta-3);
+  box-shadow: inset 0 0 0 1.5px var(--sb-linha-forte);
+}
+
+.pcId {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pcNome {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pcEmail {
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pcSelos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  margin: var(--sb-esp-1) 0 0;
+  font-size: 0.8125rem;
+  line-height: var(--sb-lh-ui);
+}
+
+.pcPapel {
+  font-weight: var(--sb-peso-medio);
+}
+
+.pcSit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.pcSit i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.pcSit[data-sit='ativo'] i {
+  background: var(--sb-sucesso);
+}
+
+.pcSit[data-sit='convite'] i {
+  box-shadow: inset 0 0 0 1.5px var(--sb-tinta-3);
+}
+
+.pcSit[data-sit='off'] {
+  color: var(--sb-tinta-2);
+}
+
+.pcSit[data-sit='off'] i {
+  background: var(--sb-linha-forte);
+}
+
+/* ---------- Conversas agora ---------- */
+
+.pcConv {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: var(--sb-esp-3);
+  border-top: 1px solid var(--sb-linha);
+}
+
+.pcRotulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sb-esp-2);
+  margin: 0;
+  padding-bottom: var(--sb-esp-1);
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+}
+
+.pcNumero {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.pcLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pcLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  margin: 0 calc(-1 * var(--sb-esp-2));
+  padding: 5px var(--sb-esp-2);
+  border-radius: var(--sb-r-mini);
+  color: var(--sb-tinta);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+/* O avatar do lead no cartão é o `.avl` do protótipo (32 px, letra de 11 px), e não o "p" de 36 px
+   do AvatarLead. Os seletores levam o data-tamanho para ganhar do `.alAvatar[data-tamanho='p']`. */
+.pcLink > .pcAvatarLead[data-tamanho] {
+  --al-d: 32px;
+  --al-fonte: 0.6875rem;
+}
+
+.pcLink:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.pcLink:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.pcLiNome {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pcEtapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+}
+
+.pcEtapaBolinha {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 22%, transparent);
+}
+
+.pcVerMais {
+  align-self: flex-start;
+  min-height: var(--sb-controle-compacto);
+  margin: 2px 0 0 calc(-1 * var(--sb-esp-2));
+  padding: 0 var(--sb-esp-2);
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.pcVerMais:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.pcVerMais:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.pcVazio {
+  margin: 0;
+  padding: var(--sb-esp-1) 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-apoio);
+}
+
+.pcTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ---------- os botões ---------- */
+
+.pcAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sb-esp-2);
+  padding-top: 14px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.pcCartao[data-convite] .pcAcoes {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* O compacto do AI PRO tem 36 px; o do cartão é o `.btn-c` do protótipo (40 px, ícone a 8 px). */
+.pcAcoes > .pcBotao[data-tamanho] {
+  min-height: 40px;
+  padding: 6px var(--sb-esp-4);
+  gap: var(--sb-esp-2);
+}
+
+.pcNota {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sb-esp-2);
+  margin: calc(-1 * var(--sb-esp-1)) 0 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.pcNotaIcone {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  color: var(--sb-tinta-3);
+}
+
+/* Celular (até 899 px): o cartão mais justo, como a fila. Os botões e o "Ver mais" ganham o alvo de
+   toque de 44 px do resto do app (decisão do equipe, 02/11; no protótipo eram 40 e 36 px). */
+@media (max-width: 899px) {
+  .pcCartao {
+    padding: var(--sb-esp-4);
+    border-radius: 20px;
+  }
+
+  .pcAcoes > .pcBotao[data-tamanho],
+  .pcVerMais {
+    min-height: var(--sb-controle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcCartao,
+  .pcCartao[data-destaque] {
+    animation: none;
+  }
+
+  .pcLink,
+  .pcVerMais {
+    transition: none;
+  }
+}
+
+@keyframes pc-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pc-realce {
+  0%,
+  35% {
+    box-shadow:
+      var(--sb-sombra-card),
+      0 0 0 3px var(--sb-azul-claro),
+      0 0 0 5px var(--sb-azul);
+  }
+
+  100% {
+    box-shadow: var(--sb-sombra-card);
+  }
+}

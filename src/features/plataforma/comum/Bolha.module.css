@@ -1,0 +1,1349 @@
+/* =============================================================================
+   A bolha da conversa (o `.m`, `.bolha` e as mídias do Chat-Final.dc.html, desenho
+   da opção A, com o balão da rodada 2 do Chat, 30/10). As 4 origens se distinguem de
+   relance: lado, cor e a bolinha de quem falou (na 1ª mensagem de cada grupo).
+     lead            cinza (canvas), à esquerda, com o avatar na cor do lead
+     janete            azul-claro, à direita, com o símbolo da Janete
+     humano_tela     navy ("quem usa a tela"), texto branco, com as iniciais em navy
+     humano_celular  branco com contorno navy e o ícone do celular
+   Sem a linha de cima: a hora vai no canto de baixo do balão, com "editada" antes e os
+   vistos depois (o nome e o papel ficam no nome acessível).
+   Curvas e tempos do mockup trocados pelos tokens:
+     --e-out → --via-ease-out   --e-mola → --via-ease-spring   --t-state → --app-t-state
+   Os keyframes moram aqui (o CSS Modules escopa o nome usado em `animation`).
+   ============================================================================= */
+
+.boMsg {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  margin-top: 14px;
+  border-radius: 18px;
+  animation: bo-entra 0.45s var(--via-ease-out) backwards;
+}
+
+.boMsg[data-agrupada] {
+  margin-top: 4px;
+}
+
+.boMsg[data-lado='dir'] {
+  align-items: flex-end;
+  animation-name: bo-entra-eu;
+}
+
+.boMsg:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* `relative`: a escolha de reação se prende à linha (ver `.boReacoes`). */
+.boLinha {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.boMsg[data-lado='dir'] .boLinha {
+  flex-direction: row-reverse;
+}
+
+/* A bolinha de quem falou tem 36 px nos dois lados (o AvatarLead p no lead); na mensagem agrupada,
+   fica só o espaço dela, para os balões do grupo alinharem. */
+.boAvatarEsp {
+  width: 36px;
+  flex: none;
+}
+
+.boQuem {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-family: var(--sb-fonte);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  letter-spacing: var(--sb-ls-sigla);
+  user-select: none;
+}
+
+.boQuem[data-quem='equipe'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.boQuem[data-quem='celular'] {
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  box-shadow: inset 0 0 0 1.5px var(--sb-navy);
+}
+
+.boCorpo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  max-width: min(34rem, 82%);
+}
+
+.boMsg[data-lado='dir'] .boCorpo {
+  align-items: flex-end;
+}
+
+.boCorpo[data-reacao] {
+  margin-bottom: 16px;
+}
+
+/* ---------- o balão ---------- */
+
+/* `flow-root` segura a hora, que flutua à direita no fim do texto (ver `.boHora`). */
+.boBolha {
+  display: flow-root;
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: 22px;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-leitura);
+  line-height: 1.5;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.boBolha[data-origem='janete'] {
+  background: var(--sb-azul-claro);
+}
+
+.boBolha[data-origem='humano_tela'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.boBolha[data-origem='humano_celular'] {
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1.5px var(--sb-navy);
+}
+
+/* A apagada e o tipo desconhecido seguem o balão de texto (flow-root): o ícone corre junto da frase,
+   e a hora flutua no fim da última linha (`.boBolha > .boHora`). Com flex e quebra, numa coluna
+   estreita (1280 px) o ícone ficava sozinho na 1ª linha e a hora ia para a esquerda. */
+.boApagada,
+.boOutro {
+  font-size: var(--sb-fs-corpo);
+}
+
+.boApagada {
+  background: var(--sb-branco);
+  color: var(--sb-tinta-3);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.boApagada svg,
+.boOutro svg {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: -3px;
+}
+
+/* ---------- a hora, com "editada" antes e os vistos depois ----------
+   No balão de texto, ela flutua à direita no fim da última linha: se couber, fica na mesma linha
+   (sem aumentar o balão); se não, desce para uma linha própria, no canto de baixo. */
+
+.boHora {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.boHoraNum {
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.boBolha > .boHora {
+  float: right;
+  position: relative;
+  margin: 9px -6px -3px 14px;
+}
+
+/* Os tons que leem em cada balão: no azul-claro, a tinta 2 (a 3 fica fraca nele); no navy, um branco
+   apagado. O visto azul da lida usa o azul de texto no claro, o azul vivo no navy e, na pílula
+   escura por cima da mídia, um azul clareado com branco (o azul vivo some nela). */
+.boBolha[data-origem='janete'] > .boHora,
+.boAudio[data-origem='janete'] .boHora {
+  color: var(--sb-tinta-2);
+}
+
+.boBolha[data-origem='humano_tela'] > .boHora,
+.boAudio[data-origem='humano_tela'] .boHora {
+  color: color-mix(in srgb, var(--sb-branco) 72%, var(--sb-navy));
+}
+
+.boVisto {
+  display: inline-flex;
+  flex: none;
+}
+
+/* A lida no balão claro: um azul mais vivo e mais claro que o azul de texto (cerca de 3,2:1 no
+   azul-claro e 3,6:1 no branco), para não ter a mesma luminosidade do cinza da entregue (1,6:1
+   entre os dois, e não 1,04:1). */
+.boVisto[data-vistos='lida'] {
+  color: color-mix(in srgb, var(--sb-azul) 80%, var(--sb-azul-texto));
+}
+
+.boBolha[data-origem='humano_tela'] .boVisto[data-vistos='lida'],
+.boAudio[data-origem='humano_tela'] .boVisto[data-vistos='lida'] {
+  color: var(--sb-azul);
+}
+
+/* Por cima da mídia (foto sem legenda, vídeo e figurinha): pílula escura translúcida no canto.
+   Com 72% de palco, o branco fica acima de 7:1 mesmo sobre foto branca. */
+.boHora[data-sobre] {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  padding: 4px 8px;
+  border-radius: var(--sb-r-pilula);
+  background: color-mix(in srgb, var(--sb-palco) 72%, transparent);
+  color: var(--sb-tinta-inversa);
+  pointer-events: none;
+}
+
+/* A lida na pílula escura: azul clareado (acima de 4:1 nela), ainda distinto do branco da entregue. */
+.boHora[data-sobre] .boVisto[data-vistos='lida'] {
+  color: color-mix(in srgb, var(--sb-azul) 50%, var(--sb-branco));
+}
+
+/* No vídeo, a pílula da hora fica na mesma linha da duração (a 12 px dos cantos). */
+.boVideo > .boHora[data-sobre] {
+  right: 12px;
+  bottom: 12px;
+}
+
+/* ---------- a citação: uma caixa com a barra colorida, dentro do balão ---------- */
+
+.boCita {
+  display: block;
+  min-width: min(12rem, 100%);
+  margin: -2px -8px 8px;
+  padding: 6px 12px 7px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sb-navy) 6%, transparent);
+  box-shadow: inset 3px 0 0 var(--sb-azul);
+  white-space: normal;
+}
+
+/* Nas mídias e na apagada, a caixa vem solta, em cima delas. */
+.boCita[data-solta] {
+  max-width: min(100%, 21rem);
+  margin: 0;
+  background: var(--sb-canvas);
+}
+
+.boMsg[data-lado='dir'] .boCita[data-solta] {
+  align-self: flex-end;
+}
+
+.boBolha[data-origem='humano_tela'] > .boCita {
+  background: color-mix(in srgb, var(--sb-branco) 12%, transparent);
+  box-shadow: inset 3px 0 0 var(--sb-azul-claro);
+}
+
+.boCitaDe {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sb-fs-meta);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--sb-tinta);
+}
+
+.boCitaTxt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  overflow-wrap: anywhere;
+}
+
+.boBolha[data-origem='humano_tela'] .boCitaDe,
+.boBolha[data-origem='humano_tela'] .boCitaTxt {
+  color: var(--sb-tinta-inversa);
+}
+
+.boBolha[data-origem='humano_tela'] .boCitaTxt {
+  color: color-mix(in srgb, var(--sb-branco) 80%, var(--sb-navy));
+}
+
+/* ---------- mídias ---------- */
+
+.boCena {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A foto e a figurinha num invólucro, para a hora ir por cima delas, no canto de baixo. A largura é
+   fixa, com o limite em max-width (a mesma regra do áudio): com `min(100%, 21rem)`, a medida do
+   .boCorpo usava a do SVG (300 px) e a foto não alinhava com os balões do grupo. */
+.boMidia {
+  position: relative;
+  display: block;
+  width: 21rem;
+  max-width: 100%;
+  transition: transform var(--app-t-touch);
+}
+
+.boMidia[data-fig] {
+  width: auto;
+}
+
+.boMidia[data-fig] > .boHora[data-sobre] {
+  right: 0;
+  bottom: 0;
+}
+
+.boFoto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #d9e7f5;
+  cursor: zoom-in;
+  transition: box-shadow var(--app-t-state);
+}
+
+/* No hover, sobe o invólucro inteiro (a foto e a hora por cima dela juntas). */
+.boMidia:has(> .boFoto:hover) {
+  transform: translateY(-2px);
+}
+
+.boFoto:hover {
+  box-shadow: var(--sb-sombra-card);
+}
+
+.boFoto:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* O áudio: play, onda e tempo numa linha; a transcrição da Janete embaixo. A largura é fixa, com o
+   limite em max-width: o .boCorpo mede pelo conteúdo, e um `min(22rem, 100%)` contava como `auto`
+   nessa medida, então o áudio encolhia até a duração grudar na hora. O documento segue a mesma regra. */
+.boAudio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 22rem;
+  max-width: 100%;
+  padding: 10px 16px 10px 10px;
+  white-space: normal;
+}
+
+.boPlayer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.boPlay {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.boPlay:hover {
+  background: var(--sb-navy-2);
+}
+
+.boPlay:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.boAudio[data-origem='humano_tela'] .boPlay {
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+}
+
+.boAudio[data-origem='humano_tela'] .boPlay:hover {
+  background: var(--sb-azul-claro);
+}
+
+/* A onda encolhe com o balão: as barras afinam, metade some quando falta espaço e o resto é
+   cortado. O tempo fica fora dela (flex: none) e nunca é coberto. */
+.boOnda {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  height: 30px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.boOnda i {
+  flex: 1 1 0;
+  min-width: 1.5px;
+  max-width: 4px;
+  border-radius: 2px;
+  background: var(--sb-borda-campo);
+  transition: background-color 0.12s;
+}
+
+.boOnda i[data-on] {
+  background: var(--sb-azul);
+}
+
+@container (max-width: 150px) {
+  .boOnda i:nth-child(even) {
+    display: none;
+  }
+}
+
+.boAudio[data-origem='humano_tela'] .boOnda i {
+  background: color-mix(in srgb, var(--sb-branco) 40%, var(--sb-navy));
+}
+
+.boAudio[data-origem='humano_tela'] .boOnda i[data-on] {
+  background: var(--sb-branco);
+}
+
+/* Ao lado do play, a onda em cima e, embaixo dela, a duração à esquerda e a hora à direita. */
+.boAudioCol {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.boAudioCol > .boOnda {
+  flex: none;
+  width: 100%;
+  height: 26px;
+}
+
+.boAudioPe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.boTempo {
+  flex: none;
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-2);
+}
+
+.boAudio[data-origem='humano_tela'] .boTempo {
+  color: var(--sb-azul-claro);
+}
+
+.boTransc {
+  padding: 6px 0 2px 6px;
+  border-top: 1px solid var(--sb-linha-forte);
+}
+
+/* Numa linha só: no balão estreito, o rótulo corta com reticências em vez de quebrar em duas
+   linhas centradas (o <button> centra o texto por padrão). */
+.boTranscBot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: var(--sb-controle);
+  margin-left: -4px;
+  padding: 0 10px 0 4px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  font-size: var(--sb-fs-meta);
+  font-weight: 600;
+  color: var(--sb-tinta-2);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.boTranscBot > * {
+  flex: none;
+}
+
+.boTranscBot > .boTranscRot {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boTranscBot:hover {
+  background: var(--sb-branco);
+}
+
+.boTranscBot:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.boTranscSeta {
+  transition: transform var(--app-t-touch);
+}
+
+.boTranscBot[aria-expanded='true'] .boTranscSeta {
+  transform: rotate(180deg);
+}
+
+.boTranscTexto {
+  margin: 2px 0 4px;
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.55;
+  color: var(--sb-tinta);
+  text-wrap: pretty;
+  animation: bo-surge 0.3s var(--via-ease-out) backwards;
+}
+
+.boTranscSem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 0 2px 6px;
+  border-top: 1px solid var(--sb-linha-forte);
+  font-size: var(--sb-fs-meta);
+  font-weight: 500;
+  color: var(--sb-atencao);
+}
+
+/* O balão navy da equipe: a linha e a transcrição em tons que leem no escuro. */
+.boAudio[data-origem='humano_tela'] .boTransc,
+.boAudio[data-origem='humano_tela'] .boTranscSem {
+  border-top-color: color-mix(in srgb, var(--sb-branco) 24%, transparent);
+}
+
+.boAudio[data-origem='humano_tela'] .boTranscBot,
+.boAudio[data-origem='humano_tela'] .boTranscTexto {
+  color: var(--sb-tinta-inversa);
+}
+
+.boAudio[data-origem='humano_tela'] .boTranscBot:hover {
+  background: var(--sb-navy-2);
+}
+
+.boVideo {
+  position: relative;
+  display: block;
+  width: 21rem;
+  max-width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #e6e1d8;
+}
+
+.boVideoPlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  box-shadow: var(--sb-sombra-flutuante);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.boVideoPlay:hover {
+  background: var(--sb-navy-2);
+}
+
+.boVideoPlay:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel), var(--sb-sombra-flutuante);
+}
+
+/* A mesma altura da pílula da hora (padding 4px 8px, line-height 1), para as duas alinharem. */
+.boVideoDur {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 4px 8px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* O documento: cartão com o ícone e a extensão, o nome numa linha e o botão de baixar. Cresce até
+   o nome caber (max-content: o nome não quebra), com 20rem de mínimo e o balão como limite. */
+.boDoc {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  min-width: min(20rem, 100%);
+  max-width: 100%;
+  padding: 10px 8px 10px 12px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+/* A coluna do botão de baixar só existe quando há o que baixar. */
+.boDoc[data-baixar] {
+  grid-template-columns: 40px minmax(0, 1fr) var(--sb-controle);
+}
+
+.boDoc[data-falhou] {
+  box-shadow: inset 0 0 0 1.5px var(--sb-erro);
+}
+
+.boDocIc {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  width: 40px;
+  height: 48px;
+  border-radius: 8px 14px 8px 8px;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.boDocExt {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.boDocTxt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.boDocNome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--sb-tinta);
+}
+
+/* Embaixo do nome: "PDF · 380 KB" à esquerda e a hora à direita. Quando os dois não cabem, a hora
+   desce para a linha de baixo, à direita, e o tipo e o tamanho ficam inteiros. */
+.boDocLinha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 8px;
+  min-width: 0;
+}
+
+.boDocLinha > .boHora {
+  flex: none;
+  margin-left: auto;
+}
+
+/* "PDF · 380 KB" numa linha só: na coluna estreita, corta com reticências em vez de quebrar. */
+.boDocMeta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+  color: var(--sb-tinta-3);
+}
+
+.boDocBaixar {
+  display: grid;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.boDocBaixar:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.boDocBaixar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.boFig {
+  display: block;
+  width: 112px;
+  height: 112px;
+  filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--sb-navy) 18%, transparent));
+}
+
+.boFig svg,
+.boFig img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ---------- a reação, presa ao canto do balão ----------
+   Fica no canto de baixo à esquerda nos dois lados: o da direita é o da hora. */
+
+.boReacao {
+  position: absolute;
+  left: 14px;
+  bottom: -17px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow:
+    0 0 0 2px var(--sb-branco),
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-card);
+  font-size: var(--sb-fs-corpo);
+  line-height: 1;
+  animation: bo-selo 0.4s var(--via-ease-spring) backwards;
+}
+
+button.boReacao {
+  cursor: pointer;
+}
+
+/* A área de toque chega a 44 px sem mudar o desenho (o .boReacao já é position: absolute). */
+button.boReacao::after {
+  content: '';
+  position: absolute;
+  inset: -7px -8px;
+}
+
+button.boReacao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- Responder e Reagir: aparecem no hover, no foco ou com a escolha de reação aberta ----------
+   Ficam dentro do .boCorpo (position: relative), depois do balão, e fora do fluxo. Sem fundo, só os
+   ícones em cinza, que escurecem no hover (pedido do equipe de 31/10: a pílula branca em cima do balão
+   ficava feia). No computador, ao lado do balão, do lado de dentro da conversa (bloco min-width:
+   900px); no celular, uma linha embaixo dele (bloco max-width: 899px). */
+
+.boAcoes {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.boAcao {
+  display: grid;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-3);
+  cursor: pointer;
+  transition: color var(--app-t-state);
+}
+
+.boAcao:hover,
+.boAcao[aria-expanded='true'] {
+  color: var(--sb-tinta-2);
+}
+
+.boAcao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* A fila das 6 reações se prende à linha da mensagem (e não aos botões, que ficam ao lado de uma
+   bolha que pode ser curta): no lead começa onde começa a bolha, depois do avatar, e cresce
+   para a direita; nas da direita termina onde termina a bolha e cresce para a esquerda. Assim os 6
+   emojis cabem sempre dentro da coluna da conversa (a fila tem ~290 px). A altura (bottom) é a de
+   cada tamanho de tela, nos blocos do fim. */
+.boReacoes {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  gap: 2px;
+  padding: 6px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  animation: bo-pop 0.2s var(--via-ease-out) backwards;
+}
+
+/* 48 px: a bolinha de quem falou (36) e o espaço até o balão (12). */
+.boMsg[data-lado='esq'] .boReacoes {
+  left: 48px;
+}
+
+.boMsg[data-lado='dir'] .boReacoes {
+  right: 48px;
+}
+
+/* ---------- computador: os botões ao lado do balão ----------
+   À direita do balão do lead e à esquerda dos da direita (o lado de dentro da conversa), no meio da
+   altura dele, sem tomar largura. Para eles caberem sempre, o balão para 72 px antes do fim da linha
+   (6 de folga e 2 botões de 32): só o balão mais largo encolhe. Escondidos, não pegam o mouse
+   (pointer-events), mas continuam na ordem do Tab. Aparecem no hover e no foco de teclado
+   (:focus-visible): o clique do mouse também dá foco à mensagem, e com focus-within os botões
+   ficavam presos depois que o mouse saía. */
+@media (min-width: 900px) {
+  /* 120 px: a bolinha de quem falou com o espaço até o balão (48) e o lugar dos botões (72). */
+  .boCorpo {
+    max-width: min(34rem, 82%, calc(100% - 120px));
+  }
+
+  .boAcoes {
+    top: 50%;
+    translate: 0 -50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--app-t-state);
+  }
+
+  .boMsg[data-lado='esq'] .boAcoes {
+    left: calc(100% + 6px);
+  }
+
+  .boMsg[data-lado='dir'] .boAcoes {
+    right: calc(100% + 6px);
+  }
+
+  .boMsg:hover .boAcoes,
+  .boMsg:focus-visible .boAcoes,
+  .boMsg:has(:focus-visible) .boAcoes,
+  .boMsg[data-reagindo] .boAcoes {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .boAcoes .boAcao {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Acima do balão, entrando 8 px nele (no respiro de cima): mais alta, a fila era cortada no topo
+     da conversa na 1ª mensagem. Fecha com Esc, com o clique fora ou com a escolha. */
+  .boReacoes {
+    bottom: calc(100% - 8px);
+  }
+}
+
+.boReacoes button {
+  display: grid;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.boReacoes button:hover {
+  background: var(--sb-canvas);
+  transform: translateY(-2px);
+}
+
+.boReacoes button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.boReacoes button[aria-pressed='true'] {
+  background: var(--sb-azul-claro);
+}
+
+/* ---------- "Não enviada · Tentar de novo" e "Envio cancelado", embaixo do balão ----------
+   Só a mensagem da empresa tem essa linha: ela fica à direita, alinhada ao balão (depois da bolinha). */
+
+.boStatus {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding-right: 48px;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+  color: var(--sb-tinta-3);
+}
+
+.boStatus svg {
+  flex: none;
+}
+
+.boStatus[data-situacao='falhou'] {
+  color: var(--sb-erro);
+  font-weight: 500;
+}
+
+.boTentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sb-controle);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-meta);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.boTentar:hover {
+  background: color-mix(in srgb, var(--sb-erro) 12%, var(--sb-erro-claro));
+}
+
+.boTentar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- a foto ou o vídeo ampliados (a "luz") ---------- */
+
+.boVeu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--sb-veu);
+  animation: bo-aparece 0.24s var(--via-ease-out) both;
+}
+
+.boLuz {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(720px, 100%);
+  max-height: calc(100dvh - 32px);
+  padding: 16px;
+  border-radius: var(--sb-r-painel);
+  background: var(--sb-palco);
+  color: var(--sb-tinta-inversa);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: bo-dialogo 0.42s var(--via-ease-out) backwards;
+}
+
+.boLuzCab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.boLuzCab > div {
+  min-width: 0;
+}
+
+.boLuzTitulo {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.boLuzSub {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--sb-palco-tinta-2);
+}
+
+.boLuzFechar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.boLuzFechar:hover {
+  background: var(--sb-navy-2);
+}
+
+.boLuzFechar:focus-visible,
+.boLuzPlay:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel-escuro);
+}
+
+.boLuzImg {
+  min-height: 0;
+}
+
+.boLuzImg svg,
+.boLuzImg img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 120px);
+  border-radius: var(--sb-r-item);
+  object-fit: contain;
+}
+
+.boLuzVideo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+}
+
+/* O vídeo de verdade (com o link assinado): os controles do navegador, no palco escuro. */
+.boLuzVideo[data-real] {
+  aspect-ratio: auto;
+  overflow: hidden;
+}
+
+.boLuzVideo[data-real] video {
+  display: block;
+  width: 100%;
+  max-height: calc(100dvh - 120px);
+  object-fit: contain;
+}
+
+/* ---------- a mídia que não abre (baixando, falhou, expirou, link pedido ou com erro) ----------
+   Na foto, no vídeo e na figurinha, uma caixa do tamanho da mídia (data-bloco), em cinza claro, com
+   o ícone, a frase e a hora; no documento e no áudio, uma linha pequena. */
+
+.boMidiaEstado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  white-space: normal;
+}
+
+.boMidiaEstado svg {
+  flex: none;
+}
+
+.boMidiaEstado[data-bloco] {
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 9rem;
+  margin: 0;
+  padding: 16px 16px 28px;
+  border: 1px dashed var(--sb-linha-forte);
+  border-radius: 18px;
+  background: var(--sb-canvas);
+  text-align: center;
+}
+
+.boMidiaEstado[data-bloco] > .boHora {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+}
+
+.boMidiaEstado[data-estado='falhou'],
+.boMidiaEstado[data-estado='erro_link'] {
+  color: var(--sb-erro);
+}
+
+.boMidiaEstado [data-girando] {
+  animation: bo-gira 1s linear infinite;
+}
+
+.boMidiaDeNovo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sb-controle);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-meta);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boMidiaDeNovo:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+@keyframes bo-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boMidiaEstado [data-girando] {
+    animation: none;
+  }
+}
+
+.boLuzPlay {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  cursor: pointer;
+}
+
+.boLuzBarra {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  height: 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--sb-branco) 20%, transparent);
+  overflow: hidden;
+}
+
+.boLuzBarra span {
+  display: block;
+  height: 100%;
+  background: var(--sb-azul);
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes bo-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes bo-entra-eu {
+  from {
+    opacity: 0;
+    transform: translate(8px, 6px);
+  }
+}
+
+@keyframes bo-surge {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes bo-selo {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes bo-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@keyframes bo-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes bo-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boMsg,
+  .boTranscTexto,
+  .boReacao,
+  .boReacoes,
+  .boVeu,
+  .boLuz {
+    animation: none;
+  }
+
+  .boMidia:has(> .boFoto:hover),
+  .boReacoes button:hover {
+    transform: none;
+  }
+}
+
+/* ---------- celular (o layout de até 899 px do Chat final) ----------
+   As ações descem para uma linha própria, embaixo do balão, e só aparecem com o foco na mensagem
+   (o toque no balão) ou com a escolha de reação aberta: assim não apertam o texto. A linha fica
+   presa ao .boCorpo (alinhada ao balão, do lado dele) e o .boCorpo reserva a altura dela embaixo
+   (margin-bottom), para a reação continuar no canto do balão. A escolha de reação abre logo acima
+   da linha das ações. */
+@media (max-width: 899px) {
+  /* A bolinha de quem falou ocupa 48 px nos dois lados. */
+  .boCorpo {
+    max-width: calc(100% - 48px);
+  }
+
+  .boAcoes {
+    display: none;
+    top: calc(100% + 6px);
+  }
+
+  .boMsg[data-lado='esq'] .boAcoes {
+    left: 0;
+  }
+
+  .boMsg[data-lado='dir'] .boAcoes {
+    right: 0;
+  }
+
+  /* Com reação, a linha desce abaixo dela (a reação passa 17 px da borda do balão). */
+  .boCorpo[data-reacao] > .boAcoes {
+    top: calc(100% + 18px);
+  }
+
+  .boMsg:focus-within .boAcoes,
+  .boMsg[data-reagindo] .boAcoes {
+    display: flex;
+  }
+
+  /* A altura da linha das ações: 6 + 44 px (18 + 44 com reação). */
+  .boMsg:focus-within .boCorpo:has(> .boAcoes),
+  .boMsg[data-reagindo] .boCorpo:has(> .boAcoes) {
+    margin-bottom: 50px;
+  }
+
+  .boMsg:focus-within .boCorpo[data-reacao]:has(> .boAcoes),
+  .boMsg[data-reagindo] .boCorpo[data-reacao]:has(> .boAcoes) {
+    margin-bottom: 62px;
+  }
+
+  /* 6 px acima da linha das ações (que ocupa os 44 px de baixo da linha da mensagem). */
+  .boReacoes {
+    bottom: 50px;
+  }
+}

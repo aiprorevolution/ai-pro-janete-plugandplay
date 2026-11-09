@@ -1,0 +1,227 @@
+/* A tela da Equipe (o .eq e o .b-grade do protótipo B): o cabeçalho com o botão à direita, a fila
+   de 320 px à esquerda e os cartões à direita. Abaixo de 1100 px a fila sobe para cima dos cartões
+   (a lista dela vira 2 colunas no FilaEquipe.module.css); no celular, tudo empilha. A largura
+   máxima (1.344 px) vem do .platConteudo. */
+
+.eqTela {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-6);
+  min-width: 0;
+  /* backwards, e não both: a animação que continua valendo depois de acabar prende dentro da tela
+     os filhos com position: fixed (a gaveta, o diálogo e o aviso). */
+  animation: eq-vista 0.45s var(--via-ease-out) backwards;
+}
+
+/* A entrada roda uma vez por troca de área: a tela pronta, que monta depois da de carregando na
+   mesma visita, aparece sem animação (useEntradaUnica, em AreaVazia.tsx). */
+.eqTela[data-sem-entrada] {
+  animation: none;
+}
+
+.eqCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sb-esp-3) var(--sb-esp-4);
+  min-width: 0;
+}
+
+.eqCabTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+  max-width: 46rem;
+}
+
+.eqTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-pagina);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  outline: none;
+}
+
+.eqDesc {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.9375rem;
+  text-wrap: pretty;
+}
+
+/* A nota do atendente fica colada no cabeçalho (o vão de 24 px da tela, menos 12). */
+.eqNota {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  margin: -12px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.84375rem;
+  line-height: 1.45;
+}
+
+.eqNotaIcone {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.eqGrade {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: var(--sb-esp-4);
+  align-items: start;
+}
+
+.eqPessoas {
+  min-width: 0;
+}
+
+.eqCartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: var(--sb-esp-4);
+  align-items: start;
+}
+
+/* ---------- o link do convite à mostra (o navegador não deixou copiar) ---------- */
+
+.eqLinkManual {
+  min-width: 0;
+}
+
+.eqLinkManualTexto {
+  margin: 0 0 var(--sb-esp-3);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- o aviso curto (o .toast do protótipo, como o dos Contatos) ---------- */
+
+.eqAviso {
+  position: fixed;
+  right: var(--sb-esp-6);
+  bottom: var(--sb-esp-6);
+  z-index: var(--via-z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  max-width: min(26rem, calc(100% - 48px));
+  padding: var(--sb-esp-3) var(--sb-esp-2) var(--sb-esp-3) var(--sb-esp-4);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.875rem;
+  line-height: var(--sb-lh-ui);
+  animation: eq-aviso 420ms var(--via-ease-out) backwards;
+}
+
+.eqAviso > svg {
+  flex: none;
+  color: var(--sb-azul);
+}
+
+/* A ação recusada: o ícone em coral claro, legível no navy (o mesmo tom do aviso de erro do Chat). */
+.eqAviso[data-recusa] > svg {
+  color: var(--sb-erro-no-escuro);
+}
+
+.eqAvisoTexto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.eqAvisoFechar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-inversa);
+  cursor: pointer;
+}
+
+.eqAvisoFechar:hover {
+  background: var(--sb-navy-2);
+}
+
+.eqAvisoFechar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.eqSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- abaixo de 1100 px: a fila sobe para cima dos cartões ---------- */
+@media (max-width: 1099px) {
+  .eqGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- celular: o vão menor, e o aviso na largura toda, acima da barra de baixo ---------- */
+@media (max-width: 899px) {
+  .eqTela {
+    gap: var(--sb-esp-4);
+  }
+
+  .eqNota {
+    margin-top: -4px;
+  }
+
+  .eqAviso {
+    right: var(--sb-esp-3);
+    bottom: 96px;
+    left: var(--sb-esp-3);
+    max-width: none;
+  }
+
+  .eqAvisoFechar {
+    width: var(--sb-controle);
+    height: var(--sb-controle);
+  }
+}
+
+@media (max-width: 599px) {
+  .eqConvidar {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eqTela,
+  .eqAviso {
+    animation: none;
+  }
+}
+
+@keyframes eq-vista {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes eq-aviso {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

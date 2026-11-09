@@ -1,0 +1,199 @@
+/* =============================================================================
+   O palco do login (proposta A, "Presença"): a Janete, dormindo, é um disco cinza gigante
+   concêntrico ao cartão, e o cartão é o ponto de fala dela. Copiado de
+   docs/mockups/conta/Login-A-Presenca.dc.html (linhas 73–146 e 214–220), com as cores do
+   `dormindo` direto dos tokens: o disco é --sb-linha-forte e o ponto --sb-borda-campo.
+   As animações são do JS (WAAPI); aqui ficam só as formas e o que cada fase esconde.
+   ============================================================================= */
+
+.cena {
+  /* Lado do disco. O JS grava o valor exato em --d (no style do main): max(86% da altura, diagonal
+     do cartão + 96 px), com teto de 150vw (200vw no celular). Este é só o de partida. */
+  --d: max(min(86vh, 960px, 150vw), 48rem);
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 40px 16px;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--aipro-carbon);
+}
+
+/* O `html { scrollbar-gutter: stable }` do aipro.css reserva 15 px de barra no computador, e o body é
+   branco: sem isto, a faixa da direita fica branca ao lado do fundo do palco. A reserva fica (o login
+   rola em janela baixa, e ela evita o cartão andar de lado); só o body pinta o mesmo fundo, como na
+   plataforma (Plataforma.module.css). */
+:global(body):has(.cena) {
+  background: var(--aipro-carbon);
+}
+
+/* O fim da passagem trava a rolagem da página, como no protótipo. */
+html:has(.cena[data-fase='fim']) {
+  overflow: hidden;
+}
+
+.palco {
+  position: relative;
+  width: min(100%, 26.5rem);
+}
+
+/* A Janete gigante: decorativa, atrás do cartão, centrada nele (rola junto, nunca sai de trás). */
+.gigante {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: var(--d);
+  height: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  perspective: 1800px;
+  pointer-events: none;
+}
+
+/* Recebe a leve inclinação com o cursor e o tremor (JS, no style). */
+.discoPos {
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* O disco (o `dormindo`): cresce na entrada e se contrai na passagem. A borda escurece um pouco e
+   uma sombra larga e macia o descola do fundo. */
+.disco {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, transparent 64%, rgb(255 77 20 / 0.035) 88%, rgb(255 77 20 / 0.08) 100%),
+    var(--aipro-carbon-raised);
+  box-shadow:
+    0 0 0 1px rgb(255 77 20 / 0.08),
+    0 64px 110px -64px rgb(0 0 0 / 0.5);
+  will-change: transform;
+}
+
+/* A noite: o navy do `carregando`, por cima do cinza; só aparece no fim da passagem. */
+.noite {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  opacity: 0;
+}
+
+/* O ponto de fala: círculo com o canto de baixo à esquerda reto. Some quando vira o cartão.
+   Parado no meio do sono (0,88), sem respirar. */
+.ponto {
+  position: absolute;
+  top: 27%;
+  left: 27%;
+  width: 46%;
+  height: 46%;
+  border-radius: 50% 50% 50% 0;
+  background: var(--sb-borda-campo);
+  opacity: 0;
+  transform: scale(0.88);
+}
+
+/* O azul do ponto no `carregando`, por cima do cinza (anima só a opacidade). */
+.pontoAzul {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sb-azul);
+  opacity: 0;
+}
+
+/* A sombra segue a forma do cartão. Enquanto o cartão se recorta (`data-plano`), o filtro sai na hora. */
+.sombra {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.08)) drop-shadow(0 24px 40px rgb(0 0 0 / 0.24));
+  transition: filter 0.3s var(--via-ease-out);
+}
+
+.sombra[data-plano] {
+  filter: none;
+  transition: none;
+}
+
+/* Três cantos grandes e o de baixo à esquerda reto, igual ao `50% 50% 50% 0` do ponto do símbolo. */
+.cartao {
+  position: relative;
+  padding: 40px 32px 32px;
+  border-radius: 28px 28px 28px 0;
+  background: var(--sb-branco);
+}
+
+.conteudo {
+  position: relative;
+}
+
+/* O véu: o cinza do ponto por cima do cartão enquanto ele abre e fecha (anima só a opacidade). */
+.veu {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sb-borda-campo);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* O que cada fase esconde: antes do primeiro efeito, nada aparece (nem no HTML do servidor); na
+   entrada e na absorção o cartão some; no fim, o carregando assume e a bola some também. */
+.cena[data-fase='inicio'] .gigante,
+.cena[data-fase='inicio'] .sombra,
+.cena[data-fase='entrada'] .sombra,
+.cena[data-fase='absorvido'] .sombra,
+.cena[data-fase='fim'] .sombra,
+.cena[data-fase='fim'] .gigante {
+  visibility: hidden;
+}
+
+/* O fim do Entrar: o `carregando` de 96 px do próprio palco, fixo no ponto medido, com a sombra do
+   símbolo em trânsito. `[data-palco-carregando]` dá peso para vencer o `position` do `.janete`. Ele
+   recebe o foco (só para o leitor de tela anunciar), sem anel, como o `.fim` do protótipo. */
+.carregando[data-palco-carregando] {
+  position: fixed;
+  z-index: 80;
+  transform: translate(-50%, -50%);
+  outline: none;
+  pointer-events: none;
+  box-shadow: 0 22px 36px -22px color-mix(in srgb, var(--sb-navy) 60%, transparent);
+  animation: sombra-entra 0.5s var(--via-ease-out) backwards;
+}
+
+@keyframes sombra-entra {
+  from {
+    box-shadow: 0 22px 36px -22px transparent;
+  }
+}
+
+@media (max-width: 599px) {
+  /* Celular: maior que a largura (741 px em 390), saindo pelas bordas. */
+  .cena {
+    --d: max(min(92vh, 200vw), 44rem);
+    padding: 24px 16px;
+  }
+
+  .cartao {
+    padding: 28px 20px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sombra {
+    transition: none;
+  }
+
+  .carregando[data-palco-carregando] {
+    animation: none;
+  }
+}

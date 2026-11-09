@@ -1,0 +1,118 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--sb-controle-compacto);
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  letter-spacing: var(--sb-ls-corpo);
+  white-space: nowrap;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.chip:hover:has(button:not(:disabled)) {
+  border-color: var(--sb-borda-campo);
+}
+
+/* 4,99:1 (azul-texto sobre azul-claro). */
+.chip[data-selecionado] {
+  border-color: transparent;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.alvo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: stretch;
+  padding: 0 var(--sb-esp-4);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+}
+
+button.alvo {
+  cursor: pointer;
+}
+
+.chip[data-removivel] .alvo {
+  padding-right: var(--sb-esp-1);
+}
+
+.alvo:focus-visible,
+.remover:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.icone {
+  display: inline-grid;
+  place-items: center;
+}
+
+.total {
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-selecionado] .total {
+  color: inherit;
+}
+
+/* Alvo de 24 dentro da pílula de 36 (WCAG 2.5.8, tamanho mínimo). */
+.remover {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.remover:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.chip[data-selecionado] .remover {
+  color: inherit;
+}
+
+.chip[data-selecionado] .remover:hover {
+  background: var(--sb-branco);
+}
+
+.alvo:disabled,
+.remover:disabled {
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .remover {
+    transition: none;
+  }
+}

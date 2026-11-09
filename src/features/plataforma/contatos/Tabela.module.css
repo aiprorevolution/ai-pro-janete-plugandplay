@@ -1,0 +1,751 @@
+/* A tabela de Contatos (Tabela.tsx). Tipografia e tons do perfil do Contatos 4; a tabela segue a
+   Tabela do AI PRO (prospeccao/_ds-candidates/Tabela.module.css), com os tokens --sb-*. Nenhum fundo
+   colorido (decisão 5 do equipe): cartão branco sobre o fundo da plataforma, a cor só nas bolinhas. */
+
+.tbRaiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+  min-width: 0;
+}
+
+/* ---------- o título e o total ---------- */
+
+.tbCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sb-esp-1) var(--sb-esp-3);
+  min-width: 0;
+}
+
+.tbTitulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: clamp(1.75rem, 1.1rem + 1.4vw, 2.5rem);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.tbTitulo:focus,
+.tbTitulo:focus-visible {
+  outline: none;
+}
+
+.tbTotal {
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-apoio);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sb-peso-medio);
+}
+
+/* ---------- as abas de contador (as abas do perfil do 4, sem o fundo) ---------- */
+
+.tbAbas {
+  display: flex;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--sb-linha);
+  scrollbar-width: none;
+}
+
+.tbAbas::-webkit-scrollbar {
+  display: none;
+}
+
+.tbAba {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--sb-esp-3);
+  border: 0;
+  border-radius: var(--sb-r-mini) var(--sb-r-mini) 0 0;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--app-t-state);
+}
+
+.tbAba:hover {
+  color: var(--sb-tinta);
+}
+
+.tbAba:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+/* A ligada: peso forte e um sublinhado navy, rente à linha de baixo da fileira. */
+.tbAba[aria-pressed='true'] {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.tbAba[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  right: var(--sb-esp-3);
+  bottom: -1px;
+  left: var(--sb-esp-3);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sb-navy);
+}
+
+.tbAbaNum {
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sb-peso-medio);
+}
+
+.tbAba[aria-pressed='true'] .tbAbaNum {
+  color: var(--sb-tinta-2);
+}
+
+/* ---------- a busca e o filtro ---------- */
+
+.tbBarra {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+}
+
+.tbBusca {
+  display: flex;
+  flex: 0 1 30rem;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.tbBusca:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.tbBuscaIcone {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.tbBusca input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+}
+
+.tbBusca input:focus,
+.tbBusca input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.tbBusca input::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.tbFiltro {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* O botão do MenuSuspenso (.msBotao), sem o fundo azul quando ligado: o número já diz. */
+.tbFiltroBotao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  min-height: 40px;
+  padding: 0 var(--sb-esp-3) 0 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.tbFiltroBotao > svg:first-child {
+  color: var(--sb-tinta-2);
+}
+
+.tbFiltroBotao:hover,
+.tbFiltroBotao[aria-expanded='true'] {
+  background: var(--sb-canvas);
+}
+
+.tbFiltroBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.tbFiltroBotao[data-ligado] {
+  border-color: var(--sb-tinta-3);
+  font-weight: var(--sb-peso-forte);
+}
+
+.tbFiltroNum {
+  color: var(--sb-azul-texto);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tbFiltroSeta {
+  color: var(--sb-tinta-3);
+  transition: rotate var(--app-t-state);
+}
+
+.tbFiltroBotao[aria-expanded='true'] .tbFiltroSeta {
+  rotate: 180deg;
+}
+
+/* O painel: o .msPop do MenuSuspenso. */
+.tbPop {
+  position: absolute;
+  top: calc(100% + var(--sb-esp-2));
+  right: 0;
+  z-index: var(--via-z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  width: 264px;
+  max-width: calc(100vw - var(--sb-esp-8));
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  padding: var(--sb-esp-2);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  animation: tb-entra 220ms var(--via-ease-out) backwards;
+}
+
+.tbGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* A linha entre os grupos fica embaixo do 1º: o border-top do 2º seria cortado pela legend dele
+   (a linha aparecia à direita de "Entrou em"), e uma sombra por dentro passaria pelo meio dela. */
+.tbGrupo:has(+ .tbGrupo) {
+  padding-bottom: var(--sb-esp-2);
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.tbGrupoTitulo {
+  padding: 6px 10px 4px;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+}
+
+.tbOpcao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: var(--sb-r-mini);
+  color: var(--sb-tinta);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+}
+
+.tbOpcao:hover {
+  background: var(--sb-canvas);
+}
+
+.tbOpcao input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--sb-navy);
+  cursor: pointer;
+}
+
+.tbOpcao input:focus-visible {
+  outline: 2px solid var(--sb-azul);
+  outline-offset: 2px;
+}
+
+.tbOpcao:has(input:checked) {
+  font-weight: var(--sb-peso-forte);
+}
+
+.tbLimpar {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-top: 1px solid var(--sb-linha);
+  border-radius: 0 0 var(--sb-r-mini) var(--sb-r-mini);
+  background: transparent;
+  color: var(--sb-azul-texto);
+  font-size: 0.875rem;
+  font-weight: var(--sb-peso-medio);
+  text-align: left;
+  cursor: pointer;
+}
+
+.tbLimpar:hover {
+  text-decoration: underline;
+}
+
+.tbLimpar:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+/* ---------- a tabela (a Tabela do AI PRO) ---------- */
+
+.tbCaixa {
+  min-width: 0;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  overflow: hidden;
+}
+
+.tbTabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+.tbTabela :is(th, td) {
+  padding: var(--sb-esp-3);
+  border-bottom: 1px solid var(--sb-linha);
+  text-align: start;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.tbTabela :is(th, td):first-child {
+  padding-inline-start: var(--sb-pad-card);
+}
+
+.tbTabela :is(th, td):last-child {
+  padding-inline-end: var(--sb-pad-card);
+}
+
+.tbTabela tbody tr:last-child > td {
+  border-bottom: 0;
+}
+
+/* O cabeçalho: 40 de altura, meta em tinta 3, sem caixa alta. */
+.tbTabela thead th {
+  height: var(--sb-esp-10);
+  padding-block: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+}
+
+/* As larguras: o contato leva o maior pedaço; as datas, o menor. Quem atende cabe "Esperando a
+   equipe · 13 min" com a bolinha, e "Última mensagem" cabe com a seta de ordem. */
+.tbColContato {
+  width: 27%;
+}
+
+.tbColEtapa {
+  width: 16%;
+}
+
+.tbColQuem {
+  width: 25%;
+}
+
+.tbColUltima {
+  width: 18%;
+}
+
+.tbColEntrada {
+  width: 14%;
+}
+
+/* 1024 a 1279 px: a tabela tem uns 700 px. Os títulos quebram em 2 linhas em vez de cortar, a etapa
+   corta com reticências e quem atende usa a forma curta ("Esperando · 4 min", em pecas). */
+@media (max-width: 1279px) {
+  .tbColContato {
+    width: 31%;
+  }
+
+  .tbColEtapa {
+    width: 17%;
+  }
+
+  .tbColQuem {
+    width: 23%;
+  }
+
+  .tbColUltima {
+    width: 16%;
+  }
+
+  .tbColEntrada {
+    width: 13%;
+  }
+
+  /* A altura de 40 px vira mínima (numa célula de tabela, height é o mínimo). */
+  .tbTabela thead th {
+    padding-block: 4px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .tbTabela thead .tbOrdenar {
+    max-width: 100%;
+    padding-block: 4px;
+    text-align: start;
+    white-space: normal;
+  }
+}
+
+.tbOrdenar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin-inline-start: -6px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.tbOrdenar:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.tbOrdenar:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.tbOrdenar[data-ativa] {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.tbOrdemIcone {
+  flex: none;
+  opacity: 0.55;
+}
+
+.tbOrdenar[data-ativa] .tbOrdemIcone {
+  opacity: 1;
+}
+
+/* A linha: a inteira abre o contato; o hover é cinza discreto, nunca colorido. */
+.tbLinha {
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.tbLinha:hover {
+  background: var(--sb-canvas);
+}
+
+.tbLinha:has(.tbNomeBotao:focus-visible) {
+  background: var(--sb-canvas);
+}
+
+.tbContato {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  min-width: 0;
+}
+
+.tbContato > :first-child {
+  flex: none;
+}
+
+.tbNome {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tbNomeBotao {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: var(--sb-peso-forte);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tbNomeBotao:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tbNomeBotao:focus-visible {
+  outline: 2px solid var(--sb-azul);
+  outline-offset: 2px;
+}
+
+.tbEmpresa,
+.tbSemEmpresa {
+  overflow: hidden;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tbSemEmpresa {
+  font-style: italic;
+}
+
+.tbData {
+  color: var(--sb-tinta-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- a lista (abaixo de 1024 px) ---------- */
+
+.tbLista {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  list-style: none;
+  overflow: hidden;
+}
+
+.tbLista > li + li {
+  border-top: 1px solid var(--sb-linha);
+}
+
+.tbItem {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-areas:
+    'av l1'
+    'av l2';
+  align-items: center;
+  column-gap: var(--sb-esp-3);
+  row-gap: 2px;
+  width: 100%;
+  min-height: 64px;
+  padding: var(--sb-esp-3) var(--sb-esp-4);
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.tbItem > :first-child {
+  grid-area: av;
+}
+
+.tbItem:hover {
+  background: var(--sb-canvas);
+}
+
+.tbItem:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.tbItemLinha1 {
+  grid-area: l1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+}
+
+.tbItemLinha1 > .tbNome {
+  display: block;
+  flex: 1;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: var(--sb-peso-forte);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tbItemHora {
+  flex: none;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A linha 2: a empresa e, num grupo que não encolhe, a etapa e quem atende. Quando os dois não
+   cabem lado a lado, o grupo desce inteiro para baixo da empresa (flex-wrap), em vez de as três
+   partes se espremerem. */
+.tbItemLinha2 {
+  grid-area: l2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  white-space: nowrap;
+}
+
+.tbItemEmpresa {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tbItemSituacao {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Só se o grupo sozinho passar da largura: a etapa corta com reticências, quem atende fica. */
+.tbItemLinha2 .tbItemSituacao > * {
+  min-width: 0;
+  font-size: var(--sb-fs-meta);
+}
+
+.tbItemLinha2 .tbItemSituacao > :last-child {
+  flex: none;
+}
+
+.tbSep {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.tbSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- celular (até 899 px) ---------- */
+
+@media (max-width: 899px) {
+  .tbRaiz {
+    gap: var(--sb-esp-3);
+  }
+
+  .tbBusca {
+    flex: 1 1 auto;
+    min-height: var(--sb-controle);
+  }
+
+  .tbBusca input {
+    height: 42px;
+  }
+
+  .tbFiltroBotao {
+    min-height: var(--sb-controle);
+  }
+
+  .tbItem {
+    padding-inline: var(--sb-esp-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tbPop {
+    animation: none;
+  }
+
+  .tbAba,
+  .tbFiltroBotao,
+  .tbFiltroSeta,
+  .tbOrdenar,
+  .tbLinha,
+  .tbItem {
+    transition: none;
+  }
+}
+
+@keyframes tb-entra {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}

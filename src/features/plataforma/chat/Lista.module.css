@@ -1,0 +1,415 @@
+/* A coluna 1 do Chat (rodada 2): a busca fina com o botão de filtro dentro, a etiqueta do filtro
+   ligado logo abaixo e uma lista só (as linhas são a LinhaChat). Sem título visível. */
+
+.liCol {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.liCab {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  padding: 14px var(--sb-esp-2) 8px;
+}
+
+/* a etiqueta do filtro ligado, numa linha logo abaixo da busca: o nome, o contador e o X para limpar */
+.liChipLinha {
+  display: flex;
+  min-width: 0;
+  padding: 0 var(--sb-esp-1);
+}
+
+.liChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: var(--sb-controle-compacto);
+  padding: 0 5px 0 var(--sb-esp-3);
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+  animation: li-pop 220ms var(--via-ease-out) backwards;
+}
+
+/* O contorno transparente aparece no alto contraste do Windows, que apaga o box-shadow. */
+.liChip:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+.liChipNome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liChipConta {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.liChipX {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition: background-color var(--app-t-state);
+}
+
+.liChip:hover .liChipX {
+  background: color-mix(in srgb, var(--sb-azul-claro) 70%, var(--sb-azul) 30%);
+}
+
+/* ---------- a busca, com o botão de filtro dentro ---------- */
+
+/* a âncora do menu do filtro: ele abre com a largura da busca */
+.liAncora {
+  position: relative;
+}
+
+.liBusca {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 6px;
+  height: 40px;
+  padding: 0 2px 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-canvas);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.liBusca:hover {
+  border-color: var(--sb-linha);
+}
+
+.liBusca:has(.liBuscaCampo:focus) {
+  border-color: var(--sb-azul);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-anel);
+}
+
+.liBuscaIcone {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+.liBuscaCampo {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 2px;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.liBuscaCampo::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+/* O anel é o da busca inteira (.liBusca:has(...)); o contorno transparente fica para o alto contraste. */
+.liBuscaCampo:focus {
+  outline: 2px solid transparent;
+  box-shadow: none;
+}
+
+.liLimpar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.liLimpar:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.liLimpar:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+.liDiv {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--sb-linha);
+}
+
+/* a raiz do MenuSuspenso fica estática: o menu se posiciona contra a âncora e ocupa a largura da busca */
+.liFiltro {
+  position: static;
+  flex: none;
+}
+
+/* o botão do filtro cabe nos 40 px da busca (o MenuSuspenso desenha 40 px) */
+.liFiltro > button {
+  width: 34px;
+  height: 34px;
+}
+
+/* O ponto de quem espera, no canto de cima do botão do filtro: amarelo com menos de 10 min de espera,
+   vermelho com 10 min ou mais. O amarelo é o mesmo da linha (o tema só tem o âmbar escuro de texto). */
+.liAlerta {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f5b82e;
+  box-shadow: 0 0 0 2px var(--sb-branco);
+  pointer-events: none;
+}
+
+/* O amarelo, sozinho, tem pouco contraste: o contorno âmbar por dentro, somado ao anel branco que o
+   separa do botão (azul, com o filtro ligado). */
+.liAlerta[data-cor='amarelo'] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--sb-atencao),
+    0 0 0 2px var(--sb-branco);
+}
+
+.liAlerta[data-cor='vermelho'] {
+  background: var(--sb-erro);
+}
+
+/* ---------- as linhas ---------- */
+
+/* A barra fina (reservada, ~10 px) faz a vez da margem direita: a linha fica com 8 px à esquerda e
+   ~10 px à direita, alinhada com a busca. */
+.liRolo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 0 var(--sb-esp-4) var(--sb-esp-2);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-linha-forte) transparent;
+}
+
+.liLinhas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-gap-lista);
+}
+
+/* ---------- vazio ---------- */
+
+.liVazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: var(--sb-esp-2);
+  padding: 28px 18px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: var(--sb-r-item);
+  text-align: center;
+}
+
+/* O esboço de uma lista (o do protótipo): 3 linhas de até 12rem, alinhadas à esquerda, na cor do esqueleto. */
+.liEsboco {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: min(100%, 12rem);
+  margin-bottom: 4px;
+}
+
+.liEsboco span {
+  width: 100%;
+  height: 10px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-esqueleto);
+}
+
+.liEsboco .liCurto {
+  width: 42%;
+}
+
+.liVazioTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.liVazioTexto {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.liVazioAcao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--sb-controle-compacto);
+  padding: 4px 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.liVazioAcao:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.liVazioAcao:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- carregando, erro e "carregar mais" ---------- */
+
+.liEstado {
+  margin: var(--sb-esp-2) var(--sb-esp-2) 0 0;
+}
+
+.liMais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - var(--sb-esp-2));
+  min-height: var(--sb-controle-compacto);
+  margin-top: var(--sb-esp-3);
+  padding: 4px 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.liMais:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.liMais:disabled {
+  color: var(--sb-tinta-2);
+  cursor: progress;
+}
+
+.liMais:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+.liSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- celular: a lista é a 1ª tela e rola com a página ---------- */
+
+@media (max-width: 899px) {
+  .liCol {
+    min-height: 60vh;
+    overflow: visible;
+  }
+
+  /* sem rolagem própria, não há barra reservada: a margem direita volta */
+  .liRolo {
+    overflow: visible;
+    padding-right: var(--sb-esp-2);
+  }
+
+  .liChip {
+    min-height: var(--sb-controle);
+  }
+
+  /* no toque, a busca e o filtro voltam a 44 px; o texto fica em 16 px (com menos, o Safari do
+     iPhone amplia a página ao focar o campo) */
+  .liBusca {
+    height: var(--sb-controle);
+  }
+
+  .liBuscaCampo {
+    font-size: var(--sb-fs-campo);
+  }
+
+  .liFiltro > button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liChip {
+    animation: none;
+  }
+}
+
+@keyframes li-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}

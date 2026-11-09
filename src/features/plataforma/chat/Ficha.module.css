@@ -1,0 +1,690 @@
+/* A coluna 3 do Chat final: a ficha do lead (`.col-ficha`, `.ficha-cab`, `.ficha-rolo`,
+   `.resumo-janete`, `.sec`, `.sit`, `.etapa-barra`, `.campo-l`, `.campo-ed`, `.obs`, `.hist`,
+   `.ficha-acoes` e o `.dialogo` de apagar do protótipo). A mesma ficha vai na coluna (computador),
+   na gaveta (tela média) e na folha de baixo (celular): quem monta dá a moldura. */
+
+.fcFicha {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.fcCab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-2);
+  padding: var(--sb-esp-3) var(--sb-esp-3) var(--sb-esp-1) var(--sb-esp-5);
+}
+
+.fcCabTit,
+.fcMeta {
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+}
+
+.fcFechar,
+.fcLapis {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.fcLapis {
+  color: var(--sb-tinta-3);
+}
+
+.fcFechar:hover,
+.fcLapis:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+/* O contorno transparente aparece no alto contraste do Windows, que apaga o box-shadow. */
+.fcFechar:focus-visible,
+.fcLapis:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+/* position: relative prende aqui dentro os textos só para o leitor de tela (.fcSr, absolutos): sem
+   ele, eles se posicionavam pela página e, com a ficha rolada ou crescendo (editar o nome), a página
+   do Chat ganhava rolagem e a torre inteira subia. */
+.fcRolo {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sb-esp-1) var(--sb-esp-5) var(--sb-esp-6);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-linha-forte) transparent;
+}
+
+/* ---------- o que a Janete já descobriu ---------- */
+
+.fcResumo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--sb-esp-4);
+  border-radius: var(--sb-esp-5);
+  background: var(--sb-azul-claro);
+}
+
+.fcRnCab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Um h3 (a ficha tem títulos para o leitor de tela andar por eles). O balance não deixa "descobriu"
+   sozinho na 2ª linha. */
+.fcRnTit {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  text-wrap: balance;
+}
+
+.fcRnTexto {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.fcRnVazio {
+  color: var(--sb-tinta-2);
+}
+
+/* ---------- seções ---------- */
+
+.fcSec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fcSecTit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-2);
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.fcSit {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* Como os campos do Contato: o rótulo em cima e o valor embaixo, sem ícone. Em 2 colunas, os
+   valores quebravam no meio na ficha estreita ("30/10/202 / 6 às 19:18"). */
+.fcSit > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 6px 0;
+  border-top: 1px solid var(--sb-linha);
+  line-height: var(--sb-lh-cartao);
+}
+
+.fcSit > div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.fcSit dt {
+  color: var(--sb-tinta-3);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.fcSit dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: var(--sb-peso-medio);
+  overflow-wrap: break-word;
+}
+
+/* ---------- etapa: o nome e "· há 21 h" numa linha só ---------- */
+
+.fcEtapaAtual {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+}
+
+.fcEtapaNome {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-secao);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fcEtapaAtual .fcMeta {
+  flex: none;
+  font-size: 0.8125rem;
+}
+
+.fcBarra {
+  display: grid;
+  gap: var(--sb-esp-1);
+}
+
+.fcBarra i {
+  height: 6px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+  transition: background-color 0.5s var(--via-ease-out);
+}
+
+.fcBarra i.fcBarraCheia {
+  background: var(--sb-navy);
+}
+
+.fcBarra[data-desfecho='ganho'] i {
+  background: var(--sb-sucesso);
+}
+
+.fcBarra[data-desfecho='perdido'] i {
+  background: var(--sb-linha-forte);
+}
+
+.fcBarra[data-desfecho='perdido'] i:last-child {
+  background: var(--sb-erro);
+}
+
+/* "Mover para…": o botão ocupa a largura da ficha e o menu abre com a mesma largura */
+.fcMover {
+  position: relative;
+}
+
+.fcMoverMenu {
+  position: static;
+  display: flex;
+  width: 100%;
+}
+
+.fcMoverMenu > button {
+  justify-content: center;
+  width: 100%;
+  font-weight: var(--sb-peso-forte);
+}
+
+/* ---------- contato ---------- */
+
+.fcCampos {
+  display: flex;
+  flex-direction: column;
+}
+
+.fcCampo {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--sb-controle-compacto);
+  padding: 2px 0;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.fcCampos > :first-child.fcCampo {
+  border-top: 0;
+}
+
+.fcCampoIcone {
+  display: grid;
+  place-items: center;
+  color: var(--sb-tinta-3);
+}
+
+.fcCampoV {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--sb-lh-cartao);
+}
+
+.fcCampoRot {
+  color: var(--sb-tinta-3);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.fcCampoValor {
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: var(--sb-peso-medio);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Empresa e e-mail podem ser longos: quebram em até 2 linhas antes das reticências. O valor inteiro
+   fica na dica (title). */
+.fcCampoValor[data-quebra] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.fcCampoValor[data-vazio] {
+  color: var(--sb-tinta-3);
+  font-weight: var(--sb-peso-regular);
+}
+
+.fcCampo:hover .fcLapis {
+  color: var(--sb-tinta);
+}
+
+/* ---------- edição de um campo ---------- */
+
+.fcEd {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  padding: var(--sb-esp-2) 0 10px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.fcCampos > :first-child > .fcEd {
+  border-top: 0;
+}
+
+.fcEdRot {
+  color: var(--sb-tinta);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.fcEdCampo {
+  min-height: var(--sb-controle);
+  padding: 0 var(--sb-esp-4);
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-campo);
+}
+
+.fcEdCampo:focus {
+  outline: 2px solid transparent;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.fcEdCampo[aria-invalid='true'] {
+  border-color: var(--sb-erro);
+}
+
+.fcEdErro {
+  margin: 0;
+  color: var(--sb-erro);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+}
+
+.fcEdAcoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* ---------- botões (o `.btn` do protótipo, no tamanho compacto) ---------- */
+
+.fcBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sb-esp-2);
+  min-height: var(--sb-controle-compacto);
+  padding: var(--sb-esp-1) 14px;
+  border: 1px solid transparent;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.fcBtn:active {
+  transform: scale(0.98);
+}
+
+.fcBtn:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+.fcBtnPri {
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-acao);
+  color: var(--sb-tinta-inversa);
+}
+
+.fcBtnPri:hover {
+  background: var(--sb-navy-2);
+}
+
+.fcBtnPri:focus-visible {
+  box-shadow: var(--sb-anel), var(--sb-sombra-acao);
+}
+
+.fcBtnDisc {
+  color: var(--sb-tinta-2);
+}
+
+.fcBtnDisc:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.fcBtnCont {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+}
+
+.fcBtnCont:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.fcBtnPerigo {
+  border-color: var(--sb-erro);
+  background: var(--sb-branco);
+  color: var(--sb-erro);
+}
+
+.fcBtnPerigo:hover {
+  background: var(--sb-erro-claro);
+}
+
+.fcBtnPerigoCheio {
+  background: var(--sb-erro);
+  color: var(--sb-tinta-inversa);
+}
+
+.fcBtnPerigoCheio:hover {
+  background: color-mix(in srgb, var(--sb-erro) 85%, var(--sb-navy));
+}
+
+/* ---------- observações ---------- */
+
+.fcObs {
+  width: 100%;
+  min-height: 84px;
+  padding: 10px 14px;
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-item);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* No celular, 16 px: com menos, o Safari do iPhone amplia a página ao focar o campo. */
+@media (max-width: 899px) {
+  .fcObs {
+    font-size: var(--sb-fs-campo);
+  }
+}
+
+.fcObs::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.fcObs:focus {
+  outline: 2px solid transparent;
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.fcObsPe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-esp-2);
+  min-height: var(--sb-controle-compacto);
+}
+
+/* ---------- histórico ---------- */
+
+.fcHist {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fcHist li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding-bottom: var(--sb-esp-3);
+}
+
+.fcHist li::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: -2px;
+  left: 7px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--sb-linha);
+}
+
+.fcHist li:last-child::before {
+  display: none;
+}
+
+.fcHistPonto {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 2px var(--sb-linha-forte);
+}
+
+.fcHist li:first-child .fcHistPonto {
+  background: var(--sb-navy);
+  box-shadow: none;
+}
+
+.fcHistEtapa {
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.35;
+}
+
+.fcHistPor {
+  grid-column: 2;
+  color: var(--sb-tinta-2);
+  font-size: 0.75rem;
+}
+
+.fcSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- ações ---------- */
+
+.fcAcoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-2);
+  padding-top: 6px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+.fcAcoes > .fcBtn {
+  width: 100%;
+}
+
+/* ---------- o diálogo de apagar ---------- */
+
+.fcVeu {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--via-z-modal) + 10);
+  display: grid;
+  place-items: center;
+  padding: var(--sb-esp-4);
+  background: var(--sb-veu);
+  animation: fc-aparece 240ms var(--via-ease-out) backwards;
+}
+
+.fcDialogo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-esp-4);
+  width: min(420px, 100%);
+  padding: var(--sb-esp-6);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta);
+  animation: fc-dialogo 420ms var(--via-ease-out) backwards;
+}
+
+.fcDialogoTit {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  overflow-wrap: anywhere;
+}
+
+.fcDialogoTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.fcDialogoAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sb-esp-2);
+}
+
+.fcDialogoAcoes > .fcBtn {
+  min-height: var(--sb-controle);
+  padding: var(--sb-esp-2) var(--sb-esp-5);
+  font-size: var(--sb-fs-corpo);
+}
+
+/* ---------- tamanhos ---------- */
+
+/* a coluna estreita (1280 a 1439): margens menores, para os valores caberem */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .fcFicha[data-modo='coluna'] .fcRolo {
+    padding: var(--sb-esp-1) var(--sb-esp-4) var(--sb-esp-5);
+  }
+
+  .fcFicha[data-modo='coluna'] .fcCab {
+    padding-left: var(--sb-esp-4);
+  }
+}
+
+/* no toque, os controles voltam a 44 px */
+@media (max-width: 899px) {
+  .fcFechar,
+  .fcLapis {
+    width: var(--sb-controle);
+    height: var(--sb-controle);
+  }
+
+  .fcBtn {
+    min-height: var(--sb-controle);
+  }
+
+  .fcCampo {
+    min-height: var(--sb-controle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fcVeu,
+  .fcDialogo {
+    animation: none;
+  }
+
+  .fcBtn,
+  .fcBarra i {
+    transition: none;
+  }
+}
+
+@keyframes fc-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fc-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}

@@ -1,0 +1,465 @@
+/* "Fale com a Janete" (o `.np` do F): a mesma linguagem do chat do onboarding (E4).
+   Curvas do F trocadas pelos tokens: --e-trav → --sb-ease-travessia, --e-out → --via-ease-out,
+   --e-snap → --via-ease-snap, --e-via → --via-ease. */
+
+.np {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, calc(100% - 32px));
+  height: min(720px, calc(100% - 32px));
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha), var(--sb-sombra-flutuante);
+  color: var(--sb-tinta);
+  outline: none;
+}
+
+.np:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--sb-linha), var(--sb-sombra-flutuante);
+}
+
+.abrindo {
+  animation: np-abre 0.52s var(--via-ease-out) both;
+}
+
+.fechando {
+  animation: np-fecha 0.36s var(--sb-ease-travessia) both;
+}
+
+.abrindo .dentro {
+  animation: aparece 0.26s var(--via-ease-out) 0.2s both;
+}
+
+.fechando .dentro {
+  opacity: 0;
+  transition: opacity 0.08s;
+}
+
+.dentro {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--sb-linha);
+}
+
+.cab h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+}
+
+.cab p {
+  margin: 2px 0 0;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.cabTexto {
+  min-width: 0;
+}
+
+.botaoIcone {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.botaoIcone:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.botaoIcone:focus-visible,
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.min {
+  margin-left: auto;
+}
+
+.voltar {
+  display: none;
+}
+
+.rolo {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  min-height: 0;
+  padding: 0 20px 12px;
+  overflow-y: auto;
+  /* sem o espaço reservado, as falas da direita andam quando a barra de rolagem aparece */
+  scrollbar-gutter: stable;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.boas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 4px 16px;
+}
+
+.olho {
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-azul-texto);
+}
+
+.saudacao {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+.corpo2 {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+/* ---------- mensagens (o `.msg` da E4) ---------- */
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: min(88%, 40rem);
+  animation: msg-entra 0.45s var(--via-ease-out) both;
+}
+
+.turno {
+  margin-top: 18px;
+}
+
+.turno:first-child {
+  margin-top: 0;
+}
+
+.eu {
+  align-self: flex-end;
+  align-items: flex-end;
+  animation-name: msg-entra-eu;
+}
+
+.janeteMsg {
+  align-self: flex-start;
+}
+
+.autor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--sb-tinta-3);
+}
+
+.texto {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--sb-tinta);
+  text-wrap: pretty;
+}
+
+.eu .texto {
+  max-width: 52ch;
+  padding: 12px 16px;
+  border-radius: 20px 20px 6px 20px;
+  background: var(--sb-navy);
+  color: var(--sb-branco);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.acao {
+  padding-top: 2px;
+}
+
+.pontos {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+}
+
+.pontos i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-tinta-3);
+  animation: ponto 1.1s var(--via-ease) infinite;
+}
+
+.pontos i:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.pontos i:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+/* ---------- atalhos (os chips do F) ---------- */
+
+.base {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: 22px;
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+  animation: sb-chip 0.32s var(--via-ease-out) both;
+}
+
+.chip:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+/* Ao apertar, só a cor muda: sem escala, nada anda (decisão 5a). */
+.chip:active {
+  background: var(--sb-azul-claro);
+}
+
+.chip:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.chip:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.chip:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- keyframes (os do F) ---------- */
+
+@keyframes np-abre {
+  0% {
+    clip-path: circle(26px at 26px calc(100% - 26px));
+    background-color: var(--sb-navy);
+  }
+  35% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: circle(150% at 26px calc(100% - 26px));
+    background-color: var(--sb-branco);
+  }
+}
+
+@keyframes np-fecha {
+  0% {
+    clip-path: circle(150% at 26px calc(100% - 26px));
+    background-color: var(--sb-branco);
+  }
+  70% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: circle(26px at 26px calc(100% - 26px));
+    background-color: var(--sb-navy);
+  }
+}
+
+@keyframes np-abre-celular {
+  0% {
+    clip-path: circle(26px at 42px calc(100% - 126px));
+    background-color: var(--sb-navy);
+  }
+  35% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: circle(150% at 42px calc(100% - 126px));
+    background-color: var(--sb-branco);
+  }
+}
+
+@keyframes np-fecha-celular {
+  0% {
+    clip-path: circle(150% at 42px calc(100% - 126px));
+    background-color: var(--sb-branco);
+  }
+  70% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: circle(26px at 42px calc(100% - 126px));
+    background-color: var(--sb-navy);
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes msg-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes msg-entra-eu {
+  from {
+    opacity: 0;
+    transform: translate(8px, 6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ponto {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@keyframes sb-chip {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- celular: o painel cobre a tela inteira ---------- */
+
+@media (max-width: 899px) {
+  .np {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+  }
+
+  .abrindo {
+    animation-name: np-abre-celular;
+  }
+
+  .fechando {
+    animation-name: np-fecha-celular;
+  }
+
+  .voltar {
+    display: grid;
+  }
+
+  .cab .fechar,
+  .cab .min {
+    display: none;
+  }
+
+  .cabTexto {
+    margin-right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np,
+  .np *,
+  .np *::before,
+  .np *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}

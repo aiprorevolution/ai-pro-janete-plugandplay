@@ -1,0 +1,558 @@
+/* =========================================================
+   A pilha da Janete (Contexto 6, .ctx-pilha): o símbolo desmontado em 3 discos finos, em CSS 3D.
+   Cada disco é a face mais 3 fatias logo abaixo (a espessura). Entre os discos há um vão de
+   verdade, sem filete claro nem anel em volta das faces. Os cliques ficam em botões 2D por cima
+   de cada disco (e da peça), sem receber 3D.
+
+   A caixa (#ctx-pilha) tem o lado do disco (--d) e o centro dela é o centro do disco do meio:
+   o voo de entrada mira nela. O disco de cima, a peça e a sombra do chão passam da caixa
+   (1,23 d acima e 0,84 d abaixo do centro; ver PILHA_ALTURA em Pilha.tsx).
+
+   --g separa o disco de cima e --g3 o de baixo. O vão que sobra é a metade do vão do 6
+   (o 6 usava .545 e .572; a face inclinada ocupa 0,5 d e a espessura 0,019 d).
+
+   Exceção aos tokens: o `black` só aparece dentro de color-mix, para escurecer o navy e o azul nas
+   fatias, na sombra do chão e nas lâminas da peça. Não há token mais escuro que --sb-navy (e
+   --sb-tinta é a mesma cor), e trocar mudaria a espessura que se vê nos prints do 6.
+   ========================================================= */
+
+.pilha {
+  --g: calc(var(--d) * 0.532);
+  --g3: calc(var(--d) * 0.546);
+  --t: calc(var(--d) * 0.022);
+  position: relative;
+  flex: none;
+  width: var(--d);
+  height: var(--d);
+}
+
+/* ---------- a sombra no chão (só com a pilha inclinada) ---------- */
+.chao {
+  position: absolute;
+  left: calc(50% - var(--d) * 0.55);
+  top: calc(50% + var(--d) * 0.18);
+  width: calc(var(--d) * 1.1);
+  height: calc(var(--d) * 0.16);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-navy) 20%, transparent), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.6s var(--via-ease-out),
+    transform 0.86s var(--sb-ease-mola-leve);
+}
+
+.pilha:not([data-fase="plano"]) .chao {
+  opacity: 1;
+}
+
+.pilha[data-fase="separada"] .chao {
+  transform: translateY(var(--g3));
+}
+
+/* ---------- a cena 3D ---------- */
+.cena {
+  position: absolute;
+  inset: 0;
+  perspective: calc(var(--d) * 18);
+  perspective-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.tresD {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.camada {
+  --rx: 0deg;
+  --ty: 0px;
+  --tz: 0px;
+  --lift: 0px;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translateY(var(--ty)) rotateX(var(--rx)) translateZ(calc(var(--tz) + var(--lift)));
+  transition: transform 0.45s var(--sb-ease-travessia);
+}
+
+/* montado: os 3 discos encaixados, um quase dentro do outro (o símbolo plano com um pouco de volume) */
+.c2 {
+  --tz: calc(var(--t) * -0.55);
+}
+
+.c3 {
+  --tz: calc(var(--t) * -1.1);
+}
+
+.pilha:not([data-fase="plano"]) .camada {
+  --rx: 60deg;
+}
+
+.pilha[data-fase="separada"] .camada {
+  --tz: 0px;
+}
+
+.pilha[data-fase="separada"] .c1 {
+  --ty: calc(var(--g) * -1);
+}
+
+.pilha[data-fase="separada"] .c3 {
+  --ty: var(--g3);
+}
+
+/* as passagens: inclinar com a travessia; separar com mola, um disco depois do outro */
+.pilha[data-fase="inclinada"] .camada {
+  transition: transform 0.62s var(--sb-ease-travessia);
+}
+
+.pilha[data-fase="separada"] .camada {
+  transition: transform 0.86s var(--sb-ease-mola-leve);
+}
+
+.pilha[data-fase="separada"] .c2 {
+  transition-delay: 0.05s;
+}
+
+.pilha[data-fase="separada"] .c3 {
+  transition-delay: 0.11s;
+}
+
+/* voltando da seção (recolhida para separada), a mesma mola, mais curta */
+.pilha[data-fase="separada"][data-de="recolhida"] .camada {
+  transition-duration: 0.56s;
+}
+
+/* assentada: o destaque e o hover respondem rápido */
+.pilha[data-fase="separada"][data-assentada] .camada {
+  transition: transform 0.3s var(--via-ease-snap);
+  transition-delay: 0s;
+}
+
+/* ---------- um disco: 3 fatias navy (a luz de um cilindro, escuro nas pontas) e a face ---------- */
+.fatia {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sb-navy) 22%, black) 0%,
+    color-mix(in srgb, var(--sb-navy) 92%, var(--sb-navy-2)) 28%,
+    color-mix(in srgb, var(--sb-navy) 30%, var(--sb-navy-2)) 50%,
+    color-mix(in srgb, var(--sb-navy) 72%, black) 74%,
+    color-mix(in srgb, var(--sb-navy) 22%, black) 100%
+  );
+  transform: translateZ(var(--z));
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  transition:
+    background-color 0.3s var(--via-ease-out),
+    box-shadow 0.3s var(--via-ease-out);
+}
+
+/* o brilho suave da face, aceso quando o disco inclina */
+.face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    80% 70% at 34% 28%,
+    color-mix(in srgb, color-mix(in srgb, var(--sb-azul) 45%, var(--sb-borda-campo)) 34%, transparent),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.6s var(--via-ease-out);
+}
+
+.pilha:not([data-fase="plano"]) .face::before,
+.disco .face::before {
+  opacity: 1;
+}
+
+/* a sombra que o disco de cima deixa no de baixo (só com o vão aberto) */
+.sombra {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, black 36%, transparent) 20%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.6s var(--via-ease-out);
+}
+
+.pilha[data-fase="separada"] .sombra {
+  opacity: 1;
+}
+
+/* o recorte do ponto de fala no disco de cima: branco e limpo */
+.furo {
+  position: absolute;
+  left: 27%;
+  top: 27%;
+  width: 46%;
+  height: 46%;
+  border-radius: 50% 50% 50% 0;
+  background: var(--sb-branco);
+  box-shadow: inset 0 calc(var(--d) * 0.02) 0 color-mix(in srgb, var(--sb-navy) 13%, transparent);
+}
+
+/* ---------- a peça azul: o mini balão, solto e flutuando acima do disco de cima ---------- */
+.peca {
+  --pz: 0px;
+  --py: 0px;
+  --prx: 0deg;
+  position: absolute;
+  left: 27%;
+  top: 27%;
+  width: 46%;
+  height: 46%;
+  transform-style: preserve-3d;
+  transform: translate3d(0px, var(--py), calc(var(--pz) + 0.8px)) rotateX(var(--prx));
+  transition: transform 0.38s var(--sb-ease-mola);
+}
+
+.pilha[data-fase="inclinada"] .peca,
+.pilha[data-fase="separada"] .peca,
+.disco .peca {
+  --pz: calc(var(--d) * 0.5);
+  --py: calc(var(--d) * -0.1);
+  --prx: -24deg;
+}
+
+/* na entrada, a peça só se solta depois que o disco inclinou */
+.pilha[data-fase="inclinada"] .peca {
+  transition: transform 0.72s var(--sb-ease-mola) 0.53s;
+}
+
+.disco .peca {
+  transition: none;
+}
+
+.pecaBob {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.pilha[data-fase="separada"][data-assentada] .pecaBob,
+.disco .pecaBob {
+  animation: ctx-flutua 4.6s var(--via-ease) infinite alternate;
+}
+
+.pecaF {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% 50% 50% 0;
+  background: color-mix(in srgb, var(--sb-azul) 78%, black);
+  transform: translateZ(var(--z));
+  transition: background-color 0.4s var(--via-ease-out);
+}
+
+.pecaTopo {
+  background: var(--sb-azul);
+}
+
+.pecaTopo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    70% 60% at 34% 30%,
+    color-mix(in srgb, var(--sb-branco) 26%, transparent),
+    transparent 70%
+  );
+}
+
+/* ---------- o destaque: o disco do grupo sobe um pouco e acende (o vínculo com o mapa) ---------- */
+.pilha[data-fase="separada"][data-destaque="oferta"] .c1,
+.pilha[data-fase="separada"][data-destaque="conversa"] .c2,
+.pilha[data-fase="separada"][data-destaque="livres"] .c3,
+.pilha[data-fase="separada"]:has(.alvo[data-camada="oferta"]:focus-visible) .c1,
+.pilha[data-fase="separada"]:has(.alvo[data-camada="conversa"]:focus-visible) .c2,
+.pilha[data-fase="separada"]:has(.alvo[data-camada="livres"]:focus-visible) .c3 {
+  --lift: calc(var(--d) * 0.02);
+}
+
+.pilha[data-destaque="oferta"] .c1 .face,
+.pilha[data-destaque="conversa"] .c2 .face,
+.pilha[data-destaque="livres"] .c3 .face,
+.pilha:has(.alvo[data-camada="oferta"]:focus-visible) .c1 .face,
+.pilha:has(.alvo[data-camada="conversa"]:focus-visible) .c2 .face,
+.pilha:has(.alvo[data-camada="livres"]:focus-visible) .c3 .face {
+  background: var(--sb-navy-2);
+  box-shadow:
+    0 0 0 2px var(--sb-azul),
+    0 0 calc(var(--d) * 0.13) calc(var(--d) * 0.015) color-mix(in srgb, var(--sb-azul) 45%, transparent);
+}
+
+@media (hover: hover) {
+  .pilha[data-fase="separada"]:has(.alvo[data-camada="oferta"]:hover) .c1,
+  .pilha[data-fase="separada"]:has(.alvo[data-camada="conversa"]:hover) .c2,
+  .pilha[data-fase="separada"]:has(.alvo[data-camada="livres"]:hover) .c3 {
+    --lift: calc(var(--d) * 0.02);
+  }
+
+  .pilha:has(.alvo[data-camada="oferta"]:hover) .c1 .face,
+  .pilha:has(.alvo[data-camada="conversa"]:hover) .c2 .face,
+  .pilha:has(.alvo[data-camada="livres"]:hover) .c3 .face {
+    background: var(--sb-navy-2);
+    box-shadow:
+      0 0 0 2px var(--sb-azul),
+      0 0 calc(var(--d) * 0.13) calc(var(--d) * 0.015) color-mix(in srgb, var(--sb-azul) 45%, transparent);
+  }
+
+  /* a peça parece clicável: no hover ela sobe um pouco e clareia */
+  .pilha:has(.pecaAlvo:hover) .peca {
+    --pz: calc(var(--d) * 0.56);
+  }
+
+  .pilha:has(.pecaAlvo:hover) .pecaTopo {
+    background: color-mix(in srgb, var(--sb-azul) 88%, var(--sb-branco));
+  }
+}
+
+.pilha:has(.pecaAlvo:focus-visible) .peca {
+  --pz: calc(var(--d) * 0.56);
+}
+
+.pilha:has(.pecaAlvo:focus-visible) .pecaTopo {
+  background: color-mix(in srgb, var(--sb-azul) 88%, var(--sb-branco));
+}
+
+/* ---------- dormindo (versão antiga): a pilha e os discos ficam cinza ---------- */
+.pilha[data-dormindo] .face,
+.disco[data-dormindo] .face {
+  background: color-mix(in srgb, var(--sb-linha-forte) 75%, var(--sb-borda-campo));
+  box-shadow: none;
+}
+
+.pilha[data-dormindo] .face::before,
+.disco[data-dormindo] .face::before {
+  opacity: 0;
+}
+
+.pilha[data-dormindo] .sombra {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sb-tinta-2) 16%, transparent) 20%, transparent 100%);
+}
+
+.pilha[data-dormindo] .fatia,
+.disco[data-dormindo] .fatia {
+  background: linear-gradient(
+    90deg,
+    var(--sb-borda-campo) 0%,
+    color-mix(in srgb, var(--sb-borda-campo) 55%, var(--sb-linha-forte)) 40%,
+    color-mix(in srgb, var(--sb-borda-campo) 35%, var(--sb-linha-forte)) 52%,
+    color-mix(in srgb, var(--sb-borda-campo) 80%, var(--sb-linha-forte)) 78%,
+    var(--sb-borda-campo) 100%
+  );
+}
+
+.pilha[data-dormindo] .furo,
+.disco[data-dormindo] .furo {
+  background: var(--sb-canvas);
+}
+
+.pilha[data-dormindo] .pecaF,
+.disco[data-dormindo] .pecaF {
+  background: color-mix(in srgb, var(--sb-borda-campo) 70%, var(--sb-tinta-2));
+}
+
+.pilha[data-dormindo] .pecaTopo,
+.disco[data-dormindo] .pecaTopo {
+  background: var(--sb-borda-campo);
+}
+
+.pilha[data-dormindo][data-fase="separada"][data-assentada] .pecaBob,
+.disco[data-dormindo] .pecaBob {
+  animation: ctx-dorme 6s var(--via-ease) infinite alternate;
+}
+
+/* ---------- os hubs: pontos sem tamanho, 8 px fora da borda, na linha do centro do disco ----------
+   O mapa mede estes pontos e desenha neles o hub e as curvas. */
+.hub {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.hub[data-hub="oferta"] {
+  left: -8px;
+  top: calc(50% - var(--g));
+}
+
+.hub[data-hub="conversa"] {
+  left: -8px;
+  top: 50%;
+}
+
+.hub[data-hub="livres"] {
+  left: calc(100% + 8px);
+  top: calc(50% + var(--g3));
+}
+
+/* ---------- os botões por cima dos discos e da peça (2D, recebem o clique e o foco) ---------- */
+.alvo {
+  position: absolute;
+  left: 0;
+  width: var(--d);
+  height: calc(var(--d) * 0.54);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.alvo[data-camada="oferta"] {
+  top: calc(50% - var(--g) - var(--d) * 0.26);
+}
+
+.alvo[data-camada="conversa"] {
+  top: calc(50% - var(--d) * 0.26);
+}
+
+.alvo[data-camada="livres"] {
+  top: calc(50% + var(--g3) - var(--d) * 0.26);
+}
+
+.alvo:focus-visible,
+.pecaAlvo:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--sb-canvas),
+    0 0 0 5px var(--sb-azul);
+}
+
+.pecaAlvo {
+  position: absolute;
+  left: calc(50% - var(--d) * 0.27);
+  top: calc(50% - var(--g) - var(--d) * 0.72);
+  width: calc(var(--d) * 0.54);
+  height: calc(var(--d) * 0.42);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* O -50% que centraliza na altura vai dentro do `transform`, junto com a entrada: com `translate` e
+   `transform` na mesma regra, o CSS servido perde o `translate`. */
+.pecaDica {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: 0.78125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-4px, -50%);
+  pointer-events: none;
+  transition:
+    opacity 0.2s var(--via-ease-out),
+    transform 0.2s var(--via-ease-out);
+}
+
+.pecaDicaIc {
+  width: 14px;
+  height: 14px;
+  color: var(--sb-azul);
+}
+
+.pecaAlvo:hover .pecaDica,
+.pecaAlvo:focus-visible .pecaDica {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+.pecaAlvo[aria-expanded="true"] .pecaDica {
+  opacity: 0;
+}
+
+/* =========================================================
+   Um disco solto (o da seção e os pequenos de trocar de área): o mesmo desenho da pilha,
+   inclinado a 60 graus e, no de cima, com a peça flutuando. A caixa tem 0,98 d de altura;
+   o centro da face fica a 0,70 d do topo (sobra lugar para a peça).
+   ========================================================= */
+.disco {
+  --t: calc(var(--d) * 0.022);
+  position: relative;
+  display: block;
+  flex: none;
+  width: var(--d);
+  height: calc(var(--d) * 0.98);
+}
+
+.discoCena {
+  position: absolute;
+  left: 0;
+  top: calc(var(--d) * 0.2);
+  width: var(--d);
+  height: var(--d);
+  perspective: calc(var(--d) * 18);
+  perspective-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.disco3d {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(60deg);
+}
+
+@keyframes ctx-flutua {
+  from {
+    transform: translateZ(0px);
+  }
+  to {
+    transform: translateZ(calc(var(--d) * 0.035));
+  }
+}
+
+@keyframes ctx-dorme {
+  from {
+    transform: translateZ(0px) scale(0.97);
+  }
+  to {
+    transform: translateZ(calc(var(--d) * 0.012)) scale(0.94);
+  }
+}
+
+/* ---------- movimento reduzido: tudo já no estado final, sem animação ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pilha,
+  .pilha *,
+  .pilha *::before,
+  .disco,
+  .disco *,
+  .disco *::before {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- o botão do canto, enquanto o Contexto mora na tela (voo.ts marca o elemento) ----------
+   Só o atributo desta tela: o estilo e o aria-hidden de outra tela ficam como estão. */
+:global(#janete-gatilho[data-ctx-escondido]) {
+  visibility: hidden !important;
+}

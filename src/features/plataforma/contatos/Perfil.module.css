@@ -1,0 +1,659 @@
+/* O perfil do contato (o do Contatos 4, menos poluído: decisão 5 do equipe). Nenhum cartão com fundo
+   colorido: os cartões são brancos sobre o fundo da plataforma, e a cor fica só na bolinha da etapa,
+   na de "ao vivo" e num ícone. As ações do cabeçalho ficam todas no mesmo tom neutro, inclusive o
+   Apagar (decisão 4).
+
+   A grade: voltar, cabeçalho e abas ocupam a largura toda; a partir de 1200 px, o corpo da aba e a
+   coluna da direita (264 px, presa no alto ao rolar) ficam lado a lado. Abaixo de 1200 px, os cartões
+   da direita vão para o alto do corpo, só na aba Resumo. */
+
+.pfRaiz {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'voltar'
+    'cab'
+    'abas'
+    'lado'
+    'corpo';
+  align-items: start;
+  min-width: 0;
+  color: var(--sb-tinta);
+}
+
+@media (min-width: 1200px) {
+  .pfRaiz {
+    grid-template-columns: minmax(0, 1fr) 264px;
+    grid-template-areas:
+      'voltar voltar'
+      'cab cab'
+      'abas abas'
+      'corpo lado';
+    column-gap: 20px;
+  }
+}
+
+/* ---------- ← Contatos ---------- */
+
+.pfVoltar {
+  grid-area: voltar;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sb-controle-compacto);
+  margin: 0 0 var(--sb-esp-2) -10px;
+  padding: 0 12px 0 10px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.pfVoltar:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.pfVoltar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- o cabeçalho ---------- */
+
+.pfCab {
+  grid-area: cab;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px 22px;
+  min-width: 0;
+  padding: 6px 4px 18px;
+}
+
+/* O avatar grande do 4, com o anel branco. As variáveis do AvatarLead (tamanho g) crescem aqui; o
+   seletor repete o data-tamanho para vencer o do próprio avatar. */
+.pfCab .pfFoto[data-tamanho] {
+  --al-d: 96px;
+  --al-fonte: 1.875rem;
+
+  grid-row: 1 / span 2;
+  align-self: start;
+  box-shadow:
+    0 0 0 5px var(--sb-branco),
+    0 0 0 6px var(--sb-linha);
+}
+
+.pfId {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* O nome numa linha só, com reticências; o foco do perfil cai aqui sem anel (é um título). */
+.pfNome {
+  min-width: 0;
+  margin: 0 0 4px;
+  overflow: hidden;
+  font-size: var(--sb-fs-pagina);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.15;
+  letter-spacing: var(--sb-ls-pagina);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pfNome:focus,
+.pfNome:focus-visible {
+  outline: none;
+}
+
+.pfDados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+}
+
+.pfDado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pfDadoTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pfIcone {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--sb-tinta-3);
+}
+
+.pfVazio {
+  color: var(--sb-tinta-3);
+}
+
+/* ---------- as ações: bolinha de 36 px, ícone de 16, rótulo de 12 embaixo, todas no mesmo tom ---------- */
+
+.pfAcoes {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 4px;
+  margin-top: 8px;
+}
+
+/* A partir de 1280 px as ações vão para o espaço vazio à direita do nome, numa linha só, e o resto
+   do perfil sobe (pedido do equipe em 31/10). Abaixo disso não cabem ao lado do nome e dos dados:
+   ficam embaixo deles, como antes. */
+@media (min-width: 1280px) {
+  .pfCab {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .pfCab .pfFoto[data-tamanho] {
+    grid-row: 1;
+  }
+
+  .pfAcoes {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+    flex-wrap: nowrap;
+    margin-top: 0;
+  }
+
+  /* Com as ações ao lado, o nome tem menos espaço: quebra em até 2 linhas antes de cortar (em 1280 px,
+     "Paulo Henrique Viana" saía cortado numa linha só). */
+  .pfNome {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: break-word;
+    white-space: normal;
+    /* Folga embaixo: com o overflow hidden, a perna do g, p e y da 2ª linha não fica cortada. */
+    padding-bottom: 0.08em;
+  }
+}
+
+.pfAcao,
+.pfMover > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 72px;
+  min-height: 0;
+  padding: 0 4px 2px;
+  border: 0;
+  border-radius: var(--sb-r-mini);
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+  transition: color var(--app-t-state);
+}
+
+.pfAcaoCirculo,
+.pfMover > button > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  color: var(--sb-tinta);
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch, 120ms);
+}
+
+.pfAcaoCirculo svg,
+.pfMover > button > span:first-child svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pfAcaoRotulo,
+.pfMover > button > span:nth-child(2) {
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* De 900 px para cima, cada rótulo numa linha só ("Ver no Kanban", "Apagar contato"), como no 4: a
+   fileira fica mais baixa. No celular, as 5 dividem a largura e o rótulo pode quebrar. */
+@media (min-width: 900px) {
+  .pfAcao,
+  .pfMover > button {
+    white-space: nowrap;
+  }
+
+  .pfAcaoRotulo,
+  .pfMover > button > span:nth-child(2) {
+    max-width: none;
+  }
+}
+
+/* O menu "Mover para…" é o MenuSuspenso comum: a seta dele sai, e o botão vira uma ação como as outras. */
+.pfMover > button > svg:last-child {
+  display: none;
+}
+
+.pfAcao:hover:not(:disabled),
+.pfMover > button:hover:not(:disabled),
+.pfMover > button[aria-expanded='true'] {
+  background: transparent;
+  color: var(--sb-tinta);
+}
+
+.pfAcao:hover:not(:disabled) .pfAcaoCirculo,
+.pfMover > button:hover:not(:disabled) > span:first-child,
+.pfMover > button[aria-expanded='true'] > span:first-child {
+  background: var(--sb-azul-nevoa);
+}
+
+.pfAcao:active:not(:disabled) .pfAcaoCirculo,
+.pfMover > button:active:not(:disabled) > span:first-child {
+  transform: scale(0.94);
+}
+
+/* O anel de foco vai na bolinha, não no botão inteiro. */
+.pfAcao:focus-visible,
+.pfMover > button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.pfAcao:focus-visible .pfAcaoCirculo,
+.pfMover > button:focus-visible > span:first-child {
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha-forte),
+    var(--sb-anel);
+}
+
+.pfAcao:disabled {
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+.pfAcao:disabled .pfAcaoCirculo {
+  color: var(--sb-tinta-3);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+
+/* ---------- as abas: a ativa em branco, as outras só texto ---------- */
+
+.pfAbas {
+  grid-area: abas;
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+  margin-bottom: var(--sb-esp-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pfAbas::-webkit-scrollbar {
+  display: none;
+}
+
+.pfAba {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sb-r-pilula);
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.pfAba:hover {
+  color: var(--sb-tinta);
+}
+
+.pfAba[aria-selected='true'] {
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.pfAba:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.pfAbaN {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-medio);
+  color: var(--sb-tinta-3);
+}
+
+/* ---------- o corpo e a coluna da direita ---------- */
+
+.pfCorpo {
+  grid-area: corpo;
+  min-width: 0;
+}
+
+.pfLado {
+  grid-area: lado;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .pfLado {
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (max-width: 1199px) {
+  .pfLado {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .pfRaiz:not([data-aba='resumo']) .pfLado {
+    display: none;
+  }
+}
+
+.pfCartao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.pfCinza {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-regular);
+}
+
+/* Quem atende */
+
+.pfQuem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding-right: 14px;
+}
+
+.pfQuemSimbolo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+}
+
+.pfQuemSimbolo:not([data-tipo='janete']) {
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+/* A cor da espera (inclusive a de falha) fica só no ícone, com a régua do Chat: âmbar até 10 min,
+   vermelho a partir daí (data-longa). */
+.pfQuemSimbolo:is([data-tipo='aguardando'], [data-tipo='falha']) {
+  color: var(--sb-atencao);
+}
+
+.pfQuemSimbolo:is([data-tipo='aguardando'], [data-tipo='falha'])[data-longa] {
+  color: var(--sb-erro);
+}
+
+.pfQuemTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.pfQuemNome {
+  overflow: hidden;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A bolinha verde de "ao vivo", no canto de cima do cartão. */
+.pfVivo {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.pfVivoPonto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sb-sucesso);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-sucesso) 18%, transparent);
+  animation: pfPulso 2s ease-in-out infinite;
+}
+
+.pfLinhaEtapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+/* O custo numa linha: o rótulo à esquerda e o valor à direita, como no Contatos 4. */
+.pfCusto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--sb-linha);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+}
+
+.pfCustoValor {
+  font-family: var(--sb-fonte-mono);
+  font-weight: var(--sb-peso-forte);
+  color: var(--sb-tinta);
+  white-space: nowrap;
+}
+
+.pfCustoNada {
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+}
+
+/* Próximo passo */
+
+.pfPassoCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.pfPassoIcone {
+  flex: none;
+  color: var(--sb-atencao);
+}
+
+.pfPassoTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.pfPassoTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.pfSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- larguras ---------- */
+
+/* 1024 a 1199: o avatar menor e as ações na largura toda. */
+@media (max-width: 1199px) {
+  .pfCab {
+    gap: 6px 16px;
+  }
+
+  .pfCab .pfFoto[data-tamanho] {
+    --al-d: 80px;
+    --al-fonte: 1.5rem;
+  }
+
+  .pfAcoes {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Celular: o perfil ocupa a tela; as 5 ações dividem a largura numa linha só. */
+@media (max-width: 899px) {
+  .pfCab {
+    padding-bottom: 14px;
+  }
+
+  .pfCab .pfFoto[data-tamanho] {
+    --al-d: 64px;
+    --al-fonte: 1.125rem;
+
+    grid-row: 1;
+  }
+
+  .pfNome {
+    font-size: var(--sb-fs-destaque);
+  }
+
+  .pfAcoes {
+    flex-wrap: nowrap;
+  }
+
+  .pfAcoes > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .pfAcao,
+  .pfMover > button {
+    width: 100%;
+    min-width: 0;
+    padding: 0 2px 2px;
+  }
+
+  /* No toque, a bolinha cresce para 44 px (alvo mínimo). */
+  .pfAcaoCirculo,
+  .pfMover > button > span:first-child {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pfAcaoRotulo,
+  .pfMover > button > span:nth-child(2) {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pfVivoPonto {
+    animation: none;
+  }
+
+  .pfAcaoCirculo,
+  .pfMover > button > span:first-child {
+    transition: none;
+  }
+}
+
+@keyframes pfPulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}

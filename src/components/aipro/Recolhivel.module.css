@@ -1,0 +1,104 @@
+.recolhivel {
+  min-width: 0;
+  border-radius: var(--sb-r-card);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+}
+
+.recolhivel[data-superficie='cartao'] {
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.resumo {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-3);
+  min-height: 56px;
+  padding: var(--sb-esp-2) var(--sb-pad-card);
+  border-radius: inherit;
+  list-style: none;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.resumo::-webkit-details-marker {
+  display: none;
+}
+
+.recolhivel[data-superficie='nenhuma'] .resumo {
+  padding-inline: var(--sb-esp-3);
+}
+
+/* Aberto, o cabeçalho perde os cantos de baixo: o corpo continua a mesma superfície. */
+.recolhivel[open] > .resumo {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.resumo:hover {
+  background: var(--sb-canvas);
+}
+
+.resumo:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--sb-anel);
+}
+
+.titulo {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+/* Com `apoio` (P-portal-4): título e linha de apoio empilhados no lugar do título. */
+.textos {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-width: 0;
+}
+
+.apoio {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-regular);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-corpo);
+}
+
+.contagem {
+  flex: none;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  flex: none;
+  color: var(--sb-tinta-2);
+  transition: transform var(--app-t-touch);
+}
+
+.recolhivel[open] > .resumo .chevron {
+  transform: rotate(180deg);
+}
+
+.corpo {
+  padding: var(--sb-esp-2) var(--sb-pad-card) var(--sb-pad-card);
+}
+
+.recolhivel[data-superficie='nenhuma'] .corpo {
+  padding-inline: var(--sb-esp-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resumo,
+  .chevron {
+    transition: none;
+  }
+}

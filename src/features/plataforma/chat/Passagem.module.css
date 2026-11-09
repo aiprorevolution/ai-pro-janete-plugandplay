@@ -1,0 +1,113 @@
+/* A passagem do Chat (rodada 2): a conversa troca de mãos. Sem cartão (sem fundo, borda ou
+   sombra): uma linha centrada e pequena, com a rota (quem passa → quem recebe, com uma setinha), o
+   texto curto e a hora em mono. Na falha da IA, o texto fica vermelho. */
+
+.paLinha {
+  position: relative;
+  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 8px;
+  max-width: 94%;
+  margin: 10px auto;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-align: center;
+  animation: pa-entra 0.45s var(--via-ease-out) backwards;
+}
+
+.paRota {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+/* A seta da rota: uma setinha de 12 px, cinza, parada. */
+.paSeta {
+  flex: none;
+  color: var(--sb-tinta-3);
+}
+
+/* Quem recebe sem nome: a pessoa que ainda não chegou (areia) ou o celular da empresa (cinza).
+   22 px, como o avatar da equipe. */
+.paPessoa {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.paPessoa[data-celular] {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-2);
+}
+
+.paLinha[data-tom='falha'] .paPessoa {
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+}
+
+/* A pessoa da equipe: o avatar navy de 22 px com as iniciais em 11,5 px (o --sb-fs-micro, que aqui
+   vale também para as iniciais). */
+.paMembro {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+  line-height: 1;
+}
+
+.paTexto {
+  min-width: 0;
+  font-weight: var(--sb-peso-medio);
+}
+
+.paLinha[data-tom='falha'] .paTexto {
+  color: var(--sb-erro);
+}
+
+.paHora {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-3);
+  white-space: nowrap;
+}
+
+/* A frase inteira, só para o leitor de tela (o que se vê fica com aria-hidden). */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes pa-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paLinha {
+    animation: none;
+  }
+}

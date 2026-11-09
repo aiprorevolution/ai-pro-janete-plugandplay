@@ -1,0 +1,504 @@
+/* A coluna da conversa do Chat final (o `.col-chat`, `.chat-cab`, `.linha-rolo` e `.escrever`
+   do Chat-Final.dc.html). A moldura da coluna (cartão, raio, sombra) é da tela (TelaChat): aqui
+   fica só o miolo, que ocupa a altura que receber. --cv-pad é a mesma borda lateral no cabeçalho,
+   nas mensagens e na caixa de escrever. */
+
+.cvRaiz {
+  --cv-pad: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  background: var(--sb-branco);
+}
+
+/* ---------- cabeçalho: uma linha só (voltar, avatar, nome e estado, bastão, ficha) ---------- */
+
+/* container-type: o bastão encolhe (rótulos curtos, depois só o ícone na frente) quando o próprio
+   cabeçalho fica estreito; o nome corta com reticências. Nada quebra para 2 linhas. */
+.cvCab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  min-width: 0;
+  padding: 10px var(--cv-pad);
+  border-bottom: 1px solid var(--sb-linha);
+  container-type: inline-size;
+}
+
+/* Base 0: o bastão e a ficha ficam com o tamanho deles e o nome fica com o resto (corta com reticências). */
+.cvId {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.cvVoltar {
+  display: none;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.cvVoltar:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.cvIdTxt {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.cvNome {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.3;
+  letter-spacing: -0.006em;
+  color: var(--sb-tinta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A linha de estado: uma só e curta, em 2 pedaços (o gap faz o espaço entre eles). O 1º (a empresa,
+   "Respondida pelo celular" ou "Aguardando") encolhe primeiro, com reticências; o 2º (a etapa ou o
+   tempo da espera) só corta depois que o 1º sumiu de todo, e nunca passa por cima do bastão. */
+.cvEstado {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+
+.cvEstado > svg {
+  flex: none;
+}
+
+.cvEstA,
+.cvEstB {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Um encolhimento muito maior que o do 2º pedaço: na prática, só ele encolhe até sumir. */
+.cvEstA {
+  flex: 0 100000 auto;
+}
+
+.cvEstB {
+  flex: 0 1 auto;
+}
+
+.cvEstado[data-tom='espera'] {
+  color: var(--sb-atencao);
+  font-weight: var(--sb-peso-medio);
+}
+
+.cvEstado[data-tom='espera'][data-longa] {
+  color: var(--sb-erro);
+}
+
+.cvBastao {
+  flex: 0 1 auto;
+}
+
+.cvAcoes {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+}
+
+/* Com a ficha aberta como coluna (a partir de 1280 px), o botão da ficha sai: a coluna tem o próprio
+   X, e a linha do nome ganha o espaço. Ao fechar a ficha, ele volta e recebe o foco. */
+@media (min-width: 1280px) {
+  .cvRaiz[data-ficha='aberta'] .cvAcoes {
+    display: none;
+  }
+}
+
+/* O botão da ficha: 36 px, branco com contorno; aceso quando a ficha está aberta. */
+.cvFicha {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.cvFicha:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.cvFicha[aria-expanded='true'] {
+  background: var(--sb-azul-claro);
+  box-shadow: none;
+  color: var(--sb-azul-texto);
+}
+
+/* O contorno transparente aparece no alto contraste do Windows, que apaga o box-shadow. */
+.cvVoltar:focus-visible,
+.cvFicha:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+/* Cabeçalho médio (a coluna da conversa de 1024 a 1440 px, com ou sem a ficha, e o celular): na
+   espera, o "Aguardando" sai e fica "há 13 min" com o relógio. O tempo nunca some. */
+@container (max-width: 500px) {
+  .cvEstA[data-sai-estreito] {
+    display: none;
+  }
+}
+
+/* Cabeçalho estreito: as folgas encolhem e o nome desce para 16 px, para caber mais dele. */
+@container (max-width: 440px) {
+  .cvId {
+    gap: 8px;
+  }
+
+  .cvNome {
+    font-size: 1rem;
+  }
+}
+
+/* ---------- as mensagens ---------- */
+
+/* column-reverse: a conversa abre no fim, como no WhatsApp, e fica presa embaixo quando chega mensagem. */
+.cvRolo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px var(--cv-pad) 16px;
+  background: var(--sb-branco);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+/* Em tela muito larga (2560 px), as mensagens e a caixa ficam num miolo de até 1120 px, no centro:
+   o lead e a equipe não ficam a mais de 1.000 px um do outro. A rolagem continua na coluna inteira. */
+.cvLista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-top: 8px;
+}
+
+/* "Janete digitando…": na mesma linha de uma mensagem da Janete (a da Bolha): à direita, a bolinha dela
+   de 36 px (ou só o espaço, quando continua o grupo dela), 12 px de folga e o balão azul-claro com os
+   3 pontos. Sem o nome em cima. */
+.cvDigita {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+  animation: cv-entra 0.45s var(--via-ease-out) backwards;
+}
+
+.cvDigita[data-agrupada] {
+  margin-top: 4px;
+}
+
+.cvDigitaQuem {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.cvDigitaEsp {
+  flex: none;
+  width: 36px;
+}
+
+.cvDigitaBolha {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 22px;
+  background: var(--sb-azul-claro);
+}
+
+.cvDigitaBolha i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-azul-texto);
+  animation: cv-ponto 1.1s var(--via-ease) infinite;
+}
+
+.cvDigitaBolha i:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.cvDigitaBolha i:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+/* ---------- a caixa de escrever ---------- */
+
+/* A caixa (e a faixa sobre ela) no mesmo miolo das mensagens, de até 1120 px, centrado nas telas muito
+   largas. O limite vem do recheio lateral, e não de max-width com margem automática nos filhos: a raiz
+   da CaixaEscrever é uma coluna flex, e a margem automática fazia a caixa encolher até o conteúdo. */
+.cvEscrever {
+  flex: none;
+  padding: 4px var(--cv-pad) 16px;
+  padding-inline: max(var(--cv-pad), calc((100% - 1120px) / 2));
+  background: var(--sb-branco);
+}
+
+.cvVazio {
+  margin: auto;
+  padding: 24px;
+  font-size: var(--sb-fs-apoio);
+  color: var(--sb-tinta-2);
+  text-align: center;
+}
+
+/* Carregando e erro de leitura, dentro da coluna (o cabeçalho, quando já há, fica). */
+.cvEstadoLeitura {
+  width: 100%;
+  max-width: 720px;
+  margin: var(--sb-esp-4) auto;
+  padding: 0 var(--cv-pad, 16px);
+}
+
+/* "Carregar mensagens anteriores", no topo das mensagens. */
+.cvMais {
+  align-self: center;
+  min-height: var(--sb-controle-compacto);
+  margin: 4px 0 8px;
+  padding: 4px 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+}
+
+.cvMais:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.cvMais:disabled {
+  color: var(--sb-tinta-2);
+  cursor: progress;
+}
+
+.cvMais:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- o diálogo "Devolver para a Janete mesmo assim?" ---------- */
+
+/* No body (portal), por cima do app inteiro, como o diálogo de apagar da ficha. */
+.cvVeu {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--via-z-modal) + 10);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--sb-veu);
+  animation: cv-aparece 0.24s var(--via-ease-out) both;
+}
+
+.cvDialogo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(420px, 100%);
+  padding: 24px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: cv-dialogo 0.42s var(--via-ease-out) backwards;
+}
+
+.cvDialogo:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--sb-anel), var(--sb-sombra-flutuante);
+}
+
+.cvDialogoTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  color: var(--sb-tinta);
+}
+
+.cvDialogoTexto {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.cvDialogoAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- larguras ---------- */
+
+/* 3 colunas apertadas (o Chat junta as 3 a partir de 1280 px). */
+@media (max-width: 1359px) and (min-width: 1280px) {
+  .cvRaiz {
+    --cv-pad: 18px;
+  }
+
+  .cvRolo,
+  .cvEscrever {
+    padding-bottom: 14px;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 900px) {
+  .cvRaiz {
+    --cv-pad: 16px;
+  }
+
+  .cvRolo,
+  .cvEscrever {
+    padding-bottom: 12px;
+  }
+}
+
+/* Celular: a conversa ocupa a tela; voltar e ficha com 44 px de toque. */
+@media (max-width: 899px) {
+  .cvCab {
+    gap: 6px;
+    padding: 8px 10px 8px 6px;
+  }
+
+  .cvVoltar {
+    display: grid;
+  }
+
+  .cvFicha {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cvRolo {
+    padding: 8px 14px 12px;
+  }
+
+  .cvEscrever {
+    padding: 4px 10px 10px;
+  }
+}
+
+@keyframes cv-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes cv-ponto {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@keyframes cv-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes cv-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvDigita,
+  .cvVeu,
+  .cvDialogo {
+    animation: none;
+  }
+
+  .cvDigitaBolha i {
+    animation: none;
+  }
+}

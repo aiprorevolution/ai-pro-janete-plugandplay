@@ -1,0 +1,147 @@
+/* O avatar do lead (o `.ci-av` e o `.av` do Chat final), com o selo de quem atende no canto.
+
+   Geometria por tamanho: --al-d é o círculo, --al-selo o selo, --al-fora quanto o selo passa da
+   borda do quadrado e --al-anel-l a espessura do anel que separa o selo do círculo. Conferido para
+   2 maiúsculas largas ("MW") na Poppins 600: com as iniciais 2 px para cima e para a esquerda, a
+   distância do canto do texto ao centro do selo fica maior que o raio do selo + o anel nos 3 tamanhos
+   (p 13,1 > 10 · m 15 > 14,5 · g 21 > 17 px; o teste t0-comum-a refaz a conta). O selo nunca
+   cobre uma letra. */
+.alAvatar {
+  --al-d: 48px;
+  --al-fonte: 0.9375rem;
+  --al-selo: 24px;
+  --al-fora: 5px;
+  --al-anel-l: 2.5px;
+  --al-icone: 13px;
+  --al-selo-fonte: 0.6875rem;
+
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--al-d);
+  height: var(--al-d);
+  border-radius: 50%;
+  background: var(--sb-azul-claro);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--al-fonte);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  letter-spacing: var(--sb-ls-sigla);
+  user-select: none;
+}
+
+.alAvatar[data-tamanho='p'] {
+  --al-d: 36px;
+  --al-fonte: 0.75rem;
+  --al-selo: 16px;
+  --al-fora: 4px;
+  --al-anel-l: 2px;
+  --al-icone: 10px;
+  --al-selo-fonte: 0.5rem;
+}
+
+.alAvatar[data-tamanho='g'] {
+  --al-d: 64px;
+  --al-fonte: 1.125rem;
+  --al-selo: 28px;
+  --al-fora: 5px;
+  --al-anel-l: 3px;
+  --al-icone: 15px;
+  --al-selo-fonte: 0.75rem;
+}
+
+/* As tintas de categoria: texto sempre na tinta navy (regra do AI PRO). */
+.alAvatar[data-cor='menta'] {
+  background: var(--sb-menta);
+}
+
+.alAvatar[data-cor='areia'] {
+  background: var(--sb-areia);
+}
+
+.alAvatar[data-cor='rosa'] {
+  background: var(--sb-rosa);
+}
+
+.alIniciais {
+  transition: translate var(--app-t-state);
+}
+
+/* Com selo, as iniciais sobem 2 px para a esquerda e abrem espaço para o canto do selo. */
+.alAvatar[data-com-selo] .alIniciais {
+  translate: -2px -2px;
+}
+
+.alSelo {
+  position: absolute;
+  right: calc(-1 * var(--al-fora));
+  bottom: calc(-1 * var(--al-fora));
+  display: grid;
+  place-items: center;
+  width: var(--al-selo);
+  height: var(--al-selo);
+  overflow: hidden;
+  border-radius: 50%;
+  /* O anel tem a cor do fundo de quem está por trás: quem usa troca --al-anel no hover e na seleção. */
+  box-shadow: 0 0 0 var(--al-anel-l) var(--al-anel, var(--sb-branco));
+  font-size: var(--al-selo-fonte);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-sigla);
+  line-height: 1;
+  transition: box-shadow var(--app-t-state);
+}
+
+.alSelo svg:not(.alSeloJanete) {
+  width: var(--al-icone);
+  height: var(--al-icone);
+  stroke-width: 2.2;
+}
+
+.alSelo[data-selo='membro'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+/* O celular da empresa: o mesmo código da lista e do bastão (branco, contorno e ícone cinza). */
+.alSelo[data-selo='celular'] {
+  background: var(--sb-branco);
+  color: var(--sb-tinta-2);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha-forte),
+    0 0 0 var(--al-anel-l) var(--al-anel, var(--sb-branco));
+}
+
+.alSelo[data-selo='aguardando'] {
+  background: var(--sb-areia);
+  color: var(--sb-atencao);
+}
+
+.alSelo[data-selo='falha'] {
+  background: var(--sb-erro-claro);
+  color: var(--sb-erro);
+}
+
+.alSeloJanete {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 22%;
+  object-fit: contain;
+}
+
+/* Contato sem nome (só o telefone): o ícone de pessoa no lugar das iniciais, do tamanho da letra. */
+.alIconeSemNome {
+  display: block;
+  width: calc(var(--al-fonte) * 1.2);
+  height: calc(var(--al-fonte) * 1.2);
+  stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alIniciais,
+  .alSelo {
+    transition: none;
+  }
+}

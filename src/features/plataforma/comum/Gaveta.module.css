@@ -1,0 +1,121 @@
+/* A gaveta lateral (o `.col-ficha.gaveta` do Chat final e o `.gaveta` do Kanban 2): véu navy a 48%
+   por trás e o painel branco preso à direita, com a sombra flutuante.
+
+   As entradas usam `backwards`, nunca `both`: com `both`, o `transform` final continua valendo
+   depois da animação e o painel vira o bloco de contenção de tudo que é `position: fixed` lá dentro
+   (os véus dos menus, os avisos), que passam a se posicionar contra a gaveta e não contra a tela. */
+
+.gvRaiz {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  pointer-events: none;
+}
+
+.gvVeu {
+  position: absolute;
+  inset: 0;
+  background: var(--sb-veu);
+  pointer-events: auto;
+  animation: gv-aparece var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+.gvPainel {
+  position: absolute;
+  top: var(--sb-esp-3);
+  right: var(--sb-esp-3);
+  bottom: var(--sb-esp-3);
+  display: flex;
+  flex-direction: column;
+  width: min(var(--gv-largura, 440px), calc(100% - var(--sb-esp-6)));
+  overflow: hidden;
+  border-radius: var(--sb-r-painel);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  box-shadow: var(--sb-sombra-flutuante);
+  pointer-events: auto;
+  outline: none;
+  animation: gv-entra 420ms var(--via-ease-out) backwards;
+}
+
+/* Ancorada (a ficha do Chat entre 900 e 1279 px, o `.col-ficha.gaveta` do Chat final): presa ao bloco
+   de quem usa (que tem `position: relative`), do `--gv-topo` até o fundo, à direita, sem véu. Fica
+   acima das mensagens, mas abaixo de menus, diálogos e avisos (que vão para o body). */
+.gvAncorada.gvAncorada {
+  top: var(--gv-topo, 0);
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  width: min(var(--gv-largura, 440px), calc(100% - var(--sb-esp-12)));
+}
+
+/* O painel recebe o foco quando não há `data-autofocus`: o anel ficaria em volta da gaveta inteira. */
+.gvPainel:focus-visible {
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.gvFechar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.gvFechar:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.gvFechar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* No celular, a gaveta é a tela toda, como a conversa aberta no WhatsApp. */
+@media (max-width: 899px) {
+  .gvPainel {
+    inset: 0;
+    width: auto;
+    border-radius: 0;
+    box-shadow: none;
+    animation-duration: 320ms;
+  }
+
+  .gvPainel:focus-visible {
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gvVeu,
+  .gvPainel {
+    animation: none;
+  }
+
+  .gvFechar {
+    transition: none;
+  }
+}
+
+@keyframes gv-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes gv-entra {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}

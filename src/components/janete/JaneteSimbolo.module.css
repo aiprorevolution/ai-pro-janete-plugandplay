@@ -1,0 +1,266 @@
+/* =============================================================================
+   O símbolo da Janete (o da E3, com o check do F): um disco navy com um ponto de fala
+   azul dentro. O ponto é um círculo com o canto de baixo à esquerda reto (um balão
+   em miniatura).
+
+   Copiado de F-Final.dc.html (`.janete`, `.janete-v`, `.janete-f`, `.janete-ck` e os
+   keyframes `dorme`, `respira`, `carrega`, `pop`, `pula`, `pula-meio`), trocando as
+   curvas locais do mockup pelos tokens:
+     --e-trav  → --sb-ease-travessia     --e-out  → --via-ease-out
+     --e-snap  → --via-ease-snap         --e-mola → --via-ease-spring
+     --e-via   → --via-ease
+
+   Os estados são `data-estado` no disco. A troca de um para outro é contínua: cor do
+   disco, canto do balão, escala do ponto e o traço do check têm `transition`, então
+   basta mudar a prop. Os keyframes moram aqui (o CSS Modules escopa o nome usado em
+   `animation`; um keyframe global não seria achado).
+   ============================================================================= */
+
+.janete {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  transition:
+    border-radius 0.42s var(--sb-ease-travessia),
+    background-color 0.5s var(--via-ease-out),
+    opacity 0.3s var(--via-ease-out);
+}
+
+/* O ponto de fala (`.janete-v`). */
+.ponto {
+  width: 72%;
+  height: 72%;
+  border-radius: 22%;
+  background: transparent url('/brand/aipro-icone.png') center / contain no-repeat;
+  transition:
+    transform 0.42s var(--sb-ease-travessia),
+    border-radius 0.42s var(--sb-ease-travessia),
+    background-color 0.5s var(--via-ease-out);
+}
+
+/* Os dois pontos laterais que aparecem quando ela fala (`.janete-f i`). */
+.falas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.falas > span {
+  position: absolute;
+  top: 43%;
+  width: 14%;
+  height: 14%;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  transform: scale(0);
+  transition: transform 0.32s var(--via-ease-snap);
+}
+
+.falas > span:first-child {
+  left: 19%;
+}
+
+.falas > span:last-child {
+  right: 19%;
+}
+
+/* Check desenhado dentro do próprio disco (`.janete-ck`): o ponto gira para dentro e o
+   traço branco aparece. Sem anel externo. */
+.check {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.check path {
+  fill: none;
+  stroke: var(--sb-branco);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 64;
+  stroke-dashoffset: 64;
+  transition: stroke-dashoffset 0.26s var(--via-ease-snap);
+}
+
+/* ---------- dormindo: cinza, respiração lenta ---------- */
+
+.janete[data-estado='dormindo'] {
+  background: var(--sb-linha-forte);
+}
+
+.janete[data-estado='dormindo'] .ponto {
+  filter: grayscale(1);
+  animation: dorme 5.5s var(--via-ease) infinite;
+}
+
+/* ---------- acordada: o ponto respira ---------- */
+
+.janete[data-estado='acordada'] .ponto {
+  animation: respira 4.2s var(--via-ease) infinite;
+}
+
+/* ---------- carregando: o canto do ponto gira em volta do centro ---------- */
+
+.janete[data-estado='carregando'] .ponto {
+  animation: carrega 1.15s var(--via-ease) infinite;
+}
+
+/* ---------- check: o ponto some girando e o traço branco é desenhado ---------- */
+
+.janete[data-estado='check'] {
+  animation: pop 0.55s var(--via-ease-out) 0.1s;
+}
+
+.janete[data-estado='check'] .ponto {
+  transform: scale(0) rotate(-140deg);
+  animation: none;
+}
+
+.janete[data-estado='check'] .check path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.5s var(--via-ease-out) 0.18s;
+}
+
+/* ---------- fala: o disco ganha o canto (vira balão) e o ponto se abre em três ----------
+   `[data-janete-gatilho]` num pai (o botão do canto) faz o mesmo no hover e no foco,
+   como o `.gatilho` do F. */
+
+.janete[data-estado='fala'],
+[data-janete-gatilho]:hover .janete,
+[data-janete-gatilho]:focus-visible .janete {
+  border-radius: 50% 50% 50% 14%;
+}
+
+.janete[data-estado='fala'] .ponto,
+[data-janete-gatilho]:hover .janete .ponto,
+[data-janete-gatilho]:focus-visible .janete .ponto {
+  background: var(--sb-azul);
+  transform: scale(0.3333);
+  border-radius: 50%;
+  animation: none;
+}
+
+.janete[data-estado='fala'] .falas > span,
+[data-janete-gatilho]:hover .janete .falas > span,
+[data-janete-gatilho]:focus-visible .janete .falas > span {
+  transform: scale(1);
+  transition: transform 0.38s var(--via-ease-spring);
+}
+
+.janete[data-estado='fala'] .falas > span:last-child,
+[data-janete-gatilho]:hover .janete .falas > span:last-child,
+[data-janete-gatilho]:focus-visible .janete .falas > span:last-child {
+  transition-delay: 0.06s;
+}
+
+/* Digitando: os três pontos pulam em onda. */
+.janete[data-estado='fala'][data-digitando] .ponto {
+  animation: pula-meio 1.1s var(--via-ease) 0.1s infinite;
+}
+
+.janete[data-estado='fala'][data-digitando] .falas > span {
+  animation: pula 1.1s var(--via-ease) infinite;
+}
+
+.janete[data-estado='fala'][data-digitando] .falas > span:last-child {
+  animation-delay: 0.22s;
+}
+
+/* ---------- keyframes (os do F) ---------- */
+
+@keyframes respira {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes dorme {
+  0%,
+  100% {
+    transform: scale(0.84);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+}
+
+@keyframes carrega {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.86);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pula {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 0 -55%;
+  }
+}
+
+@keyframes pula-meio {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 0 -18%;
+  }
+}
+
+/* Movimento reduzido: estado final no primeiro quadro, como no F (a troca de estado
+   continua acontecendo, só que sem percurso e sem laço). */
+@media (prefers-reduced-motion: reduce) {
+  .janete,
+  .janete *,
+  .janete *::before,
+  .janete *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+
+  /* Sem o laço, o carregando ficaria igual ao acordada. Fica parado no meio do giro do
+     `carrega` (canto reto virado para cima, ponto menor e mais apagado): um sinal
+     estático de que algo está em andamento. */
+  .janete[data-estado='carregando'] .ponto {
+    animation: none;
+    transform: rotate(90deg) scale(0.86);
+    opacity: 0.7;
+  }
+}

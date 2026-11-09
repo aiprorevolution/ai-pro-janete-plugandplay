@@ -1,0 +1,291 @@
+/* A linha da lista de conversas do Chat final (o `.ci` da opção A), que o Kanban reusa como card.
+   O fundo é da raiz (e não do botão) para o `extra` do card ficar na mesma superfície. O anel do
+   selo do avatar (--al-anel) acompanha o fundo: branco, cinza no hover e cinza suave selecionada. */
+
+.lcLinha {
+  /* O cinza suave da linha aberta (#edf0f5 do protótipo): entre o canvas e a linha. */
+  --lc-selecionada: color-mix(in srgb, var(--sb-linha) 57%, var(--sb-canvas));
+  --al-anel: var(--sb-branco);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--sb-tinta);
+  transition: background-color var(--app-t-state);
+}
+
+.lcLinha:hover {
+  --al-anel: var(--sb-canvas);
+  background: var(--sb-canvas);
+}
+
+.lcLinha[data-selecionada] {
+  --al-anel: var(--lc-selecionada);
+  background: var(--lc-selecionada);
+}
+
+.lcAbrir {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 88px;
+  padding: var(--sb-esp-3);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* compacta (a lista da etapa em chat do Kanban): 52 px do avatar + 7 px em cima e embaixo = 66 px,
+   como no protótipo. A conversa que espera alguém ganha a 3ª linha e cresce o que precisar. */
+.lcLinha[data-compacta] .lcAbrir {
+  min-height: 66px;
+  padding-block: 7px;
+}
+
+.lcAbrir:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+/* A coluna do avatar tem 52 px: o círculo de 48 e a folga para o selo, que passa 5 px do canto. */
+.lcAv {
+  display: grid;
+  place-items: center start;
+  width: 52px;
+  height: 52px;
+}
+
+.lcTxt {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.lcL1 {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+}
+
+.lcNome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sb-fs-campo);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.35;
+}
+
+.lcHora {
+  flex: none;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.lcLinha[data-selecionada] .lcHora {
+  color: var(--sb-tinta-2);
+}
+
+.lcL2 {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-esp-2);
+  min-width: 0;
+}
+
+.lcPrev {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+}
+
+.lcPrevTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lcIcone {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--sb-tinta-3);
+}
+
+/* Lida: os dois vistos em azul (o azul de texto, que passa 3:1 como ícone). */
+.lcIcone[data-status='lida'] {
+  color: var(--sb-azul-texto);
+}
+
+.lcPrev[data-tom='digita'] {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-medio);
+}
+
+.lcPrev[data-tom='falhou'],
+.lcPrev[data-tom='falhou'] .lcIcone {
+  color: var(--sb-erro);
+  font-weight: var(--sb-peso-medio);
+}
+
+.lcNl {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Com não lidas: nome forte, hora azul e prévia na tinta. */
+.lcLinha[data-nova] .lcNome {
+  font-weight: var(--sb-peso-forte);
+}
+
+.lcLinha[data-nova] .lcHora,
+.lcLinha[data-nova][data-selecionada] .lcHora {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-forte);
+}
+
+.lcLinha[data-nova] .lcPrev:not([data-tom]) {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* ---------- a linha de situação ---------- */
+
+.lcL3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.45;
+}
+
+.lcSitTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lcPonto {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-borda-campo);
+}
+
+.lcL3[data-quem='janete'] .lcPonto {
+  background: var(--sb-azul);
+}
+
+.lcL3[data-quem='membro'] .lcPonto {
+  background: var(--sb-navy);
+}
+
+.lcL3[data-quem='celular'] .lcPonto {
+  background: var(--sb-tinta-3);
+}
+
+.lcL3[data-desfecho='ganho'] {
+  font-weight: var(--sb-peso-forte);
+}
+
+.lcL3[data-desfecho='ganho'] .lcPonto {
+  background: var(--sb-sucesso);
+}
+
+.lcL3[data-desfecho='perdido'] .lcPonto {
+  background: var(--sb-borda-campo);
+}
+
+.lcL3[data-quem='aguardando'] {
+  color: var(--sb-atencao);
+  font-weight: var(--sb-peso-forte);
+}
+
+.lcL3[data-quem='falha'] {
+  color: var(--sb-erro);
+  font-weight: var(--sb-peso-forte);
+}
+
+/* O tempo esperando alguém (o relógio correndo da opção C). */
+.lcEspera {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sb-esp-1);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--sb-peso-forte);
+  transition: color 600ms var(--via-ease-out);
+}
+
+.lcEspera svg {
+  width: 13px;
+  height: 13px;
+}
+
+.lcEspera[data-longa] {
+  color: var(--sb-erro);
+}
+
+/* Na linha compacta (a etapa em chat do Kanban), o tempo de espera fica no lugar da hora, como no
+   protótipo: âmbar para quem espera, vermelho para falha ou espera longa. */
+.lcHora[data-espera] {
+  color: var(--sb-atencao);
+  font-weight: var(--sb-peso-forte);
+}
+
+.lcHora[data-espera='falha'],
+.lcHora[data-espera][data-longa] {
+  color: var(--sb-erro);
+}
+
+/* ---------- o extra (card do Kanban) ---------- */
+
+.lcExtra {
+  min-width: 0;
+  padding: 0 var(--sb-esp-3) var(--sb-esp-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lcLinha,
+  .lcEspera {
+    transition: none;
+  }
+}

@@ -1,0 +1,1332 @@
+/* =============================================================================
+   O funil da versão final (o da B, com a faixa da mudança 5: a Janete no centro, 3 chips de cada lado).
+
+   Palco (dvbFp*): cada camada fica em posição absoluta sobre as linhas fixas do cartão ABERTO e é
+   levada aos outros estados só com transform, opacity e clip-path, a partir das variáveis que o motor
+   escreve a cada quadro na vista presa (Palco.tsx; o --p vai no [data-dash="palco"]):
+     --a-cresce  o recipiente crescendo (fase 1)      --b/--n  a barra e o número da coluna (fase 1)
+     --m/--q     as métricas e a queda da coluna (2)  --d      a barra deitando no lugar (fase 3, 1º tempo)
+     --a-sai     o conteúdo aberto saindo (fase 3)    --a-ind  a fileira subindo junto com o cartão (2º tempo)
+     --a-chip    os fundos dos chips e as setas
+   (na fase 3 a barra deita na mesma janela do --a-ind: ela encolhe para o alto, e o pé do cartão fica
+   12 px abaixo do pé dela; --a-lado leva cada coluna até o chip dela na faixa com a Janete no centro)
+   e a geometria medida no redimensionamento (--g-*). Até a fase 3 as colunas não andam na horizontal: a faixa do
+índice usa o mesmo x de cada coluna (o chip nasce onde a coluna estava).
+
+   Linhas fixas (px, do topo do cartão):
+     repouso: nome 64 · número de 28 px em 80 · conversão em 114 · barras de 140 até --g-base0
+     aberto:  nome 82 · número de 44 px em 100 · conversão em 154 · barras de 186 até --g-base1,
+              a queda em base1 + 18, as métricas em base1 + 96 e a pílula "Role para ver cada
+              etapa" na linha do pé (46 px acima do fim do cartão)
+     faixa:  chip de 8 a 60 · nome em 16 · número de 15 px em 33 · mini barra em 53 (3 px)
+   Na fase 3, nome, número e barra de TODAS as colunas sobem pelo mesmo --a-ind (nada em diagonal); a
+   onda entre as colunas fica só no recorte da barra que deita (--d).
+   ============================================================================= */
+
+/* A raiz do funil no palco não gera caixa: só carrega os atributos (foco, vazio, carregando). */
+.dvbFpColuna {
+  display: contents;
+}
+
+/* x da coluna e largura do lugar dela. Da final: `--chip` é a borda esquerda do chip da coluna na
+   faixa com a Janete no centro (16 px + i chips e vãos; depois da Janete, + o lugar dela no lugar de um
+   vão), e `--dxf` é quanto a coluna anda na horizontal até ele (o texto fica 12 px dentro do chip).
+   O que vai para a faixa anda `--dxf × --a-lado` só por transform. */
+.dvbFpNome,
+.dvbFpNumero,
+.dvbFpConv,
+.dvbFpBarra,
+.dvbFpPonte,
+.dvbFpQueda,
+.dvbFpMetricas,
+.dvbFpChipFundo,
+.dvbFpSairam {
+  --x: calc(var(--g-px) + var(--i, 0) * var(--g-sw));
+  --largura: var(--g-sw);
+  --chip: calc(16px + var(--i, 0) * (var(--g-cw) + var(--g-vao)) + var(--depois, 0) * (var(--g-nz) - var(--g-vao)));
+  --dxf: calc(var(--chip) + 12px - var(--x));
+  --anda: calc(var(--dxf) * var(--a-lado, 0));
+}
+
+[data-perdidos] .dvbFpNome,
+.dvbFpNome[data-perdidos],
+.dvbFpNumero[data-perdidos],
+.dvbFpConv[data-perdidos],
+.dvbFpBarra[data-perdidos],
+.dvbFpMetricas[data-perdidos],
+.dvbFpSairam,
+.dvbFpChipFundo[data-sairam] {
+  --largura: calc(var(--g-sw) * 0.82);
+}
+
+/* ---------- os fundos dos chips (fase 3, embaixo do texto) ---------- */
+
+.dvbFpChipFundo {
+  position: absolute;
+  top: 8px;
+  left: calc(var(--x) - 12px);
+  width: var(--g-cw);
+  height: 52px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-canvas);
+  opacity: var(--a-chip, 0);
+  pointer-events: none;
+  transform: translateX(var(--anda));
+}
+
+/* O fundo do "Para onde foram os que saíram" tem a largura dos outros chips: a faixa fica simétrica
+   em volta da Janete (o último chip termina a 16 px da borda direita). */
+.dvbFpChipFundo[data-sairam] {
+  width: var(--g-cw);
+}
+
+/* ---------- a Janete no centro da faixa (mudança 5 da final) ----------
+   O desenho dela entra com a formação da faixa, já com a cor dela (ajuste 1 do equipe: nada de disco
+   translúcido, que sobre o branco vira cinza, a cara da Janete parada): a opacidade fica cheia nos
+   primeiros 8% do --a-janete, quando ela ainda é um ponto de ~14 px, e o resto da entrada é só a escala,
+   de 0,35 a 1. Sobe junto com a fileira (o mesmo --a-ind dos nomes: 66 px abaixo do lugar final quando
+   a fileira ainda está na linha do funil aberto). Na troca, a faixa real (com o botão de verdade)
+   assume no mesmo pixel. */
+.dvbFpJanete {
+  position: absolute;
+  top: 14px;
+  left: calc(16px + 3 * (var(--g-cw) + var(--g-vao)) - var(--g-vao) + (var(--g-nz) - 40px) / 2);
+  width: 40px;
+  height: 40px;
+  opacity: clamp(0, var(--a-janete, 0) * 12.5, 1);
+  transform: translateY(calc(66px * (1 - var(--a-ind, 0)))) scale(calc(0.35 + 0.65 * var(--a-janete, 0)));
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.dvbFpChipTrilho {
+  position: absolute;
+  top: 45px;
+  left: 12px;
+  width: var(--g-mini);
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sb-linha);
+}
+
+/* ---------- título, âncora, dica ---------- */
+
+/* O título e a âncora numa linha só ("Funil do período · dos 190 leads que chegaram nos últimos 30
+   dias"): sobram ~20 px de respiro até os nomes das etapas, sem mexer nas linhas fixas nem na dobra. */
+.dvbFpTitulo {
+  position: absolute;
+  top: 22px;
+  left: var(--g-px);
+  /* só o (i) do "como contamos" à direita (o convite a rolar foi para o pé do cartão) */
+  right: calc(var(--g-px) + 40px);
+  transform: translateY(calc(6px * var(--a-cresce, 0) - 26px * var(--a-sai, 0)));
+  opacity: calc(1 - var(--a-sai, 0));
+}
+
+.dvbFpTitulo1 {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  opacity: calc(1 - var(--a-titulo, 0));
+}
+
+.dvbFpH2,
+.dvbFpTitulo2 {
+  display: block;
+  flex: none;
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: 22px;
+  letter-spacing: var(--sb-ls-secao);
+  white-space: nowrap;
+}
+
+/* Na fase 2 o título vira "O funil, etapa por etapa" (troca no mesmo lugar, subindo 5 px); a âncora sai
+   junto com o título de antes. */
+.dvbFpTitulo2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: var(--a-titulo, 0);
+  transform: translateY(calc(5px * (1 - var(--a-titulo, 0))));
+}
+
+.dvbFpAncora {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-regular);
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvbFpAncora::before {
+  content: '· ';
+  color: var(--sb-tinta-3);
+}
+
+.dvbFpComo {
+  position: absolute;
+  top: 19px;
+  right: calc(var(--g-px) - 2px);
+  transform: translateY(calc(6px * var(--a-cresce, 0) - 26px * var(--a-sai, 0)));
+  opacity: calc(1 - var(--a-sai, 0));
+}
+
+/* ---------- o convite a rolar (ajuste 4 do equipe) ----------
+   Uma pílula no azul-névoa com o texto no azul de texto (5,4:1) e a seta descendo devagar. No palco
+   ela fica centralizada no cartão, na altura que o motor escreve (--dvb-dica-y, coreografia.ts,
+   posicaoDaDica): na dobra, 16 px acima do fim da tela; com o pé do cartão à vista, logo embaixo dele;
+   com o funil aberto, na linha dela no pé do cartão. Some com o --a-dica (de 0,72 a 0,755 de p),
+   descendo 6 px, antes de a faixa se formar. */
+.dvbDicaRolar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  margin: 0;
+  padding: 0 12px 0 14px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-nevoa);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--sb-azul) 24%, transparent),
+    0 6px 16px -10px color-mix(in srgb, var(--sb-navy) 45%, transparent);
+  color: var(--sb-azul-texto);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.dvbDicaSeta {
+  flex: none;
+  animation: dvbSetaDesce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes dvbSetaDesce {
+  0%,
+  100% {
+    transform: translateY(-1.5px);
+  }
+  50% {
+    transform: translateY(2.5px);
+  }
+}
+
+.dvbFpDica {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  opacity: var(--a-dica, 1);
+  transform: translate(-50%, calc(var(--dvb-dica-y, calc(var(--g-h0, 272px) + 12px)) + 6px * (1 - var(--a-dica, 1))));
+}
+
+/* depois que sumiu, a seta para de se mexer (nada anima fora da tela) */
+[data-sai-fim] .dvbFpDica,
+[data-dash-fase='detalhe'] .dvbFpDica,
+[data-dash-fase='resultado'] .dvbFpDica {
+  visibility: hidden;
+}
+
+[data-sai-fim] .dvbFpDica .dvbDicaSeta,
+[data-dash-fase='detalhe'] .dvbFpDica .dvbDicaSeta,
+[data-dash-fase='resultado'] .dvbFpDica .dvbDicaSeta {
+  animation: none;
+}
+
+/* ---------- o cabeçalho de cada coluna ---------- */
+
+/* O nome tem a largura de dentro do chip do índice desde o repouso: ele sobe para o chip sem mudar de
+   caixa (o "Em qualificação" cabe inteiro em toda largura com palco). */
+.dvbFpNome {
+  position: absolute;
+  top: 64px;
+  left: var(--x);
+  width: calc(var(--g-cw) - 24px);
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* sobe para a 1ª linha do chip (82 → 16) junto com a fileira inteira, e anda até o chip dele */
+  transform: translate(var(--anda), calc(18px * var(--a-cresce, 0) - 66px * var(--a-ind, 0)));
+}
+
+/* O número: três camadas no mesmo canto (28, 44 e 15 px), trocadas em crossfade curto com escala — a
+   fonte nunca é esticada e cada tamanho final é renderizado no corpo dele. As três têm o mesmo
+   espaçamento entre letras (em em) e a mesma altura de linha proporcional: escaladas, coincidem pixel a
+   pixel, e o número nunca aparece "duplo" no meio da troca. */
+.dvbFpNumero {
+  position: absolute;
+  top: 80px;
+  left: var(--x);
+  width: calc(var(--largura) - 12px);
+  height: 52px;
+  transform: translate(var(--anda), calc(20px * var(--a-cresce, 0) - 67px * var(--a-ind, 0)));
+}
+
+.dvbFpNumero .dvbFpN28,
+.dvbFpNumero .dvbFpN44,
+.dvbFpNumero .dvbFpN15 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--sb-tinta);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  transform-origin: 0 0;
+}
+
+.dvbFpNumero .dvbFpN28 {
+  font-size: 28px;
+  transform: scale(calc(1 + 0.5714 * var(--n, 0)));
+  opacity: clamp(0, (0.55 - var(--n, 0)) / 0.1, 1);
+}
+
+.dvbFpNumero .dvbFpN44 {
+  font-size: 44px;
+  transform: scale(calc((0.6364 + 0.3636 * var(--n, 0)) * (1 - 0.6591 * var(--a-ind, 0))));
+  opacity: calc(clamp(0, (var(--n, 0) - 0.45) / 0.1, 1) * clamp(0, (0.55 - var(--a-ind, 0)) / 0.1, 1));
+}
+
+/* O tamanho do chip do índice (o mesmo número, com a mesma caixa, da faixa real). */
+.dvbFpNumero .dvbFpN15 {
+  font-size: 15px;
+  transform: scale(calc(2.9333 - 1.9333 * var(--a-ind, 0)));
+  opacity: clamp(0, (var(--a-ind, 0) - 0.45) / 0.1, 1);
+}
+
+/* will-change só nas fases em que o palco anda (o motor liga o data-movendo pela fase), e só nas
+   barras e nas pontes: os textos ficam fora (nada de troca de suavização quando a camada some). */
+[data-movendo] .dvbFpBarra,
+[data-movendo] .dvbFpPonte {
+  will-change: transform;
+}
+
+/* Os "Perdidos" não viram chip de número: "Perdido 79" sobe com a fileira e troca, no mesmo ponto e em
+   crossfade, por "Para onde foram os que saíram" (no mesmo trecho em que os números trocam de tamanho,
+   --a-ind de 0,35 a 0,65). A barra do Perdido some na mesma troca. */
+.dvbFpNumero[data-perdidos] .dvbFpN28,
+.dvbFpNumero[data-perdidos] .dvbFpN44 {
+  color: var(--sb-tinta-2);
+}
+
+.dvbFpNome[data-perdidos],
+.dvbFpNumero[data-perdidos],
+.dvbFpBarra[data-perdidos] {
+  opacity: calc(1 - clamp(0, (var(--a-ind, 0) - 0.35) / 0.3, 1));
+}
+
+.dvbFpConv {
+  position: absolute;
+  top: 114px;
+  left: var(--x);
+  width: calc(var(--largura) - 18px);
+  overflow: hidden;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* desce por um valor comum a todas as colunas (o --n0 da 1ª): a fileira de conversões fica sempre
+     na mesma linha, sem escada na diagonal */
+  transform: translateY(calc(20px * var(--a-cresce, 0) + 20px * var(--n0, 0) - 14px * var(--a-sai, 0)));
+  opacity: calc(1 - var(--a-sai, 0));
+}
+
+.dvbFpConv:not(:empty)::before {
+  content: '→ ';
+  color: var(--sb-tinta-3);
+  font-weight: var(--sb-peso-regular);
+}
+
+/* (data-primeira e não data-entrada: este nome é a entrada animada do AI PRO na raiz da página) */
+.dvbFpConv[data-primeira]::before,
+.dvbFpConv[data-perdidos]::before {
+  content: none;
+}
+
+.dvbFpConv[data-primeira],
+.dvbFpConv[data-perdidos] {
+  color: var(--sb-tinta-3);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* ---------- a barra ----------
+   A caixa é a da barra ABERTA (base em --g-base1, altura v × --g-bh1, largura que cabe a barra em
+   pé e a mini barra deitada). O clip-path recorta o que aparece: no repouso, só a altura de repouso
+   (de baixo para cima, a partir da base de repouso, pelo translate). Na fase 3, num tempo só:
+     - deitar (--d): o recorte desce pelo topo até sobrar 3 px, e a largura vai da barra em pé até a
+       mini barra do chip;
+     - subir junto (--a-ind, na mesma janela do --d): a base de todas as barras sobe de --g-base1 até o
+       pé da mini barra (56), pelo mesmo progresso do cartão, dos nomes e dos números.
+   Juntos, o topo visível da barra vai em linha reta até a linha da mini barra: ela encolhe para o alto.
+   O raio sai exato em todos os pontos: nada é escalado. */
+.dvbFpBarra {
+  position: absolute;
+  top: calc(var(--g-base1) - var(--g-bh1) * var(--v));
+  left: var(--x);
+  width: var(--g-bwcaixa);
+  height: calc(var(--g-bh1) * var(--v));
+  overflow: hidden;
+  background: var(--sb-azul);
+  transform: translate(
+    var(--anda),
+    calc((var(--g-base0) - var(--g-base1)) * (1 - var(--a-cresce, 0)) + (56px - var(--g-base1)) * var(--a-ind, 0))
+  );
+  clip-path: inset(
+    calc(var(--v) * (var(--g-bh1) - var(--g-bh0)) * (1 - var(--b, 0)) + (var(--v) * var(--g-bh1) - 3px) * var(--d, 0))
+      calc(var(--g-bwcaixa) - var(--g-bw) + (var(--g-bw) - var(--g-mini) * var(--v)) * var(--d, 0)) 0 0
+      round calc(6px - 4.5px * var(--d, 0)) calc(6px - 4.5px * var(--d, 0)) calc(2px - 0.5px * var(--d, 0))
+      calc(2px - 0.5px * var(--d, 0))
+  );
+}
+
+/* O Ganho é a venda: o verde de sucesso, em todo lugar da página (o funil, o índice, os capítulos e o
+   Kanban de agora). O azul é a Janete e quem avançou; o navy, a equipe. */
+.dvbFpBarra[data-ganho] {
+  background: var(--sb-sucesso);
+}
+
+/* O Perdido: o destino de quem sai, no cinza sólido dos perdidos (o mesmo código da página inteira:
+   avançaram em azul, ainda estão em azul claro, perdidos em cinza, sem resposta na hachura). Mais
+   estreito; na fase 3 deita e sobe com as outras e some na troca pelo "Para onde foram os que saíram"
+   (a opacidade está junto com a do nome, acima). */
+.dvbFpBarra[data-perdidos] {
+  --bwp: calc(var(--g-bw) * 0.82);
+  width: var(--bwp);
+  background: var(--dvb-perdido);
+  clip-path: inset(
+    calc(var(--v) * (var(--g-bh1) - var(--g-bh0)) * (1 - var(--b, 0)) + (var(--v) * var(--g-bh1) - 3px) * var(--d, 0)) 0 0 0
+      round 6px 6px 2px 2px
+  );
+}
+
+/* Fase 2: a barra mostra do que é feita. De cima para baixo: os perdidos (cinza claro com o fio de 1 px),
+   os sem resposta (a hachura), os que ainda estão (o azul claro, separado de quem avançou por 1 px
+   branco) e, embaixo, quem avançou (o azul cheio). Some antes de a barra deitar. */
+.dvbFpSegAinda,
+.dvbFpSegPerdido,
+.dvbFpSegSem {
+  position: absolute;
+  left: 0;
+  width: var(--g-bw);
+  opacity: calc(var(--q, 0) * (1 - var(--a-sai, 0)));
+}
+
+.dvbFpSegAinda {
+  bottom: calc(var(--vav) * 100%);
+  height: calc(var(--vainda) * 100%);
+  background: color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco));
+  box-shadow: 0 1px 0 var(--sb-branco);
+}
+
+.dvbFpSegPerdido {
+  top: 0;
+  height: calc(var(--vperd) * 100%);
+  background: var(--dvb-perdido);
+  box-shadow: 0 1px 0 var(--sb-branco);
+}
+
+.dvbFpSegSem {
+  top: calc(var(--vperd) * 100%);
+  height: calc(var(--vsem) * 100%);
+  background-color: var(--sb-branco);
+  background-image: var(--dvb-hachura);
+  box-shadow: inset 0 1px 0 var(--sb-branco);
+}
+
+/* A ponte: o fluxo que segue para a próxima etapa (a altura da próxima barra; o degrau entre ela e a
+   barra é a queda). Na fase 3 ela deita e sobe com as barras (o mesmo recorte e a mesma base) e, no
+   meio do caminho, troca de lugar com a seta pequena entre os chips, que nasce no pé dela. */
+.dvbFpPonte {
+  position: absolute;
+  top: calc(var(--g-base1) - var(--g-bh1) * var(--vp));
+  left: calc(var(--x) + var(--g-bw));
+  width: calc(var(--g-sw) - var(--g-bw));
+  height: calc(var(--g-bh1) * var(--vp));
+  background: color-mix(in srgb, var(--sb-azul) 12%, var(--sb-branco));
+  transform: translate(
+    var(--anda),
+    calc((var(--g-base0) - var(--g-base1)) * (1 - var(--a-cresce, 0)) + (56px - var(--g-base1)) * var(--a-ind, 0))
+  );
+  clip-path: inset(calc(var(--vp) * (var(--g-bh1) - var(--g-bh0)) * (1 - var(--bp, 0)) + (var(--vp) * var(--g-bh1) - 3px) * var(--d, 0)) 0 0 0);
+  opacity: calc(1 - clamp(0, (var(--a-ind, 0) - 0.3) / 0.3, 1));
+}
+
+/* Na faixa, a ponte vira a seta pequena no vão entre os chips (o vão do chip da coluna até o próximo),
+   e anda junto com os chips: ela nasce no pé da ponte (22 px acima da base das barras) quando a ponte
+   começa a sumir e sobe com a fileira. Entre Qualificado e Em negociação fica a Janete: ali não há seta. */
+.dvbFpSeta {
+  --x: calc(var(--g-px) + var(--i, 0) * var(--g-sw));
+  --chip: calc(16px + var(--i, 0) * (var(--g-cw) + var(--g-vao)) + var(--depois, 0) * (var(--g-nz) - var(--g-vao)));
+  --origem: calc(var(--x) + var(--g-sw) - 36px);
+  --destino: calc(var(--chip) + var(--g-cw));
+  position: absolute;
+  top: 26px;
+  left: var(--origem);
+  display: grid;
+  place-items: center;
+  width: var(--g-vao);
+  height: 16px;
+  color: var(--sb-tinta-3);
+  opacity: clamp(0, (var(--a-ind, 0) - 0.4) / 0.35, 1);
+  transform: translate(
+    calc((var(--destino) - var(--origem)) * var(--a-lado, 0)),
+    calc((var(--g-base1) - 56px) * (1 - var(--a-ind, 0)))
+  );
+}
+
+/* ---------- a queda aberta e as métricas (fase 2) ---------- */
+
+.dvbFpQueda {
+  position: absolute;
+  top: calc(var(--g-base1) + 18px);
+  left: var(--x);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: calc(var(--largura) - 16px);
+  opacity: calc(var(--q, 0) * (1 - var(--a-sai, 0)));
+  transform: translateY(calc(8px * (1 - var(--q, 0)) - 12px * var(--a-sai, 0)));
+}
+
+/* As métricas entram linha por linha, de cima para baixo (o rótulo e o valor juntos, nunca um valor
+   sem o rótulo dele): cada linha k aparece no trecho [0,3k; 0,3k + 0,4] do progresso da coluna. */
+.dvbFpMetricas {
+  position: absolute;
+  top: calc(var(--g-base1) + 96px);
+  left: var(--x);
+  display: grid;
+  grid-auto-rows: 36px;
+  width: calc(var(--largura) - 16px);
+  opacity: calc(1 - var(--a-sai, 0));
+}
+
+.dvbFpMetricas > .dvbMetrica {
+  --mk: clamp(0, (var(--m, 0) - var(--k, 0) * 0.3) / 0.4, 1);
+  opacity: var(--mk);
+  transform: translateY(calc(4px * (1 - var(--mk))));
+}
+
+/* A coluna do Perdido: a lista de onde saíram os perdidos começa na linha da queda (alinhada com
+   "23 saíram") e tem a altura que precisar (as 4 etapas inteiras); entra com as quedas. */
+.dvbFpMetricas[data-perdidos] {
+  top: calc(var(--g-base1) + 18px);
+  grid-auto-rows: auto;
+  opacity: calc(var(--q, 0) * (1 - var(--a-sai, 0)));
+  transform: translateY(calc(8px * (1 - var(--q, 0)) - 12px * var(--a-sai, 0)));
+}
+
+.dvbFpPerdidosLista {
+  display: grid;
+  gap: 4px;
+}
+
+.dvbFpPerdidosLista > span {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 1px 0 3px;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  line-height: 1.25;
+}
+
+.dvbFpPerdidosLista > span > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvbFpPerdidosLista b {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.dvbFpPerdidosLista > span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: calc(var(--dvb-v, 0) * 100%);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--dvb-perdido);
+}
+
+/* ---------- os alvos de foco e as dicas ---------- */
+
+.dvbFpAlvo {
+  --x: calc(var(--g-px) + var(--i, 0) * var(--g-sw));
+  position: absolute;
+  top: 58px;
+  left: calc(var(--x) - 8px);
+  width: calc(var(--g-sw) - 10px);
+  height: 118px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.dvbFpAlvo[data-perdidos] {
+  width: calc(var(--g-sw) * 0.82 - 4px);
+}
+
+/* O realce do foco por baixo do texto (multiplica: o texto nunca fica lavado). */
+.dvbFpAlvo:hover {
+  background: var(--sb-azul-nevoa);
+  mix-blend-mode: multiply;
+}
+
+.dvbFpAlvo:focus-visible,
+.dvbFpAlvoQueda:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* Na queda: uma faixa de 28 px no degrau, que acompanha o topo da ponte. */
+.dvbFpAlvoQueda {
+  --x: calc(var(--g-px) + var(--i, 0) * var(--g-sw));
+  position: absolute;
+  top: calc(var(--g-base1) - var(--g-bh1) * var(--vp) - 30px);
+  left: calc(var(--x) + var(--g-bw));
+  width: calc(var(--g-sw) - var(--g-bw));
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(
+    calc((var(--g-base0) - var(--g-base1)) * (1 - var(--a-cresce, 0)) + var(--vp) * (var(--g-bh1) - var(--g-bh0)) * (1 - var(--bp, 0)))
+  );
+}
+
+.dvbFpAlvoQueda:hover {
+  background: var(--sb-areia);
+  mix-blend-mode: multiply;
+}
+
+/* No fim da fase 3 o desenho da faixa já está idêntico à faixa real (o <nav>), que assume no mesmo
+   lugar: o desenho sai de cena sem mudar um pixel. */
+[data-troca] .dvbFpChipFundo,
+[data-troca] .dvbFpSeta,
+[data-troca] .dvbFpJanete,
+[data-troca] .dvbFpSairam,
+[data-troca] .dvbFpNome,
+[data-troca] .dvbFpNumero,
+[data-troca] .dvbFpBarra,
+[data-troca] .dvbFpPonte {
+  visibility: hidden;
+}
+
+/* Depois do aberto, os alvos saem (a faixa real do índice assume). */
+[data-dash-fase='indice'] .dvbFpAlvo,
+[data-dash-fase='detalhe'] .dvbFpAlvo,
+[data-dash-fase='resultado'] .dvbFpAlvo,
+[data-dash-fase='indice'] .dvbFpAlvoQueda,
+[data-dash-fase='detalhe'] .dvbFpAlvoQueda,
+[data-dash-fase='resultado'] .dvbFpAlvoQueda {
+  visibility: hidden;
+}
+
+/* O (i) do "como contamos" esmaece com o título ao lado (a opacidade do .dvbFpComo); na fase 3 ele só
+   deixa de receber o ponteiro, e some de vez quando o conteúdo aberto terminou de sair. */
+[data-dash-fase='indice'] .dvbFpComo :is(button, a),
+[data-dash-fase='detalhe'] .dvbFpComo :is(button, a),
+[data-dash-fase='resultado'] .dvbFpComo :is(button, a) {
+  pointer-events: none;
+}
+
+[data-sai-fim] .dvbFpComo {
+  visibility: hidden;
+}
+
+/* A dica encosta no alvo (sem vão) e recebe o ponteiro: dá para levar o mouse até ela sem ela sumir
+   (critério 1.4.13). */
+.dvbFpDicaBalao {
+  --x: calc(var(--g-px) + var(--i, 0) * var(--g-sw));
+  position: absolute;
+  top: 176px;
+  left: calc(var(--x) - 8px);
+  z-index: 6;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: min(260px, calc(var(--g-sw) * 1.6));
+  padding: 9px 12px;
+  border-radius: var(--sb-r-mini);
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+  color: var(--sb-tinta-inversa);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.45;
+  text-wrap: pretty;
+  pointer-events: auto;
+  transform: translateY(calc(-30px * (1 - var(--a-cresce, 0))));
+}
+
+/* Enquanto a vista rola, nenhum balão (o hover do navegador só atualiza quando a rolagem para). */
+[data-rolando] .dvbFpDicaBalao {
+  display: none;
+}
+
+.dvbFpDicaBalao > span:first-child {
+  font-weight: var(--sb-peso-forte);
+}
+
+.dvbFpDicaBalao[data-tipo='queda'] {
+  top: calc(var(--g-base1) - var(--g-bh1) * var(--vp));
+  left: calc(var(--x) + var(--g-bw) - 8px);
+  max-width: 230px;
+  transform: translateY(
+    calc((var(--g-base0) - var(--g-base1)) * (1 - var(--a-cresce, 0)) + var(--vp) * (var(--g-bh1) - var(--g-bh0)) * (1 - var(--bp, 0)))
+  );
+}
+
+.dvbFpDicaBalao[data-tipo='queda'] > span:first-child {
+  font-weight: var(--sb-peso-regular);
+}
+
+.dvbFpDicaBalao[data-tipo='perdidos'] {
+  left: auto;
+  right: calc(var(--g-px) - 8px);
+  max-width: 280px;
+}
+
+.dvbFpDicaBalao[data-tipo='perdidos'] > span:first-child {
+  font-weight: var(--sb-peso-regular);
+}
+
+/* Foco numa etapa: as outras barras recuam um pouco (sem mexer no lugar de nada). Só no funil aberto
+   (nunca na fase 3) e multiplicando a opacidade que a rolagem dá (nunca a sobrescreve). A transição
+   só existe enquanto há foco e a vista não rola: no palco a opacidade acompanha a rolagem 1 para 1. */
+[data-foco] .dvbFpBarra,
+[data-foco] .dvbFpPonte {
+  transition: opacity var(--app-t-state);
+}
+
+[data-rolando] [data-foco] .dvbFpBarra,
+[data-rolando] [data-foco] .dvbFpPonte {
+  transition: none;
+}
+
+:is([data-dash-fase='repouso'], [data-dash-fase='crescer'], [data-dash-fase='abrir'])
+  :is(
+    [data-foco='etapa-0'] .dvbFpBarra:not([data-col='0']),
+    [data-foco='etapa-1'] .dvbFpBarra:not([data-col='1']),
+    [data-foco='etapa-2'] .dvbFpBarra:not([data-col='2']),
+    [data-foco='etapa-3'] .dvbFpBarra:not([data-col='3']),
+    [data-foco='etapa-4'] .dvbFpBarra:not([data-col='4']),
+    [data-foco='perdidos-5'] .dvbFpBarra:not([data-col='5'])
+  ):not([data-perdidos]) {
+  opacity: 0.45;
+}
+
+:is([data-dash-fase='repouso'], [data-dash-fase='crescer'], [data-dash-fase='abrir'])
+  :is(
+    [data-foco='etapa-0'],
+    [data-foco='etapa-1'],
+    [data-foco='etapa-2'],
+    [data-foco='etapa-3'],
+    [data-foco='etapa-4']
+  )
+  .dvbFpBarra[data-perdidos],
+:is([data-dash-fase='repouso'], [data-dash-fase='crescer'], [data-dash-fase='abrir'])
+  :is([data-foco^='etapa'], [data-foco^='perdidos'])
+  .dvbFpPonte {
+  opacity: 0.45;
+}
+
+/* ---------- "Para onde foram os que saíram" (fase 3) ---------- */
+
+/* Nasce no lugar do nome "Perdido" e sobe com ele (o mesmo translate), trocando por crossfade. */
+.dvbFpSairam {
+  position: absolute;
+  top: 64px;
+  left: var(--x);
+  width: calc(var(--g-cw) - 24px);
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 16px;
+  opacity: clamp(0, (var(--a-ind, 0) - 0.35) / 0.3, 1);
+  pointer-events: none;
+  transform: translate(var(--anda), calc(18px * var(--a-cresce, 0) - 66px * var(--a-ind, 0)));
+}
+
+.dvbFpVazio {
+  position: absolute;
+  top: calc(var(--g-base0) - 70px);
+  left: 50%;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+  transform: translate(-50%, calc((var(--g-base1) - var(--g-base0)) * var(--a-cresce, 0) * 0.5));
+  opacity: calc(1 - var(--a-sai, 0));
+}
+
+[data-vazio] .dvbFpBarra:not([data-perdidos]) {
+  background: var(--sb-linha);
+}
+
+[data-vazio] .dvbFpPonte {
+  background: color-mix(in srgb, var(--sb-linha) 55%, var(--sb-branco));
+}
+
+/* carregando: todas as barras (o Perdido também) viram esqueleto */
+[data-carregando] .dvbFpBarra,
+[data-carregando] .dvbFpPonte,
+[data-carregando] .dvbFaBarra,
+[data-carregando] .dvbFaPonte {
+  background: var(--sb-esqueleto);
+  box-shadow: none;
+}
+
+/* =============================================================================
+   Peças comuns: a queda aberta, as métricas, o "Pergunte à Janete".
+   ============================================================================= */
+
+.dvbQuedaLinha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-micro);
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.dvbQuedaNum {
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.dvbQuedaAmostra {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--dvb-perdido);
+}
+
+.dvbQuedaAmostra[data-tom='sem'] {
+  background-color: var(--sb-branco);
+  background-image: var(--dvb-hachura);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+
+.dvbQuedaAmostra[data-tom='ainda'] {
+  background: color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco));
+  box-shadow: none;
+}
+
+.dvbMetrica {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dvbMetricaRotulo {
+  overflow: hidden;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-micro);
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvbMetricaValor {
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvbPergunte {
+  display: grid;
+  gap: 8px;
+}
+
+.dvbPergunteRotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.3;
+}
+
+/* Como bloco próprio (no fim dos capítulos): o rótulo é o título do bloco. */
+.dvbPergunte[data-titulo] {
+  gap: 14px;
+}
+
+.dvbPergunte[data-titulo] .dvbPergunteRotulo {
+  gap: 10px;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.dvbPergunteRotulo > [data-estado] {
+  flex: none;
+}
+
+.dvbPergunteOpcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dvbPergunteOpcao {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.dvbPergunteOpcao:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.dvbPergunteOpcao[aria-expanded='true'] {
+  border-color: transparent;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.dvbPergunteOpcao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* A resposta: uma nota quieta, sem balão nem digitação (ela responde só quando perguntam). A região
+   que anuncia (aria-live) fica sempre na árvore, sem caixa; a nota é o parágrafo de dentro. */
+.dvbResposta {
+  display: block;
+  max-width: 720px;
+}
+
+.dvbPergunte .dvbResposta:empty {
+  margin-top: -8px;
+}
+
+.dvbRespostaTexto {
+  padding: 10px 14px;
+  border-radius: var(--sb-r-item);
+  background: var(--sb-canvas);
+  animation: dvbResposta 220ms var(--via-ease-out);
+}
+
+@keyframes dvbResposta {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+.dvbRespostaTexto {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.dvbSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =============================================================================
+   O funil aberto (sem movimento): uma grade comum, com a barra de 220 px.
+   ============================================================================= */
+
+.dvbFaCabecalho,
+.dvbFlCabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dvbFaTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: 22px;
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.dvbFaAncora {
+  margin: 2px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: 20px;
+}
+
+/* As 5 etapas e o Perdido (82% da largura), a mesma proporção das colunas do palco. */
+.dvbFaGrade {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 0.82fr);
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dvbFaColuna {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dvbFaCabeca {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 0 8px 0 -8px;
+  padding: 6px 8px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dvbFaCabeca:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.dvbFaCabeca:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.dvbFaNome {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dvbFaCabeca .dvbFaNumero {
+  font-size: 2.25rem;
+  letter-spacing: -0.035em;
+}
+
+.dvbFaConv {
+  min-height: 18px;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.dvbFaArea {
+  position: relative;
+  display: block;
+  height: 220px;
+  margin-top: 12px;
+}
+
+.dvbFaBarra {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60%;
+  height: calc(var(--v) * 100%);
+  overflow: hidden;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--sb-azul);
+}
+
+.dvbFaBarra[data-ganho] {
+  background: var(--sb-sucesso);
+}
+
+.dvbFaBarra[data-perdidos] {
+  width: 72%;
+  background: var(--dvb-perdido);
+}
+
+.dvbFaBarra :is(.dvbFpSegAinda, .dvbFpSegPerdido, .dvbFpSegSem) {
+  width: 100%;
+  opacity: 1;
+}
+
+.dvbFaPerdidos {
+  display: block;
+  margin-top: 16px;
+}
+
+.dvbFaPonte {
+  position: absolute;
+  bottom: 0;
+  left: 60%;
+  width: 40%;
+  height: calc(var(--vp) * 100%);
+  background: color-mix(in srgb, var(--sb-azul) 14%, var(--sb-branco));
+}
+
+/* No período vazio, o funil fantasma é só o contorno tracejado das barras (sem preenchimento): não se
+   confunde com o esqueleto do carregando. */
+[data-vazio] .dvbFaBarra,
+[data-vazio] .dvbFaBarra[data-perdidos] {
+  border: 1.5px dashed var(--sb-linha-forte);
+  border-bottom-width: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-vazio] .dvbFaPonte {
+  display: none;
+}
+
+.dvbFaQueda {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 48px;
+  margin-top: 16px;
+}
+
+.dvbFaMetricas {
+  display: grid;
+  grid-auto-rows: 36px;
+  margin-top: 12px;
+}
+
+.dvbFaVazio {
+  margin: 12px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* No período vazio, a frase fica centrada sobre o alto do funil fantasma, logo abaixo dos nomes das
+   etapas (sem zeros), dentro da parte que espia na dobra. */
+.dvbFaGrade[data-vazio] + .dvbFaVazio {
+  position: relative;
+  z-index: 1;
+  width: max-content;
+  max-width: 100%;
+  margin: -300px auto 260px;
+  padding: 8px 16px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+
+.dvbFaPergunte {
+  margin-top: 22px;
+}
+
+/* sem palco: a pílula centralizada no pé do cartão (o cartão em fluxo tem 24 px embaixo) */
+.dvbDicaRolar.dvbFaDica {
+  display: flex;
+  width: max-content;
+  margin: 18px auto 0;
+}
+
+/* =============================================================================
+   O funil do celular: uma etapa por linha, a barra deitada, a queda entre as linhas.
+   ============================================================================= */
+
+.dvbFlLista {
+  display: grid;
+  gap: 4px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dvbFlEtapa {
+  display: grid;
+  gap: 6px;
+}
+
+.dvbFlTopo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0 -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dvbFlTopo:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.dvbFlNome {
+  flex: 1;
+  overflow: hidden;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O número e, depois dele, a conversão em tom de apoio ("146 · → 84%"). */
+.dvbFlFim {
+  display: inline-flex;
+  flex: none;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dvbFlConv {
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  font-variant-numeric: tabular-nums;
+}
+
+.dvbFlConv::before {
+  content: '· → ';
+  color: var(--sb-tinta-3);
+}
+
+.dvbFlTopo .dvbFlNumero {
+  font-size: 1.375rem;
+}
+
+.dvbFlBarra {
+  position: relative;
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-canvas);
+}
+
+.dvbFlBarra > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(var(--dvb-v, 0) * 100%);
+  border-radius: inherit;
+  background: var(--sb-azul);
+}
+
+.dvbFlEtapa[data-ganho] .dvbFlBarra > span {
+  background: var(--sb-sucesso);
+}
+
+[data-vazio] .dvbFlBarra > span {
+  background: var(--sb-linha-forte);
+}
+
+.dvbFlQueda {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 4px 0 6px 6px;
+  padding-left: 10px;
+  border-left: 2px dotted var(--sb-linha-forte);
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+}
+
+.dvbFlQueda > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sb-tinta-3);
+}
+
+/* ---------- larguras ---------- */
+
+/* O nome e o "Para onde foram" no mesmo corpo do chip do índice (Palco.module.css). */
+@media (max-width: 1359px) {
+  .dvbFpNome,
+  .dvbFpSairam {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 1279px) {
+  .dvbFaGrade .dvbFaNumero {
+    font-size: 1.875rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .dvbPergunteOpcao {
+    min-height: 44px;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dvbRespostaTexto,
+  .dvbDicaSeta {
+    animation: none;
+  }
+
+  .dvbPergunteOpcao,
+  .dvbFpAlvo {
+    transition: none;
+  }
+}

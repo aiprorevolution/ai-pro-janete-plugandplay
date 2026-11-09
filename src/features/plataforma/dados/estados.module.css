@@ -1,0 +1,25 @@
+/* Os 3 estados iguais em todas as telas (plano, "Peças comuns", item 4): só o arranjo dos ossos. */
+
+.carregando {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.linhaLista {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.textoLista {
+  flex: 1;
+  min-width: 0;
+}
+
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}

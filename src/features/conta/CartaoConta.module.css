@@ -1,0 +1,166 @@
+/* =============================================================================
+   O conteúdo do cartão da conta (o `.tela`, `.cab`, `.nome`, `.titulo`, `.sub`, `.form`,
+   `.medida`, `.olhar`, `.rodape` e `.link` do protótipo Login-A-Presenca). O cartão, a
+   sombra e a Janete gigante são do PalcoConta.module.css; o padding do cartão também.
+   Curvas: --e-mola → --via-ease-spring.
+   ============================================================================= */
+
+/* A tela: tudo em coluna, 20 px entre os blocos. */
+.tela {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* "Janete", pequeno, acima do título: quem fala é ela. */
+.nome {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.2;
+  color: var(--sb-tinta);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--sb-fs-destaque);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-titulo);
+  letter-spacing: var(--sb-ls-pagina);
+  text-wrap: balance;
+  outline: none;
+}
+
+.sub {
+  max-width: 32ch;
+  margin: 0;
+  font-size: var(--sb-fs-corpo);
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+
+.sub b {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-forte);
+  overflow-wrap: anywhere;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 0;
+}
+
+/* A medida da senha, na linha do rótulo. */
+.medida {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  color: var(--sb-tinta-3);
+  transition: color 0.3s;
+}
+
+.medida[data-ok] {
+  color: var(--sb-sucesso);
+}
+
+.medidaPonto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sb-linha-forte);
+  transition:
+    background-color 0.3s,
+    transform 0.45s var(--via-ease-spring);
+}
+
+.medida[data-ok] .medidaPonto {
+  background: var(--sb-sucesso);
+  transform: scale(1.15);
+}
+
+/* Mostrar / Ocultar, em texto (`.olhar`). */
+.olhar {
+  flex: none;
+  min-height: 44px;
+  margin-right: 1px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.olhar:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.olhar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.rodape {
+  margin: -4px 0 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+  color: var(--sb-tinta-2);
+  text-align: center;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-medio);
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.link:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medida,
+  .medidaPonto,
+  .olhar {
+    transition: none !important;
+  }
+}

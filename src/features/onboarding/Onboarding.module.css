@@ -1,0 +1,440 @@
+/* =============================================================================
+   A casca do onboarding: a barra de cima do F (`.nav`, `.nav-marca`, `.nav-janete`,
+   `.passos`, `.passo`, `.nav-acao`) e o palco. Curvas do mockup trocadas pelos tokens:
+     --e-trav → --sb-ease-travessia   --e-out → --via-ease-out   --e-snap → --via-ease-snap
+   ============================================================================= */
+
+.app {
+  --onb-nav-h: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--sb-canvas);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) auto minmax(10rem, 1fr);
+  grid-template-areas: 'marca passos acao';
+  align-items: center;
+  gap: 24px;
+  min-height: var(--onb-nav-h);
+  padding: 0 32px;
+  background: var(--sb-branco);
+  border-bottom: 1px solid var(--sb-linha);
+  visibility: visible;
+  /* A barra sempre desce ao aparecer, como no F (vindo da conta criada, do Entrar ou recarregando). */
+  animation: nav-entra 0.55s var(--via-ease-out) backwards;
+  transition:
+    transform 0.5s var(--sb-ease-travessia),
+    opacity 0.35s var(--via-ease-out),
+    visibility 0s;
+}
+
+/* Na validação a barra sai de cena: nada fica em cima do logo girando (o `.nav.recolhe` do F). */
+.nav[data-recolhe] {
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.5s var(--sb-ease-travessia),
+    opacity 0.3s var(--via-ease-snap) 0.1s,
+    visibility 0s linear 0.5s;
+}
+
+.marca {
+  grid-area: marca;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.janete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--sb-fs-apoio);
+  line-height: 1.3;
+  white-space: nowrap;
+  animation: aparece 0.4s var(--via-ease-out) both;
+}
+
+/* A arte fixa do símbolo (`.janete-svg.janete--28` do F); `data-dorme` é o `.dorme`. */
+.janeteSvg {
+  display: block;
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+.nsDisco {
+  fill: var(--sb-navy);
+}
+
+.nsPonto {
+  fill: var(--sb-azul);
+}
+
+.janeteSvg[data-dorme] .nsDisco {
+  fill: var(--sb-linha-forte);
+}
+
+.janeteSvg[data-dorme] .nsPonto {
+  fill: var(--sb-borda-campo);
+}
+
+.janeteTxt {
+  display: flex;
+  flex-direction: column;
+}
+
+.janeteTxt b {
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+}
+
+.janeteEstado {
+  color: var(--sb-tinta-3);
+}
+
+.janeteEstado[data-on] {
+  color: var(--sb-sucesso);
+}
+
+.passos {
+  grid-area: passos;
+  min-width: 0;
+}
+
+.passosLista {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sb-tinta-3);
+  font: inherit;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+button.passo {
+  cursor: pointer;
+}
+
+button.passo:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+button.passo:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.passo::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sb-azul);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--via-ease-out);
+}
+
+.num {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+}
+
+.check {
+  display: none;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rotulo {
+  display: inline-grid;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Reserva a largura do rótulo em negrito: quando o passo vira o atual (e fica em negrito), a trilha
+   não muda de largura e os passos não andam para o lado ("sai do eixo"). */
+.rotulo::after {
+  content: attr(data-texto);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--sb-peso-forte);
+  pointer-events: none;
+  user-select: none;
+}
+
+.passo[data-estado='feito'] {
+  color: var(--sb-tinta-2);
+}
+
+.passo[data-estado='feito'] .num {
+  border-radius: 50%;
+  background: var(--sb-menta);
+  color: var(--sb-sucesso);
+}
+
+.passo[data-estado='feito'] .n {
+  display: none;
+}
+
+.passo[data-estado='feito'] .check {
+  display: block;
+}
+
+.passo[data-estado='atual'] {
+  color: var(--sb-tinta);
+}
+
+.passo[data-estado='atual'] .rotulo {
+  font-weight: var(--sb-peso-forte);
+}
+
+.passo[data-estado='atual'] .num {
+  color: var(--sb-azul-texto);
+}
+
+.passo[data-estado='atual']::after {
+  transform: scaleX(1);
+}
+
+.acao {
+  grid-area: acao;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* O "Sair" é o `btn btn-disc` do F (no lugar do "Recomeçar" da demonstração). */
+.sair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  font: inherit;
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.sair:hover:not(:disabled) {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.sair:disabled {
+  cursor: progress;
+}
+
+.sair svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* O palco: cada etapa se centraliza nele (a largura é dela). */
+.palco {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+:where(.palco) > * {
+  width: 100%;
+  max-width: 100%;
+}
+
+@keyframes nav-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- responsivo (o do F) ---------- */
+@media (max-width: 1279px) {
+  .rotulo {
+    display: none;
+  }
+
+  .passo[data-estado='atual'] .rotulo {
+    display: inline-grid;
+  }
+}
+
+@media (max-width: 899px) {
+  .app {
+    --onb-nav-h: 7.25rem;
+  }
+
+  .nav {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'marca acao'
+      'passos passos';
+    gap: 0 12px;
+    padding: 8px 16px 4px;
+  }
+
+  .passosLista {
+    justify-content: space-between;
+  }
+
+  .passo {
+    min-width: 44px;
+    justify-content: center;
+    padding: 0 8px;
+  }
+
+  .sairTxt {
+    display: none;
+  }
+
+  .sair {
+    width: 44px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .janeteEstado {
+    display: none;
+  }
+}
+
+/* Celular (até 439 px): os 7 passos de 44 px mais o rótulo do atual não cabem. Fica só o
+   número; o título da etapa, logo abaixo, já diz onde a pessoa está. */
+@media (max-width: 439px) {
+  .passo[data-estado='atual'] .rotulo {
+    display: none;
+  }
+}
+
+/* Celular estreito (até 374 px, o de 360): os 7 passos de 44 px só cabem sem espaço entre eles;
+   cada um continua com os 44 px do toque. */
+@media (max-width: 374px) {
+  .passosLista {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav,
+  .janete,
+  .passo,
+  .passo::after,
+  .sair {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------- C8: a espera do que já foi gravado e a falha ao concluir ---------- */
+
+/* Antes da primeira etapa: o estado (carregando ou erro) no meio da tela, na largura do cartão. */
+.espera {
+  width: min(100% - 2rem, 32rem);
+  margin: auto;
+  padding: 2rem 0;
+}
+
+/* A falha do concluir_onboarding: por cima do preparo, embaixo, sem mudar a altura do palco. */
+.falhaConcluir {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(100% - 2rem, 32rem);
+  z-index: 60;
+}

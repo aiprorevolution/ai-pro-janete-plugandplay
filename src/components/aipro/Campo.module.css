@@ -1,0 +1,198 @@
+.campo {
+  display: grid;
+  /* minmax(0, 1fr): o <input> tem largura intrínseca e, numa coluna automática,
+     empurrava o campo 13px para fora da tela de 390px. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sb-esp-2);
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sb-esp-1) var(--sb-esp-3);
+}
+
+.rotulo {
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+}
+
+/* A caixa desenha borda, foco e erro; o <input> de dentro é transparente. Assim o
+   anel envolve o controle inteiro, inclusive o botão de mostrar a senha. */
+.caixa {
+  display: flex;
+  align-items: center;
+  min-height: var(--sb-controle-campo);
+  padding: 0 var(--sb-esp-5);
+  border: 1px solid var(--sb-borda-campo);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.caixa[data-com-sufixo] {
+  padding-right: 1px;
+}
+
+.caixa[data-com-prefixo] {
+  gap: var(--sb-esp-2);
+  padding-left: var(--sb-esp-4);
+}
+
+.prefixo {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-campo);
+}
+
+/* Curta: CEP, data, código. 12ch da fonte do campo mais o recheio da pílula. */
+.campo[data-largura='curta'] {
+  width: min(100%, calc(12ch + var(--sb-esp-10)));
+}
+
+/* Rótulo só para leitor: continua na árvore e ligado ao campo pelo `for`. */
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.caixa:hover {
+  border-color: var(--sb-tinta-3);
+}
+
+.caixa:focus-within {
+  border-color: var(--sb-azul);
+  box-shadow: var(--sb-anel);
+}
+
+.campo[data-invalido] .caixa {
+  border-color: var(--sb-erro);
+}
+
+.campo[data-invalido] .caixa:focus-within {
+  box-shadow:
+    0 0 0 2px var(--sb-branco),
+    0 0 0 4px var(--sb-erro);
+}
+
+.entrada {
+  flex: 1;
+  min-width: 0;
+  height: calc(var(--sb-controle-campo) - 2px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-campo);
+  letter-spacing: var(--sb-ls-corpo);
+}
+
+/* O anel já está na caixa. O `input:focus-visible` da base do DS pinta um segundo anel
+   (branco 2px + navy-60 4px) por dentro dela: medido em 24/10/2026 na busca do admin,
+   box-shadow 'rgb(255,255,255) 0 0 0 2px, rgba(10,31,59,0.6) 0 0 0 4px' no <input>.
+   Esta regra vem ANTES das de :autofill, que têm a mesma especificidade: um campo
+   preenchido pelo navegador e focado continua com a sombra interna branca. */
+.entrada:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* O preenchimento automático do navegador pinta o campo de azul claro. Uma sombra
+   interna branca cobre essa pintura e o texto volta à tinta da identidade. Em regras
+   separadas: um seletor desconhecido numa lista derrubaria a regra inteira. */
+.entrada:-webkit-autofill {
+  box-shadow: 0 0 0 100px var(--sb-branco) inset;
+  -webkit-text-fill-color: var(--sb-tinta);
+  caret-color: var(--sb-tinta);
+}
+
+.entrada:autofill {
+  box-shadow: 0 0 0 100px var(--sb-branco) inset;
+  -webkit-text-fill-color: var(--sb-tinta);
+  caret-color: var(--sb-tinta);
+}
+
+.entrada::placeholder {
+  color: var(--sb-tinta-3);
+}
+
+.caixa:has(.entrada:disabled),
+.caixa:has(.entrada:disabled):hover {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-canvas);
+}
+
+.erro,
+.dica {
+  margin: 0;
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+.erro {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sb-esp-2);
+  color: var(--sb-erro);
+  font-weight: var(--sb-peso-medio);
+}
+
+.erro svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.dica {
+  color: var(--sb-tinta-2);
+}
+
+/* Botão de mostrar a senha: círculo de 44px dentro da pílula de 48px. */
+.alternar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.alternar:hover {
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.alternar[aria-pressed='true'] {
+  color: var(--sb-azul-texto);
+}
+
+.alternar:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caixa,
+  .alternar {
+    transition: none;
+  }
+}

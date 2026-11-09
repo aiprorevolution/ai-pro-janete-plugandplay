@@ -1,0 +1,622 @@
+/* O card do Kanban 2 (o `.cartao` do protótipo): uma linha de conversa, da família da lista do Chat.
+   --kc-fundo é o fundo do card; o anel do selo do avatar (--al-anel) e a sombra do botão "Mover para…"
+   acompanham esse fundo, para nada "furar" a linha. */
+
+.kcCard {
+  --kc-fundo: var(--sb-branco);
+  --al-anel: var(--kc-fundo);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  flex: none;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--kc-fundo);
+  box-shadow: var(--sb-sombra-card);
+  color: var(--sb-tinta);
+  transition:
+    background-color 0.6s var(--sb-ease-assentar),
+    box-shadow 0.2s var(--sb-ease-assentar),
+    opacity 0.2s var(--sb-ease-assentar);
+}
+
+.kcCard:hover {
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.kcCard[data-compacto] {
+  grid-template-columns: 36px minmax(0, 1fr);
+  column-gap: 10px;
+  min-height: 52px;
+  padding: 8px 10px;
+}
+
+/* Esfriando: a linha fica um pouco mais apagada (um tom só no card, o avatar cinza e o nome mais claro). */
+.kcCard[data-frio] {
+  --kc-fundo: color-mix(in srgb, var(--sb-canvas) 55%, var(--sb-branco));
+}
+
+.kcCard[data-frio] .kcNome {
+  color: var(--sb-tinta-2);
+}
+
+/* Arrastando: o card de origem vira um "buraco" tracejado enquanto a cópia segue o ponteiro. */
+.kcCard[data-arrastando] {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--sb-linha-forte);
+}
+
+.kcCard[data-arrastando] > * {
+  visibility: hidden;
+}
+
+.kcCard[data-pousou] {
+  animation: kc-pousa 0.9s var(--sb-ease-assentar) both;
+}
+
+/* Nas mãos da Janete: o contorno azul e o símbolo dela no canto, como um colega levando o card. */
+.kcCard[data-voando] {
+  z-index: 4;
+  box-shadow:
+    0 0 0 2px var(--sb-azul),
+    0 24px 40px -18px color-mix(in srgb, var(--sb-navy) 55%, transparent);
+}
+
+.kcVooJanete {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 3;
+  box-shadow:
+    0 0 0 3px var(--sb-branco),
+    0 8px 16px -8px color-mix(in srgb, var(--sb-navy) 60%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* O botão que abre a conversa cobre o card inteiro; o resto fica por cima só onde é clicável. */
+.kcAbrir {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Arrastável: o ponteiro passa pelo botão e cai no card (o arrasto não começa num botão, que o Firefox
+   não deixa arrastar). O clique no card abre a conversa; o teclado usa o botão, que segue focável. */
+.kcCard[draggable='true'] {
+  cursor: grab;
+}
+
+.kcCard[draggable='true'] .kcAbrir {
+  pointer-events: none;
+}
+
+.kcAbrir:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+/* O avatar, com o selo de quem atende; o anel azul de "ativa agora" fica por baixo dele. */
+.kcAv {
+  position: relative;
+  display: grid;
+  place-items: center start;
+  pointer-events: none;
+}
+
+.kcCard[data-ativo] .kcAv::before {
+  content: '';
+  position: absolute;
+  top: -3.5px;
+  left: -3.5px;
+  width: calc(100% + 7px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--sb-azul);
+}
+
+.kcCard[data-compacto] .kcAv::before {
+  width: 43px;
+}
+
+.kcTxt {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.kcL1,
+.kcL2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kcNome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.90625rem;
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.4;
+}
+
+.kcCard[data-compacto] .kcNome {
+  font-size: 0.84375rem;
+}
+
+.kcHora {
+  flex: none;
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.71875rem;
+  font-weight: var(--sb-peso-medio);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kcCard[data-nova] .kcNome {
+  font-weight: var(--sb-peso-forte);
+}
+
+.kcCard[data-nova] .kcHora {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-forte);
+}
+
+/* Esperando a equipe: no lugar da hora, só o tempo de espera em âmbar (falha: no tom de erro). */
+.kcSelo {
+  flex: none;
+  color: var(--sb-atencao);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.71875rem;
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kcSelo[data-falha] {
+  color: var(--sb-erro);
+}
+
+.kcPrev {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  color: var(--sb-tinta-2);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.kcCard[data-nova] .kcPrev:not([data-tom]) {
+  color: var(--sb-tinta);
+  font-weight: var(--sb-peso-medio);
+}
+
+.kcPrev[data-tom='digita'] {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-medio);
+}
+
+.kcPrev[data-tom='falhou'],
+.kcPrev[data-tom='falhou'] .kcIcone {
+  color: var(--sb-erro);
+}
+
+.kcPrevTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kcIcone {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--sb-tinta-3);
+}
+
+.kcIcone[data-status='lida'] {
+  color: var(--sb-azul-texto);
+}
+
+.kcNl {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.6875rem;
+  font-weight: var(--sb-peso-forte);
+  animation: kc-selo 0.4s var(--sb-ease-mola) both;
+}
+
+/* "Mover para…": aparece no hover ou no foco, por cima da hora, com uma sombra do fundo do card. */
+.kcMover {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--kc-fundo);
+  box-shadow: -10px 0 10px -2px var(--kc-fundo);
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.kcCard:hover .kcMover,
+.kcCard:focus-within .kcMover,
+.kcMover[aria-expanded='true'] {
+  opacity: 1;
+}
+
+.kcMover:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.kcMover:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sb-azul);
+}
+
+/* No card que espera a equipe, o botão desce para a linha 2 e não cobre o tempo de espera. */
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .kcCard[data-espera] .kcMover {
+    top: auto;
+    bottom: 6px;
+  }
+
+  .kcCard[data-espera]:hover .kcNl,
+  .kcCard[data-espera]:focus-within .kcNl {
+    visibility: hidden;
+  }
+}
+
+/* Sem hover (toque e celular): o botão fica sempre à mostra, numa coluna própria de 44 px. */
+@media (max-width: 899px), (hover: none), (pointer: coarse) {
+  .kcCard {
+    grid-template-columns: 40px minmax(0, 1fr) 44px;
+  }
+
+  .kcCard[data-compacto] {
+    grid-template-columns: 36px minmax(0, 1fr) 44px;
+  }
+
+  .kcMover {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    box-shadow: none;
+    color: var(--sb-tinta-3);
+    opacity: 1;
+  }
+}
+
+/* Toque no computador ou no tablet (900 px ou mais, sem hover): a coluna visual do botão fica com 32 px e
+   o alvo de toque continua com 44 px (a margem negativa), para o nome ganhar uns 16 px. */
+@media (hover: none) and (min-width: 900px), (pointer: coarse) and (min-width: 900px) {
+  .kcCard {
+    grid-template-columns: 40px minmax(0, 1fr) 32px;
+  }
+
+  .kcCard[data-compacto] {
+    grid-template-columns: 36px minmax(0, 1fr) 32px;
+  }
+
+  .kcMover {
+    width: 44px;
+    height: 44px;
+    margin: -6px -8px -6px -4px;
+  }
+}
+
+/* ---------- o menu "Mover para…" ---------- */
+
+.kcMenu {
+  position: relative;
+  z-index: 2;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--sb-canvas);
+  animation: kc-entra 0.25s var(--sb-ease-assentar) both;
+}
+
+.kcMenuTitulo {
+  margin: 0;
+  padding: 2px 8px 4px;
+  color: var(--sb-tinta-3);
+  font-size: 0.75rem;
+  font-weight: var(--sb-peso-medio);
+}
+
+.kcMenuOpcao,
+.kcDesfazer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: var(--sb-peso-medio);
+  text-align: left;
+  cursor: pointer;
+}
+
+.kcMenuOpcao:hover:not(:disabled),
+.kcDesfazer:hover {
+  background: var(--sb-branco);
+}
+
+.kcMenuOpcao:focus-visible,
+.kcDesfazer:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+
+.kcMenuOpcao:disabled {
+  color: var(--sb-tinta-3);
+  cursor: default;
+}
+
+.kcMenuCor {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 12%, transparent);
+}
+
+.kcDesfazer {
+  color: var(--sb-azul-texto);
+  font-weight: var(--sb-peso-forte);
+}
+
+.kcDesfazer + .kcMenuTitulo {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+@media (max-width: 899px), (pointer: coarse) {
+  .kcMenuOpcao,
+  .kcDesfazer {
+    min-height: 44px;
+  }
+}
+
+/* No celular, o menu rola até ficar acima da barra de baixo (~84 px) e do botão da Janete (até 152 px). */
+@media (max-width: 899px) {
+  .kcMenu {
+    scroll-margin-bottom: 168px;
+  }
+}
+
+/* ---------- a decisão da Janete: por 3 s o card vira o momento dela, com tempo para vetar ---------- */
+
+.kcDecisao {
+  position: relative;
+  z-index: 3;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 10px;
+  min-height: 64px;
+  margin: -10px -12px;
+  padding: 7px 10px 8px 12px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+  animation: kc-decisao 0.45s var(--sb-ease-mola) both;
+}
+
+.kcCard[data-compacto] .kcDecisao {
+  min-height: 52px;
+  margin: -8px -10px;
+}
+
+.kcDecTitulo {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 20px;
+}
+
+/* O símbolo da Janete (navy) sobre o fundo navy: um anel branco translúcido, como no protótipo. */
+.kcDecTitulo > :first-child {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, #fff 40%, transparent);
+}
+
+.kcDecNome {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kcDecSeta {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: #7cc4ff;
+}
+
+.kcDecEtapa,
+.kcDecMotivo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kcDecMotivo {
+  color: #d5dcec;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.kcDecVeto {
+  position: relative;
+  z-index: 1;
+  min-height: 28px;
+  padding: 2px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sb-branco);
+  color: var(--sb-navy);
+  font: inherit;
+  font-size: 0.78125rem;
+  font-weight: var(--sb-peso-forte);
+  cursor: pointer;
+}
+
+.kcDecVeto:hover {
+  background: var(--sb-azul-claro);
+}
+
+.kcDecVeto:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--sb-navy),
+    0 0 0 4px #7cc4ff;
+}
+
+@media (max-width: 899px), (pointer: coarse) {
+  .kcDecVeto {
+    min-height: 44px;
+  }
+}
+
+.kcDecBarra {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #7cc4ff;
+  transform-origin: left center;
+  animation: kc-esvazia var(--kc-dur, 3s) linear both;
+}
+
+.kcSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes kc-pousa {
+  0% {
+    background-color: var(--sb-azul-claro);
+    transform: scale(0.96);
+  }
+  45% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes kc-selo {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes kc-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes kc-decisao {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.94);
+  }
+}
+
+@keyframes kc-esvazia {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Movimento reduzido: estado final no primeiro quadro (a barra da decisão também some de uma vez). */
+@media (prefers-reduced-motion: reduce) {
+  .kcCard,
+  .kcCard *,
+  .kcCard *::before {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 1ms !important;
+  }
+
+  .kcDecBarra {
+    display: none;
+  }
+}

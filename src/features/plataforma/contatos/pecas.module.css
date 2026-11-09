@@ -1,0 +1,182 @@
+/* As peças pequenas de Contatos (pecas.tsx). Sem fundo colorido (decisão 5 do equipe): a cor fica só na
+   bolinha da etapa e na de "ao vivo". */
+
+/* ---------- a etapa: bolinha e nome ---------- */
+
+/* max-width: numa célula estreita, o nome corta com reticências em vez de sumir pela borda. */
+.ptEtapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+/* As cores da etapa são pastel: o contorno fino (o mesmo do Kanban) segura a bolinha no branco. */
+.ptBolinha {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 22%, transparent);
+}
+
+.ptNome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- quem atende ---------- */
+
+.ptQuem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+}
+
+.ptQuem[data-tipo='celular'] {
+  color: var(--sb-tinta-2);
+}
+
+/* O texto numa linha só ("4 min" nunca se separa) e, sem espaço, com reticências. */
+.ptTexto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A forma curta ("Esperando · 4 min") só aparece onde foi pedida. */
+.ptCurto {
+  display: none;
+}
+
+.ptQuem[data-curto='sempre'] > .ptLongo {
+  display: none;
+}
+
+.ptQuem[data-curto='sempre'] > .ptCurto {
+  display: block;
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .ptQuem[data-curto='estreito'] > .ptLongo {
+    display: none;
+  }
+
+  .ptQuem[data-curto='estreito'] > .ptCurto {
+    display: block;
+  }
+}
+
+/* Esperando a equipe: o texto fica na cor normal; a cor vai só nesta bolinha (decisão 5 do equipe).
+   Âmbar até 10 min, vermelha a partir daí, como o sinal do Chat (a falha segue a mesma régua). */
+.ptAlerta {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-atencao);
+}
+
+.ptAlerta[data-longa] {
+  background: var(--sb-erro);
+}
+
+/* A bolinha verde de "ao vivo", pequena e com um pulso suave. */
+.ptVivo {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sb-sucesso);
+  animation: ptPulso 2s ease-in-out infinite;
+}
+
+.ptSr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- o vazio (o .vazioPlat da AreaVazia, sem o esboço) ---------- */
+
+.ptVazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  border: 2px dashed var(--sb-linha-forte);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.ptVazioTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.ptVazioTexto {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  text-wrap: pretty;
+}
+
+/* ---------- a paginação da tabela ---------- */
+
+.ptPaginas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0 4px;
+}
+
+.ptPaginasTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-variant-numeric: tabular-nums;
+}
+
+.ptPaginasBotoes {
+  display: flex;
+  gap: 8px;
+}
+
+@keyframes ptPulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptVivo {
+    animation: none;
+  }
+}

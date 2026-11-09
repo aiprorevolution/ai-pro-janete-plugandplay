@@ -1,0 +1,54 @@
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sb-esp-1);
+  min-height: 30px;
+  padding: 0 var(--sb-esp-3);
+  border: 1px solid transparent;
+  border-radius: var(--sb-r-pilula);
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.2;
+  letter-spacing: var(--sb-ls-corpo);
+  white-space: nowrap;
+}
+
+.selo[data-compacto] {
+  min-height: 24px;
+  padding: 0 var(--sb-esp-2);
+  font-size: var(--sb-fs-meta);
+}
+
+.selo[data-tom='rosa'] {
+  background: var(--sb-rosa);
+}
+
+.selo[data-tom='menta'] {
+  background: var(--sb-menta);
+}
+
+.selo[data-tom='areia'] {
+  background: var(--sb-areia);
+}
+
+.selo[data-tom='azul'] {
+  background: var(--sb-azul-claro);
+}
+
+.selo[data-tom='neutro'] {
+  background: var(--sb-canvas);
+}
+
+/* Fato: atributo do item, não categoria. Contorno de linha, tinta de apoio. */
+.selo[data-variante='fato'] {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-branco);
+  color: var(--sb-tinta-2);
+}
+
+.icone {
+  display: inline-grid;
+  place-items: center;
+}

@@ -1,0 +1,119 @@
+.botao {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--sb-controle);
+  height: var(--sb-controle);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.botao[data-tamanho='compacto'] {
+  width: var(--sb-controle-compacto);
+  height: var(--sb-controle-compacto);
+}
+
+.botao[data-variante='contorno'] {
+  border-color: var(--sb-linha);
+  background: var(--sb-branco);
+}
+
+.botao[data-variante='contorno']:hover:not(:disabled) {
+  border-color: var(--sb-linha-forte);
+  background: var(--sb-azul-nevoa);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='suave'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.botao[data-variante='suave']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-azul-claro) 82%, var(--sb-azul) 18%);
+}
+
+.botao[data-variante='discreto']:hover:not(:disabled) {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='principal'] {
+  background: var(--sb-navy);
+  color: var(--sb-tinta-inversa);
+}
+
+.botao[data-variante='principal']:hover:not(:disabled) {
+  background: var(--sb-navy-2);
+}
+
+/* Alternância ligada: o tom do ativo, como o item atual da navegação. */
+.botao[aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+/* Clique marcado só pela cor (item 5a da spec r2: nada se mexe ao clicar); antes encolhia (scale 0.96). */
+.botao:active:not(:disabled) {
+  background: var(--sb-azul-claro);
+  color: var(--sb-tinta);
+}
+
+.botao[data-variante='principal']:active:not(:disabled) {
+  background: var(--sb-navy-2);
+  color: var(--sb-tinta-inversa);
+}
+
+.botao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.botao:disabled:not([aria-busy]) {
+  border-color: transparent;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+.botao[aria-busy] {
+  cursor: progress;
+}
+
+.icone {
+  display: grid;
+  place-items: center;
+}
+
+/* Ponto de novidade: azul (indicador, não texto) com anel branco para separar do ícone. */
+.ponto {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  outline: 2px solid var(--sb-branco);
+}
+
+.botao[data-tamanho='compacto'] .ponto {
+  top: 6px;
+  right: 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao {
+    transition: none;
+  }
+}

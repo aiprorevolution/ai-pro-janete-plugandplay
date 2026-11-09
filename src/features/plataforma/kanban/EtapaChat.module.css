@@ -1,0 +1,183 @@
+/* A etapa que vira chat (o `.foco` do Kanban-2.dc.html): o cabeçalho com "Voltar ao quadro", o nome
+   da etapa e as setas; embaixo, a lista da etapa (320 px, cartão branco) e a conversa encaixada. */
+
+/* Ocupa o que sobra do `.kbTela` (coluna flex) embaixo da barra de ferramentas. */
+.ecRaiz {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  background: var(--sb-canvas);
+  animation: ec-entra 0.3s var(--via-ease-out) backwards;
+}
+
+.ecCab {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.ecTitulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+}
+
+.ecTitulo span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ecPonto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-navy) 14%, transparent);
+}
+
+.ecConta {
+  font-size: 0.8125rem;
+  color: var(--sb-tinta-2);
+}
+
+.ecSetas {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.ecSeta {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.ecSeta:hover:not(:disabled) {
+  background: var(--sb-azul-nevoa);
+}
+
+.ecSeta:disabled {
+  color: var(--sb-tinta-3);
+  cursor: not-allowed;
+}
+
+.ecSeta:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+.ecLista {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.ecVazio,
+.ecEscolha {
+  margin: auto;
+  padding: 24px 16px;
+  font-size: var(--sb-fs-apoio);
+  color: var(--sb-tinta-2);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.ecPainel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+/* Até 1365 px (1280 e 1366), a lista com 280 px: a conversa encaixada fica com uns 410 px em 1280. */
+@media (max-width: 1365px) {
+  .ecRaiz {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+}
+
+/* No celular (abaixo de 900 px, quando o componente marca `data-tela-cheia`), o `.foco` do protótipo:
+   a etapa cobre a tela por cima da barra do quadro (o que sobra dele, sem z-index), e embaixo do
+   botão da Janete (9) e do dock (10), que ficam por cima dela como no protótipo (.foco 25, menu 30,
+   botão 32); a gaveta do lead (--via-z-modal), as caixas de confirmação e os avisos do quadro (55 e
+   58) também ficam por cima. Os dois estão na raiz do empilhamento (nem o .plat nem o .platMain criam
+   contexto no celular), e esta seção vai para o body: os números se comparam direto. O 7 fica ainda
+   embaixo da bolinha do tour (8), no mesmo canto do botão.
+   A página rola dentro dela, com o espaço do dock e do botão do canto embaixo (--sb-reserva-dock),
+   para a última linha subir acima deles; a lista cresce com as linhas. A conversa abre na gaveta.
+   O cabeçalho quebra como no protótipo: "Voltar ao quadro", o nome e a conta numa linha; as setas
+   embaixo, à direita. */
+.ecRaiz[data-tela-cheia] {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(var(--sb-reserva-dock) + env(safe-area-inset-bottom, 0px));
+  outline: none;
+}
+
+.ecRaiz[data-tela-cheia] .ecSeta {
+  width: 44px;
+  height: 44px;
+}
+
+/* "Voltar ao quadro" é o alvo de toque principal da tela cheia: 44 px, como o `.btn-c` do protótipo
+   abaixo de 900 px. A especificidade (0,3,0) ganha do `.botao[data-tamanho='compacto']`. */
+.ecRaiz[data-tela-cheia] .ecVoltar {
+  min-height: 44px;
+}
+
+.ecRaiz[data-tela-cheia] .ecLista {
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ecRaiz {
+    animation: none;
+  }
+
+  .ecSeta {
+    transition: none;
+  }
+}
+
+@keyframes ec-entra {
+  from {
+    opacity: 0;
+  }
+}

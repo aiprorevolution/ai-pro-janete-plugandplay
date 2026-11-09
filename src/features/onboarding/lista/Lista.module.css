@@ -1,0 +1,1381 @@
+/* =========================================================
+   1 e 2 · A lista editorial em acordeão (E3) e o palco da validação (E4).
+   Copiado do F (F-Final.dc.html, seção "1 e 2 · A lista" e "Validação"),
+   com os tokens --sb-* de src/styles/aipro.css.
+   ========================================================= */
+
+.secao {
+  --lista-anel: var(--sb-anel);
+  --lista-sombra-acao: var(--sb-sombra-acao);
+  /* a tela some e volta sem a barra do sistema empurrar nada */
+  align-self: flex-start;
+  width: 100%;
+  min-width: 0;
+  animation: tela-entra 0.5s var(--via-ease-out) backwards;
+}
+/* no F a seção é a mesma no WhatsApp e no cérebro: no desdobrar ela não volta a aparecer do zero
+   (o disco navy de onde o cartão nasce continua o check, sem piscar); o cabeçalho tem o próprio
+   sb-entrada */
+.secao.desdobrando {
+  animation: none;
+}
+
+/* `:where` deixa este anel com peso baixo, como o `:where(.app) :focus-visible` do F: o
+   `.entrada:focus-visible` do Campo vence e o campo não ganha um segundo anel por dentro. */
+:where(.secao) :focus-visible {
+  outline: none;
+  box-shadow: var(--lista-anel);
+}
+
+.mono {
+  font-family: var(--sb-fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ic {
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.icP {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2;
+}
+.icG {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.hPagina {
+  margin: 0;
+  font-size: var(--sb-fs-pagina);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+.hPagina:focus-visible {
+  box-shadow: none;
+}
+.hDestaque {
+  margin: 0;
+  font-size: var(--sb-fs-destaque);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+.corpo2 {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+.meta {
+  font-size: 0.78125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--sb-tinta-3);
+}
+.olho {
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-azul-texto);
+}
+.estadoLinha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+}
+.estadoLinha[data-tom='ok'] {
+  color: var(--sb-sucesso);
+}
+.estadoLinha[data-tom='erro'] {
+  color: var(--sb-erro);
+}
+.estadoLinha[data-tom='atencao'] {
+  color: var(--sb-atencao);
+}
+
+/* botão compacto do F (.btn-c): 44 px de alvo, texto de apoio */
+.btnC.btnC {
+  min-height: 44px;
+  padding: 4px 14px;
+  font-size: 0.84375rem;
+}
+.linhaResumo .btnC:hover:not(:disabled) {
+  background: var(--sb-branco);
+}
+
+/* ---------- logos de terceiros: ladrilho neutro, nunca o maior destaque ---------- */
+.logoTile {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 44px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha);
+}
+.logoTile img {
+  display: block;
+  height: 22px;
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
+}
+.logoTile.larga img {
+  height: 16px;
+}
+.logoTile.escura {
+  background: var(--sb-grafite);
+  box-shadow: none;
+}
+.logoTile.mini {
+  width: 48px;
+  height: 32px;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 2px var(--sb-canvas),
+    inset 0 0 0 1px var(--sb-linha);
+}
+.logoTile.mini img {
+  height: 14px;
+}
+.logoTile.mini.larga img {
+  height: 12px;
+}
+.logoTile.mini.escura {
+  box-shadow: 0 0 0 2px var(--sb-canvas);
+}
+.seloWa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 12px 0 8px;
+  border-radius: 999px;
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--sb-tinta);
+}
+.seloWa img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- página e cabeçalho ---------- */
+.paginaLista {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding: 48px 16px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.listaCab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  visibility: visible;
+  transition:
+    opacity 0.4s var(--via-ease-out) 0.2s,
+    transform 0.5s var(--via-ease-out) 0.2s,
+    visibility 0s;
+}
+.listaCab .corpo2 {
+  max-width: 40ch;
+}
+.secao.espera .listaCab {
+  opacity: 0;
+}
+.secao.desdobrando .listaCab,
+.secao.nascendo .listaCab {
+  animation: sb-entrada 0.5s var(--via-ease-out) 0.32s backwards;
+}
+/* validação: o cabeçalho sai de cena, só o logo girando fica no palco */
+.secao.validando .listaCab {
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s var(--via-ease-snap),
+    transform 0.3s var(--via-ease-snap),
+    visibility 0s linear 0.3s;
+}
+
+.listaPalco {
+  position: relative;
+}
+/* A região que precisa estar inteira na tela antes de o cartão dobrar: do topo do disco da
+   validação (centro a 10,5rem, lado 9,5rem) até o fim do texto do resultado. Vai até o fim do
+   cartão e para em 27rem, para não aumentar a página quando o cartão é baixo.
+   Começa mais acima, pela altura da barra de etapas (presa no topo, --onb-nav-h, do .app): "inteira
+   na tela" só vale com o topo do disco abaixo da barra, que volta no resultado.
+   trazerCartao (useValidacao.ts) e o "Próximo" do cérebro medem por ela com rolarAteEMedir. */
+.discoMira {
+  position: absolute;
+  left: 50%;
+  top: calc(10.5rem - 76px - var(--onb-nav-h, 4.5rem));
+  bottom: 0;
+  width: 1px;
+  max-height: calc(27rem + var(--onb-nav-h, 4.5rem));
+  pointer-events: none;
+  visibility: hidden;
+}
+/* O círculo de onde o cartão da conexão nasce, na chegada do login (o símbolo voa até ele):
+   96 px, com o centro a TOPO_NASCE (72 px) do topo do cartão. */
+.nasceMira {
+  position: absolute;
+  left: calc(50% - 48px);
+  top: 24px;
+  width: 96px;
+  height: 96px;
+  pointer-events: none;
+  visibility: hidden;
+}
+.listaSombra {
+  filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--sb-navy) 5%, transparent))
+    drop-shadow(0 16px 24px color-mix(in srgb, var(--sb-navy) 7%, transparent));
+}
+.lista {
+  position: relative;
+  border-radius: 28px;
+  background: var(--sb-branco);
+  clip-path: inset(0 0 0 0 round 28px);
+  transition: clip-path 0.62s var(--sb-ease-travessia);
+  /* a barra de etapas (presa no topo) tem 4.5rem, ou 7.25rem abaixo de 900 px: --onb-nav-h, do .app */
+  scroll-margin-top: calc(var(--onb-nav-h, 4.5rem) + 16px);
+}
+.lista:focus-visible {
+  box-shadow: none;
+}
+.lista.espera {
+  opacity: 0;
+  pointer-events: none;
+}
+.lista.espera .listaIn {
+  visibility: hidden;
+}
+/* o cartão dobra no disco da validação: 9,5rem, com o centro a 10,5rem do topo */
+.lista.fechada {
+  clip-path: inset(calc(10.5rem - 76px) calc(50% - 76px) calc(100% - 10.5rem - 76px) calc(50% - 76px) round 76px);
+  transition: clip-path 0.6s var(--sb-ease-travessia) 0.06s;
+}
+/* o conteúdo fica no lugar (só invisível, por .fechada): a altura não muda e o scroll não pula sob o disco */
+.lista.sob {
+  opacity: 0;
+  min-height: 36rem;
+}
+/* o passo do QR code (PassoQr no palco) é mais alto que o resultado: o cartão cresce para a
+   página ter onde rolar. O QR fica no disco (o quadro de 15rem termina 7,5rem abaixo do centro, que
+   está a 10,5rem do topo), e o texto começa em 17rem + a folga do quadro (1rem + 22px); abaixo vêm
+   o estado e o título (até 2 linhas), os 3 passos numa coluna (até 6 linhas), a linha viva e os
+   botões: ~43rem, mais a margem de baixo */
+.lista.sob[data-fase='qr'] {
+  min-height: 44rem;
+}
+/* a lista de vozes no resultado da etapa Voz (o .okExtra do BlocoOk): a altura do resultado muda com
+   a lista (o "Mostrar mais", nomes longos, o selo que quebra no celular), e uma altura fixa cortava
+   o fim. Aqui o palco entra no fluxo da página e dá a altura; o cartão (invisível no resultado) fica
+   por baixo, do mesmo tamanho. O disco continua a 10,5rem do topo e o texto a 17rem, como sem a
+   lista; o #disco-mira (o alvo do voo) não muda. */
+.listaPalco:has(.okExtra) .listaSombra {
+  position: absolute;
+  inset: 0;
+}
+.listaPalco:has(.okExtra) .lista.sob {
+  height: 100%;
+  min-height: 0;
+}
+.listaPalco:has(.okExtra) .val {
+  position: relative;
+  inset: auto;
+}
+.listaPalco:has(.okExtra) .valTexto {
+  position: relative;
+  top: auto;
+  padding-top: calc(10.5rem + 6.5rem);
+}
+.lista.desdobrando {
+  animation: desdobra 0.74s var(--sb-ease-travessia) both;
+}
+.lista.nascendo {
+  animation: nasce 0.74s var(--sb-ease-travessia) both;
+}
+.listaIn {
+  visibility: visible;
+  transition:
+    opacity 0.34s var(--via-ease-snap) 0.46s,
+    visibility 0s;
+}
+/* invisível = fora do Tab e da leitura de tela */
+.lista.fechada .listaIn {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.14s var(--via-ease-snap),
+    visibility 0s linear 0.14s;
+}
+.lista.desdobrando .listaIn,
+.lista.nascendo .listaIn {
+  animation: aparece 0.34s var(--via-ease-out) 0.42s backwards;
+}
+.listaIn ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* dobra: abre e fecha a altura com grid 0fr/1fr, e tira o conteúdo fechado do Tab */
+.dobra {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 0.46s var(--via-ease-out),
+    opacity 0.34s var(--via-ease-out);
+}
+.dobra.fechado {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.dobraIn {
+  min-height: 0;
+  overflow: hidden;
+  visibility: visible;
+  transition: visibility 0s;
+}
+.dobra.fechado > .dobraIn {
+  visibility: hidden;
+  transition: visibility 0s linear 0.46s;
+}
+.listaOlho {
+  margin: 0;
+  padding: 22px 24px 10px;
+  font-size: 0.78125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--sb-tinta-3);
+}
+.listaOlho:focus-visible {
+  box-shadow: none;
+}
+.listaOlho.apos {
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* ---------- linhas ---------- */
+.linha {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 84px;
+  padding: 16px 24px;
+  border: 0;
+  border-top: 1px solid var(--sb-linha);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+.linha:hover {
+  background: var(--sb-azul-nevoa);
+}
+.secao .linha:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--sb-azul);
+}
+.linhaSeta {
+  color: var(--sb-tinta-3);
+  transition:
+    transform var(--app-t-touch),
+    color var(--app-t-state);
+}
+.linha:hover .linhaSeta {
+  transform: translateX(3px);
+  color: var(--sb-tinta);
+}
+.linhaIcone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+.linhaIcone.p {
+  width: 36px;
+  height: 36px;
+}
+.linhaIcone.p .ic {
+  width: 1rem;
+  height: 1rem;
+}
+.linhaTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.linhaNome {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+}
+.linhaFrase {
+  font-size: 0.84375rem;
+  line-height: 1.45;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+.linhaTexto .estadoLinha {
+  margin-top: 4px;
+  font-size: 0.78125rem;
+}
+.linhaResumo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 12px 10px 24px;
+  background: var(--sb-canvas);
+}
+.linhaResumo.pe {
+  border-top: 1px solid var(--sb-linha);
+}
+.resumoNome {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--sb-tinta);
+}
+.miniLogos {
+  display: flex;
+  align-items: center;
+}
+.miniLogos .logoTile + .logoTile {
+  margin-left: -8px;
+}
+.feitoGlifo {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  color: var(--sb-tinta-3);
+}
+.feitoGlifo.ok {
+  background: var(--sb-menta);
+  color: var(--sb-sucesso);
+}
+
+/* ---------- o painel aberto do provedor ---------- */
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px 24px;
+  border-top: 1px solid var(--sb-linha);
+  background: var(--sb-branco);
+  /* os campos e os modelos vão para 2 colunas quando o próprio painel tem largura (ver @container) */
+  container-type: inline-size;
+}
+.painelCab {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+.camposGrade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+/* em 2 colunas o campo fica estreito: o placeholder longo termina em reticências, não no meio da palavra */
+.camposGrade input {
+  text-overflow: ellipsis;
+}
+/* selo de dificuldade na linha do provedor (Fácil, Médio, Difícil) */
+.seloDificuldade {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--sb-canvas);
+}
+.gerado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+.gerado + .gerado {
+  padding-top: 12px;
+  border-top: 1px solid var(--sb-linha);
+}
+.geradoTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.geradoRotulo {
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--sb-tinta);
+}
+.geradoValor {
+  font-size: 0.84375rem;
+  color: var(--sb-tinta-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.geradoPendente {
+  font-size: 0.84375rem;
+  font-style: italic;
+  color: var(--sb-atencao);
+}
+.geradoNota {
+  font-size: 0.78125rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-3);
+}
+.btnCopiar.btnCopiar {
+  min-width: 7rem;
+}
+.btnCopiar.copiado {
+  border-color: transparent;
+  background: var(--sb-menta);
+  color: var(--sb-tinta);
+}
+.btnCopiar.copiado svg {
+  color: var(--sb-sucesso);
+}
+.painelPe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--sb-linha);
+}
+.olhar {
+  /* "Mostrar" e "Ocultar" com a mesma largura: o campo não muda de tamanho ao alternar */
+  min-width: 5.5rem;
+  min-height: 44px;
+  margin-right: 3px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--sb-tinta-2);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+.olhar:hover {
+  background: var(--sb-canvas);
+  color: var(--sb-tinta);
+}
+
+/* ---------- aviso ---------- */
+.aviso {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 0.84375rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.aviso .ic {
+  margin-top: 1px;
+}
+.aviso b {
+  font-weight: 600;
+}
+.avisoInfo {
+  background: var(--sb-azul-nevoa);
+}
+.avisoInfo .ic {
+  color: var(--sb-azul-texto);
+}
+.avisoErro {
+  background: var(--sb-erro-claro);
+  animation: sb-entrada 0.32s var(--via-ease-out) both;
+}
+.avisoErro .ic {
+  color: var(--sb-erro);
+}
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sb-azul-claro);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--sb-tinta);
+  white-space: nowrap;
+}
+
+/* ---------- modelos do cérebro ---------- */
+.campoModelo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.campoRotulo {
+  margin: 0;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--sb-tinta);
+}
+.ajuda {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+  color: var(--sb-tinta-2);
+  text-wrap: pretty;
+}
+/* a lista de modelos: 1 coluna; 2 colunas quando o painel tem largura (@container, abaixo) */
+.modelos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  padding: 6px;
+  border-radius: 20px;
+  background: var(--sb-canvas);
+}
+.modelosCab {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 6px 12px 4px;
+  font-size: 0.78125rem;
+  font-weight: 500;
+  color: var(--sb-tinta-3);
+}
+.maisModelos {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 4px 4px 2px 12px;
+  font-size: 0.78125rem;
+  color: var(--sb-tinta-3);
+}
+.modelo {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+  gap: 2px 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 60px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--sb-tinta);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+.modelo:hover {
+  background: var(--sb-branco);
+}
+.modelo.ativo {
+  background: var(--sb-branco);
+  box-shadow: inset 0 0 0 1.5px var(--sb-azul);
+}
+.secao .modelo.ativo:focus-visible {
+  box-shadow:
+    inset 0 0 0 1.5px var(--sb-azul),
+    var(--lista-anel);
+}
+.radio {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  flex: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--sb-borda-campo);
+  background: var(--sb-branco);
+  transition: box-shadow var(--app-t-state);
+}
+/* rádio em navy: o ponto azul dentro do navy fica só para a Janete */
+.radio::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--sb-navy);
+  transform: scale(0);
+  transition: transform 0.42s var(--via-ease-spring);
+}
+.ativo .radio {
+  box-shadow: inset 0 0 0 1.5px var(--sb-navy);
+}
+.ativo .radio::after {
+  transform: scale(1);
+}
+.mdTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mdNome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.mdId {
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.mdPerfil {
+  font-size: 0.84375rem;
+  color: var(--sb-tinta-2);
+  overflow-wrap: anywhere;
+}
+/* o id do modelo (OpenRouter), em mono, sob o nome */
+.mdPerfil.mdId {
+  font-size: 0.78125rem;
+  font-weight: 400;
+}
+.mdPreco {
+  grid-column: 2;
+  font-family: var(--sb-fonte-mono);
+  font-size: 0.78125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sb-tinta-2);
+  white-space: nowrap;
+}
+/* o painel tem largura: campos e modelos em 2 colunas */
+@container (min-width: 32rem) {
+  .camposGrade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+  /* a URL do Evolution e o campo que sobra sozinho na última linha (camposLargos em dados.ts) */
+  .camposGrade > .campoLargo {
+    grid-column: 1 / -1;
+  }
+  .modelos.duasColunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+}
+.consultando {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.buscaVazia {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 0.84375rem;
+  color: var(--sb-tinta-2);
+}
+
+/* =========================================================
+   Validação (E4), grande e no centro, igual para WhatsApp e IA:
+   o cartão vira o logo real, a moeda gira, pousa reta e vira o check.
+   Sem anel externo em volta do check e sem cabeçalho em cima.
+   ========================================================= */
+.val {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.val[data-reabrindo] {
+  animation: some 0.18s var(--via-ease-snap) both;
+}
+.valAncora {
+  position: absolute;
+  left: 50%;
+  top: 10.5rem;
+  width: 9.5rem;
+  height: 9.5rem;
+  transform: translate(-50%, -50%);
+}
+.disco {
+  position: absolute;
+  inset: 0;
+  perspective: 40rem;
+  transition: transform 0.5s var(--via-ease-out);
+}
+.moeda {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+/* 3150 ms (WhatsApp) e 2050 ms (IA) caem no trecho parado da volta: o logo pousa de frente, sem salto */
+.val[data-gira] .moeda {
+  animation: moeda 1.1s var(--via-ease) infinite;
+}
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sb-branco);
+  box-shadow:
+    inset 0 0 0 1px var(--sb-linha),
+    var(--sb-sombra-flutuante);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    background-color 0.35s var(--via-ease-snap) 0.05s,
+    box-shadow 0.35s;
+}
+.face.escura {
+  background: var(--sb-grafite);
+  box-shadow: var(--sb-sombra-flutuante);
+  animation: face-escurece 0.35s var(--via-ease-snap) backwards;
+}
+.face img {
+  display: block;
+  height: 28%;
+  width: auto;
+  max-width: 56%;
+  object-fit: contain;
+  animation: logo-entra 0.4s var(--via-ease-out) 0.15s both;
+}
+.face.larga img {
+  height: 19%;
+  max-width: 72%;
+}
+/* durante a dobra: o disco com o logo já está por cima do cartão que se fecha; o giro só começa em "verificando" */
+.val[data-fase='fechando'] .face {
+  animation: aparece 0.3s var(--via-ease-out) 0.36s backwards;
+}
+.val[data-fase='fechando'] .face.escura {
+  animation:
+    aparece 0.3s var(--via-ease-out) 0.36s backwards,
+    face-escurece 0.35s var(--via-ease-snap) 0.36s backwards;
+}
+.val[data-fase='fechando'] .face img {
+  animation-delay: 0.28s;
+}
+/* o verso também mostra o logo: girado 180°, ele aparece sempre de frente, como numa moeda */
+.face.verso {
+  transform: rotateY(180deg);
+}
+.val[data-vis='ok'] .face.verso,
+.val[data-vis='erro'] .face.verso {
+  opacity: 0;
+}
+.val[data-vis='ok'] .face img,
+.val[data-vis='erro'] .face img {
+  animation: logo-sai 0.2s var(--via-ease-snap) forwards;
+}
+.val[data-vis='ok'] .face {
+  background: var(--sb-navy);
+  box-shadow: var(--sb-sombra-flutuante);
+}
+.val[data-vis='erro'] .face {
+  background: var(--sb-erro-claro);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-erro) 20%, transparent);
+}
+.discoCheck,
+.discoAlerta {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.discoCheck path {
+  fill: none;
+  stroke: var(--sb-branco);
+  stroke-width: 4.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 64;
+  stroke-dashoffset: 64;
+}
+.val[data-vis='ok'] .discoCheck path {
+  animation: traco 0.5s var(--via-ease-out) 0.18s forwards;
+}
+.discoAlerta path {
+  fill: none;
+  stroke: var(--sb-erro);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.discoAlerta circle {
+  fill: var(--sb-erro);
+  opacity: 0;
+}
+.val[data-vis='erro'] .discoAlerta path,
+.val[data-vis='erro'] .discoAlerta circle {
+  animation: aparece 0.3s var(--via-ease-out) 0.18s forwards;
+}
+.val[data-vis='ok'] .disco {
+  animation: pop 0.55s var(--via-ease-out) 0.1s;
+}
+.val[data-vis='erro'] .disco {
+  animation: tremor 0.52s var(--via-ease-snap) 0.12s;
+}
+/* no passo do QR o disco real sai de cena: o DiscoQr do PassoQr nasce igual a ele, no mesmo
+   lugar, e cresce até virar o quadro do QR (spec-qr-whatsapp, seção 8) */
+.val[data-vis='qr'] .disco {
+  visibility: hidden;
+}
+/* Depois do "Próximo" no cérebro, a cena FusaoJanete (posição fixa, por cima da tela) começa
+   exatamente onde está o check: o disco do palco sai de cena na hora, para não haver dois. */
+.val[data-fusao] .disco {
+  visibility: hidden;
+}
+.valTexto {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(10.5rem + 6.5rem);
+  display: flex;
+  justify-content: center;
+  padding: 0 24px 24px;
+  text-align: center;
+  pointer-events: auto;
+  transition:
+    opacity 0.3s var(--via-ease-out),
+    transform 0.3s var(--via-ease-out);
+}
+.val[data-fusao] .valTexto {
+  /* sai também do teclado: o PalcoValidacao põe inert no .valTexto durante a cena */
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+/* fora do cartão o fundo é o canvas: o texto do estado fica na tinta e só o ícone leva o verde */
+.valTexto .estadoLinha[data-tom='ok'] {
+  color: var(--sb-tinta);
+}
+.valTexto .estadoLinha[data-tom='ok'] .ic {
+  color: var(--sb-sucesso);
+}
+.verif {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 16rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  animation: sb-entrada 0.4s var(--via-ease-out) 0.12s both;
+}
+.verifItem {
+  display: grid;
+  grid-template-columns: 18px auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  color: var(--sb-tinta-3);
+  transition: color 0.3s;
+}
+.verifGlifo {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--sb-linha-forte);
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
+}
+.verifItem[data-estado='ativo'] {
+  color: var(--sb-tinta);
+}
+.verifItem[data-estado='ativo'] .verifGlifo {
+  background: var(--sb-azul-claro);
+  box-shadow: none;
+}
+.verifItem[data-estado='ativo'] .verifGlifo::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+  animation: respira-p 1s var(--via-ease) infinite;
+}
+.verifItem[data-estado='feito'] {
+  color: var(--sb-tinta-2);
+}
+.verifItem[data-estado='feito'] .verifGlifo {
+  background: var(--sb-menta);
+  box-shadow: none;
+}
+.verifItem[data-estado='feito'] .verifGlifo::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--sb-sucesso);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.okBloco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  max-width: 32rem;
+}
+.okDetalhe {
+  margin: 0;
+  font-size: 0.78125rem;
+  color: var(--sb-tinta-2);
+  overflow-wrap: anywhere;
+}
+.okSub {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  max-width: 36ch;
+  text-wrap: pretty;
+}
+.okAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+/* o bloco extra do resultado (a lista de vozes): ocupa a largura do bloco, alinhado à esquerda */
+.okExtra {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  text-align: left;
+}
+.okExtraTitulo {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sb-tinta);
+}
+.sobe {
+  animation: sb-entrada 0.5s var(--via-ease-out) 0.5s both;
+}
+.okBloco .d1 {
+  animation-delay: 0.56s;
+}
+.okBloco .d2 {
+  animation-delay: 0.66s;
+}
+.okBloco .d3 {
+  animation-delay: 0.78s;
+}
+.okBloco .d4 {
+  animation-delay: 0.9s;
+}
+.erroBloco .sobe {
+  animation-delay: 0.3s;
+}
+.erroBloco .d1 {
+  animation-delay: 0.36s;
+}
+.erroBloco .d2 {
+  animation-delay: 0.44s;
+}
+.erroBloco .d3 {
+  animation-delay: 0.54s;
+}
+
+/* a saída para o despertar: o texto some com o check virando a Janete */
+.secao.saindo .valTexto {
+  pointer-events: none;
+}
+
+/* ---------- celular ---------- */
+@media (max-width: 899px) {
+  .paginaLista {
+    padding: 28px 16px 64px;
+    gap: 22px;
+  }
+}
+@media (max-width: 599px) {
+  .linha {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .linha .logoTile {
+    width: 52px;
+    height: 38px;
+  }
+  .linha .logoTile img {
+    height: 18px;
+  }
+  .linha .logoTile.larga img {
+    height: 12px;
+  }
+  .linhaResumo {
+    padding: 10px 8px 10px 16px;
+  }
+  .listaOlho {
+    padding: 20px 16px 8px;
+  }
+  .painel {
+    padding: 18px 16px 20px;
+  }
+  .painelCab {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  .painelCab .btnC {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .painelCab .linhaFrase {
+    display: none;
+  }
+  .gerado {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gerado .btnCopiar {
+    justify-self: start;
+  }
+  /* a URL inteira, para a pessoa conferir o que vai colar */
+  .geradoValor {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  /* rodapé "Outros provedores": os mini-logos (decorativos, repetem o texto) saem para o texto
+     não quebrar em 4 linhas entre eles e o "Ver todos" */
+  .linhaResumo.pe {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .linhaResumo.pe .miniLogos {
+    display: none;
+  }
+  .lista.sob {
+    min-height: 40rem;
+  }
+  /* no celular o título e os passos quebram em mais linhas (os passos chegam a 8), a linha viva em
+     2, e a frase do celular aparece (3 linhas): ~50rem, mais a margem de baixo */
+  .lista.sob[data-fase='qr'] {
+    min-height: 52rem;
+  }
+}
+
+/* ---------- movimento reduzido: estado final no primeiro quadro ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .secao,
+  .secao *,
+  .secao *::before,
+  .secao *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------- quadros-chave ---------- */
+@keyframes sb-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes tela-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes some {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes respira-p {
+  0%,
+  100% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+/* o contêiner do cérebro nasce do check (disco da validação, 9,5rem a 10,5rem do topo) */
+@keyframes desdobra {
+  0% {
+    clip-path: inset(calc(10.5rem - 76px) calc(50% - 76px) calc(100% - 10.5rem - 76px) calc(50% - 76px) round 76px);
+    background-color: var(--sb-navy);
+  }
+  42% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: inset(0 0 0 0 round 28px);
+    background-color: var(--sb-branco);
+  }
+}
+/* o contêiner da conexão nasce do símbolo do login, que pousa no topo do cartão (E6) */
+@keyframes nasce {
+  0% {
+    clip-path: inset(24px calc(50% - 48px) calc(100% - 120px) calc(50% - 48px) round 48px);
+    background-color: var(--sb-navy);
+  }
+  40% {
+    background-color: var(--sb-branco);
+  }
+  100% {
+    clip-path: inset(0 0 0 0 round 28px);
+    background-color: var(--sb-branco);
+  }
+}
+@keyframes moeda {
+  0%,
+  8% {
+    transform: rotateY(0deg);
+  }
+  62%,
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes logo-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes logo-sai {
+  to {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes traco {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes tremor {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  18% {
+    transform: translateX(-7px);
+  }
+  36% {
+    transform: translateX(6px);
+  }
+  54% {
+    transform: translateX(-4px);
+  }
+  72% {
+    transform: translateX(2px);
+  }
+}
+@keyframes face-escurece {
+  from {
+    background-color: var(--sb-branco);
+  }
+}

@@ -1,0 +1,815 @@
+/* Os capítulos do detalhamento da versão final: o corpo da A (o cartão grande do Fluxo, o "Agora nesta
+   etapa" e a faixa de números) com o cabeçalho da D (o nome e o número juntos, e a frase de leitura).
+   Um por etapa, com espaço generoso entre eles e o ritmo alternando (data-lado): nos pares, o Fluxo à
+   esquerda e o "Agora" à direita; nos ímpares, o contrário, com as entradas por dia em gráfico maior.
+   No palco, o motor (Palco.tsx) leva os capítulos colados embaixo do cartão do funil que encolhe, e o
+   1º nasce por opacidade. O alvo da rolagem e do foco desconta a faixa presa (--dvb-margem-cap). */
+
+.detalhe {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.detalheTitulo,
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.capitulo {
+  position: relative;
+  padding: 28px 0 64px;
+  /* o índice leva a rolagem até a <section>: o cabeçalho fica inteiro embaixo da faixa presa */
+  scroll-margin-top: var(--dvb-margem-cap, calc(var(--sb-topo) + 116px));
+}
+
+.capitulo + .capitulo {
+  padding-top: 56px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* Ajuste 4 do equipe: no palco, com a faixa presa, o começo do 1º capítulo aparece logo embaixo dela (o
+   título a ~56 px do pé da faixa, e não a 76); na virada, ele sobe colado ao pé do cartão do funil. */
+[data-modo='palco'] > .detalhe > .capitulo:first-of-type {
+  padding-top: 8px;
+}
+
+/* o foco que rola a página (Tab) também não para atrás do índice preso */
+.capitulo :is(a, button, [tabindex]) {
+  scroll-margin-top: var(--dvb-margem-cap, calc(var(--sb-topo) + 116px));
+  scroll-margin-bottom: 24px;
+}
+
+/* ---------- o cabeçalho (o da D): o nome e o número juntos, e a frase ---------- */
+
+.capCab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 72ch;
+  margin-bottom: 24px;
+}
+
+/* "Novo · 190 leads chegaram": o nome forte, o número mais leve na mesma linha */
+.capTitulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-destaque);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-titulo);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.capTitulo em {
+  color: var(--sb-tinta-3);
+  font-style: normal;
+  font-weight: var(--sb-peso-medio);
+}
+
+.capSep {
+  display: inline;
+}
+
+.capTitulo:focus {
+  outline: none;
+}
+
+.capTitulo:focus-visible {
+  border-radius: var(--sb-r-chip);
+  box-shadow: var(--sb-anel);
+}
+
+.capFrase {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  line-height: var(--sb-lh-corpo);
+  text-wrap: pretty;
+}
+
+/* o selo: um ponto azul (a Janete tem um lugar só na página; aqui ela não aparece de novo) */
+.capSelo i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sb-azul);
+}
+
+/* a pílula no azul claro (o névoa sumia sobre o fundo da página e o selo parecia um texto recuado) */
+.capSelo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 4px 12px 4px 10px;
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* ---------- a grade dos blocos ---------- */
+
+.capGrade {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 22px;
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  box-shadow: var(--sb-sombra-card);
+}
+
+.blocoFluxo {
+  grid-row: 1;
+  grid-column: 1 / span 8;
+}
+
+.blocoAgora {
+  grid-row: 1;
+  grid-column: 9 / span 4;
+}
+
+.capitulo[data-lado='direita'] .blocoFluxo {
+  grid-column: 5 / span 8;
+}
+
+.capitulo[data-lado='direita'] .blocoAgora {
+  grid-column: 1 / span 4;
+}
+
+/* Ajuste 2 do equipe: o "Agora nesta etapa" (e o "Em Perdido agora", no capítulo dos que saíram) tem
+   sempre a altura do cartão ao lado e encosta na faixa de números de baixo, como ele; com poucos leads,
+   o espaço que sobra fica dentro do cartão, arrumado: a lista no alto e o "Ver todos no Kanban" preso
+   no pé, separado por um fio. Os dois cartões da fileira 1 ficam na mesma linha da grade (grid-row: 1),
+   então têm a mesma altura em toda largura com dois lado a lado. */
+.blocoAgora {
+  align-self: stretch;
+  container-type: inline-size;
+}
+
+.blocoFluxo {
+  align-self: stretch;
+}
+
+.blocoAgora > .link {
+  align-self: stretch;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* nos pares, as entradas por dia são o gráfico grande do capítulo */
+.capitulo[data-lado='direita'] .entradas figure > [role='img'] {
+  height: 150px;
+}
+
+/* tempo, trabalho e custo: uma faixa só, com os números em linha separados por fios */
+.blocoNumeros {
+  grid-column: 1 / -1;
+  gap: 0;
+  padding: 18px 22px;
+}
+
+.blocoRotulo {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.3;
+}
+
+.grande {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: 2.5rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.grandeUnidade {
+  color: var(--sb-tinta-2);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-corpo);
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: var(--sb-ls-corpo);
+}
+
+.apoio {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ---------- a faixa: a coluna do funil deitada (avançaram, ainda aqui, perdidos, sem resposta) ---------- */
+
+.faixa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.faixaBarra,
+.faixaTrilho {
+  display: flex;
+  gap: 2px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.faixaTrilho {
+  background: var(--sb-canvas);
+}
+
+.faixaBarra > span,
+.faixaTrilho > span {
+  display: flex;
+  flex-basis: 0;
+  align-items: center;
+  min-width: 3px;
+  padding: 0 10px;
+  overflow: hidden;
+}
+
+.faixaBarra b {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.faixaBarra > [data-tom='forte'] b {
+  color: var(--sb-branco);
+}
+
+/* sobre a hachura, o número vai numa pílula branca (contraste AA, spec 12) */
+.faixaBarra > :is([data-tom='hachura'], [data-tom='hachuraClara']) b {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--sb-branco);
+  line-height: 20px;
+}
+
+.faixaBarra > :is([data-tom='hachura'], [data-tom='hachuraClara']) {
+  padding: 0 6px;
+}
+
+.faixaPonta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  white-space: nowrap;
+}
+
+.faixaPonta svg {
+  color: var(--sb-azul-texto);
+}
+
+.faixaPonta b {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+/* as mesmas cores do funil: o degrau azul, o azul claro e as duas hachuras (escura = perdido, clara = sem
+   resposta, como em toda a página) */
+[data-tom='forte'] > i {
+  background: var(--sb-azul);
+}
+
+.faixaBarra > [data-tom='forte'] {
+  background: linear-gradient(180deg, var(--sb-azul), color-mix(in srgb, var(--sb-azul) 84%, var(--sb-navy)));
+}
+
+[data-tom='escuro'] > i,
+.faixaTrilho > [data-tom='escuro'] {
+  background: linear-gradient(180deg, var(--sb-navy-2), var(--sb-navy));
+}
+
+/* o Ganho é a venda: o mesmo verde do funil e da faixa das etapas */
+.faixaTrilho > [data-tom='ganho'] {
+  background: var(--sb-sucesso);
+}
+
+/* Um código só na página toda (o mesmo do funil, TelaDashboardFinal.module.css): avançaram em azul,
+   ainda estão em azul claro, perdidos no cinza sólido (--dvb-perdido, 3:1 contra o branco) e sem
+   resposta na hachura do funil (--dvb-hachura). Vale na barra do Fluxo, nas barras dos que saíram e
+   em todas as legendas. (Os nomes dos tons, "hachura" e "hachuraClara", ficaram da A: hoje são
+   "perdidos" e "sem resposta".) */
+[data-tom='claro'] > i,
+.faixaBarra > [data-tom='claro'],
+.saidaBarras [data-tom='claro'] {
+  background: var(--dvb-ainda, color-mix(in srgb, var(--sb-azul) 42%, var(--sb-branco)));
+}
+
+[data-tom='hachura'] > i,
+.faixaBarra > [data-tom='hachura'],
+.saidaBarras [data-tom='hachura'] {
+  background: var(--dvb-perdido);
+}
+
+[data-tom='hachuraClara'] > i,
+.faixaBarra > [data-tom='hachuraClara'],
+.saidaBarras [data-tom='hachuraClara'] {
+  background-color: var(--sb-branco);
+  background-image: var(--dvb-hachura);
+  box-shadow: inset 0 0 0 1px var(--sb-linha-forte);
+}
+
+.faixaBarra > [data-tom='vazio'] {
+  background: var(--sb-linha);
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+}
+
+.legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legenda i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legenda b {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.entradas {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* ---------- a faixa de números (tempo, trabalho, custo) ---------- */
+
+/* rótulo, número e apoio em três linhas alinhadas entre as células (subgrid): um rótulo de duas linhas
+   não empurra o número dele para baixo dos vizinhos */
+.celulas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  row-gap: 14px;
+  margin: 0;
+}
+
+.celula {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 4px;
+  align-content: start;
+  min-width: 0;
+  padding: 2px 20px;
+  border-left: 1px solid var(--sb-linha);
+}
+
+.celula:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.celula dt {
+  align-self: end;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: 1.35;
+}
+
+.celula dd {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: 1.5rem;
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.celula dd [data-unidade] {
+  color: var(--sb-tinta-2);
+  font-size: 0.6em;
+  font-weight: var(--sb-peso-medio);
+  letter-spacing: 0;
+}
+
+/* o apoio embaixo do número: mais fraco que o rótulo de cima (cinza, peso regular) */
+.celula dd.apoio {
+  color: var(--sb-tinta-2);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-micro);
+  font-weight: var(--sb-peso-regular);
+  letter-spacing: 0;
+  white-space: normal;
+}
+
+.moveu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--sb-linha);
+}
+
+/* ---------- Agora nesta etapa ---------- */
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista li {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 44px;
+}
+
+.listaNome {
+  overflow: hidden;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* o tempo em Poppins pequeno, ao lado do nome; na coluna estreita, embaixo dele (o nome não corta) */
+.listaTempo {
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* na coluna estreita, o tempo desce para baixo do nome e o rosto ocupa as 2 linhas (só aqui: fora
+   dela, a 2ª linha vazia deixava o nome 9 px acima do centro do rosto) */
+@container (max-width: 300px) {
+  .lista li {
+    grid-template-columns: 36px minmax(0, 1fr);
+    row-gap: 0;
+  }
+
+  .lista li > :first-child {
+    grid-row: 1 / span 2;
+  }
+
+  .listaNome {
+    align-self: end;
+  }
+
+  .listaTempo {
+    grid-row: 2;
+    grid-column: 2;
+    align-self: start;
+    font-size: var(--sb-fs-micro);
+  }
+}
+
+/* uma linha de contexto em cima da lista: quem está nela e em que ordem */
+.listaContexto {
+  margin: -4px 0 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+  line-height: 1.4;
+}
+
+.listaVazia {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+}
+
+/* o atalho para o Kanban (no "Agora nesta etapa", preso no pé do cartão) */
+.link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  min-height: 36px;
+  color: var(--sb-azul-texto);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-forte);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
+.link:focus-visible {
+  outline: none;
+  border-radius: 6px;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- Para onde foram os que saíram ---------- */
+
+.blocoSaidas {
+  gap: 14px;
+}
+
+.saidas {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saida {
+  display: grid;
+  grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+  grid-template-areas:
+    'nome barras'
+    'nome numeros';
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 4px;
+}
+
+.saidaNome {
+  grid-area: nome;
+  color: var(--sb-tinta);
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+}
+
+/* uma barra empilhada por etapa, com 14 px: a largura é o total que saiu dela (pela maior), e os dois
+   pedaços (perdidos, sem resposta) dividem a barra */
+.saidaBarras {
+  grid-area: barras;
+  display: block;
+}
+
+.saidaBarras > span {
+  display: flex;
+  gap: 2px;
+  width: max(4px, calc(var(--k, 0) * 100%));
+  height: 14px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.saidaBarras i {
+  display: block;
+  flex-basis: 0;
+  min-width: 2px;
+  height: 100%;
+}
+
+.saidaNumeros {
+  grid-area: numeros;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-meta);
+}
+
+.saidaNumeros b {
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- carregando ---------- */
+
+.ossoCab {
+  width: min(100%, 520px);
+}
+
+.ossoGrade {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 16px;
+}
+
+/* ---------- o fim (palco) e o período sem leads ---------- */
+
+/* o "Pergunte à Janete" fecha o detalhamento, no lugar do espaço que sobra do último capítulo */
+.pergunteFim {
+  margin-top: -24px;
+  padding: 24px 26px;
+}
+
+.semLeads {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 32px;
+}
+
+.semLeadsTitulo {
+  margin: 0;
+  font-size: var(--sb-fs-destaque);
+  font-weight: var(--sb-peso-forte);
+  line-height: 1.25;
+  letter-spacing: var(--sb-ls-secao);
+}
+
+.semLeadsTexto {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-corpo);
+  line-height: 1.5;
+}
+
+.semLeadsAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.semLeadsBotao {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--sb-linha-forte);
+  border-radius: var(--sb-r-pilula);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  font: inherit;
+  font-size: var(--sb-fs-apoio);
+  font-weight: var(--sb-peso-medio);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.semLeadsBotao:hover {
+  background: var(--sb-azul-nevoa);
+}
+
+.semLeadsBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel);
+}
+
+/* ---------- larguras médias e celular ---------- */
+
+@media (max-width: 1179px) {
+  .capGrade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .blocoFluxo,
+  .capitulo[data-lado='direita'] .blocoFluxo,
+  .blocoAgora,
+  .capitulo[data-lado='direita'] .blocoAgora {
+    grid-row: auto;
+    grid-column: 1 / -1;
+  }
+
+  .blocoNumeros {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 899px) {
+  .capitulo {
+    padding: 24px 0 44px;
+  }
+
+  .capitulo + .capitulo {
+    padding-top: 36px;
+  }
+
+  .capGrade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .celulas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 4px;
+  }
+
+  .celula {
+    padding: 8px 12px;
+  }
+
+  .celula:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .faixa {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  /* no celular, as entradas por dia dos capítulos pares voltam a ser um gráfico baixo */
+  .capitulo[data-lado='direita'] .entradas figure > [role='img'] {
+    height: 72px;
+  }
+
+  .bloco {
+    padding: 16px;
+  }
+
+  .grande {
+    font-size: 2rem;
+  }
+
+  /* o "· N leads chegaram" vira a linha de baixo do título, sem o ponto pendurado */
+  .capTitulo em {
+    display: block;
+  }
+
+  .capSep {
+    display: none;
+  }
+
+  .semLeads {
+    padding: 20px;
+  }
+
+  .pergunteFim {
+    margin-top: -12px;
+    padding: 18px 16px;
+  }
+
+  .semLeadsBotao {
+    min-height: 44px;
+  }
+
+  .saida {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'nome'
+      'barras'
+      'numeros';
+  }
+
+  .ossoGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .link {
+    min-height: 44px;
+  }
+}

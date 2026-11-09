@@ -1,0 +1,184 @@
+.cartao {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--sb-esp-4);
+  min-width: 0;
+  padding: var(--sb-pad-card);
+  border-radius: var(--sb-r-card);
+  background: var(--sb-branco);
+  color: var(--sb-tinta);
+  /* Conteúdo absoluto (névoa, selo no canto) não escapa da pilha do card. */
+  isolation: isolate;
+  box-shadow: var(--sb-sombra-card);
+  text-decoration: none;
+}
+
+.cartao[data-raio='painel'] {
+  border-radius: var(--sb-r-painel);
+}
+
+.cartao[data-recheio='compacto'] {
+  padding: var(--sb-pad-card-compacto);
+}
+
+.cartao[data-recheio='nenhum'] {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Bloco dentro de outro card: tom recuado, sem sombra (card dentro de card não). */
+.cartao[data-tom='canvas'] {
+  background: var(--sb-canvas);
+  box-shadow: none;
+}
+
+.cartao[data-tom='azul'] {
+  background: var(--sb-azul-claro);
+  box-shadow: none;
+}
+
+/* Raio aninhado: dentro de um card com folga de 8, o bloco fica em 24 − 8 = 16. */
+.cartao .cartao[data-tom='canvas'],
+.cartao .cartao[data-tom='azul'] {
+  border-radius: var(--sb-r-item);
+}
+
+@supports (corner-shape: squircle) {
+  .cartao {
+    corner-shape: squircle;
+  }
+}
+
+/* Card que é link inteiro: ganha a sombra do que flutua, sem sair do lugar (item 5a da spec r2:
+   nada se mexe no hover nem no clique; antes subia 2px e encolhia ao clicar). */
+.cartao[data-interativo] {
+  transition: box-shadow var(--app-t-touch);
+}
+
+.cartao[data-interativo]:hover {
+  box-shadow: var(--sb-sombra-flutuante);
+}
+
+.cartao:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-anel), var(--sb-sombra-card);
+}
+
+.cartao[data-interativo]:focus-visible {
+  box-shadow: var(--sb-anel), var(--sb-sombra-flutuante);
+}
+
+.cartao[data-interativo]:active {
+  box-shadow: var(--sb-sombra-card);
+}
+
+.itemLista {
+  display: grid;
+  list-style: none;
+}
+
+/* ---------- topo ---------- */
+
+.topo {
+  display: flex;
+  /* Título longo em card estreito: a ação desce para a linha de baixo, à direita,
+     em vez de espremer o título numa coluna de uma palavra. */
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sb-esp-4);
+  min-width: 0;
+}
+
+.topo:has(> .passo) {
+  justify-content: flex-start;
+  column-gap: var(--sb-esp-3);
+}
+
+/* Passo: círculo de 28 alinhado pela primeira linha do título (17 × 1,3 ≈ 22). */
+.passo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--sb-canvas);
+  color: var(--sb-tinta-3);
+  font-family: var(--sb-fonte-mono);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.passo[data-estado='atual'] {
+  background: var(--sb-azul-claro);
+  color: var(--sb-azul-texto);
+}
+
+.passo[data-estado='feito'] {
+  background: var(--sb-menta);
+  color: var(--sb-sucesso);
+}
+
+.textos {
+  display: grid;
+  flex: 1 1 12rem;
+  gap: var(--sb-esp-1);
+  min-width: 0;
+}
+
+.meta {
+  margin: 0;
+  color: var(--sb-tinta-3);
+  font-size: var(--sb-fs-meta);
+  font-weight: var(--sb-peso-medio);
+  line-height: var(--sb-lh-ui);
+  letter-spacing: var(--sb-ls-rotulo);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--sb-tinta);
+  font-family: var(--sb-fonte);
+  font-size: var(--sb-fs-cartao);
+  font-weight: var(--sb-peso-forte);
+  line-height: var(--sb-lh-cartao);
+  letter-spacing: var(--sb-ls-secao);
+  text-wrap: balance;
+}
+
+.apoio {
+  margin: 0;
+  color: var(--sb-tinta-2);
+  font-size: var(--sb-fs-apoio);
+  line-height: var(--sb-lh-ui);
+  text-wrap: pretty;
+}
+
+.acao {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-left: auto;
+  gap: var(--sb-esp-2);
+}
+
+@media (max-width: 599px) {
+  .cartao {
+    padding: var(--sb-pad-card-compacto);
+  }
+
+  .cartao[data-recheio='nenhum'] {
+    padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao[data-interativo] {
+    transition: none;
+  }
+}

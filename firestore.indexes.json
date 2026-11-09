@@ -1,0 +1,2137 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "auditoria",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "acao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "alvo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conexao_eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conexao_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ativa_de",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ativa_para",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conexoes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ativa",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "atualizado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conexoes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "gateway",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id_externo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conexoes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ativa",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contato_etapa_historico",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contato_etapa_historico",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contato_etapa_historico",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contato_etapa_historico",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contatos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "etapa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "etapa_desde",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversa_eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversa_eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem_mensagem_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversa_eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversa_eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nao_lidas",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "nao_lidas",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responder_apos",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "contato_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "aguardando_humano_desde",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "responsavel_id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "modo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsavel_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "nao_lidas",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "conversas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ultima_mensagem_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "convites",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "etapas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "arquivada",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordem",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "etapas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ordem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "etapas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "arquivada",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordem",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "eventos_webhook",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "processado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "recebido_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tentativas",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "eventos_webhook",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "processado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tentativas",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "recebido_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "eventos_webhook",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "recebido_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "processado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "ia_chamadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "ia_chaves",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "finalidade",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "ia_chaves",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "ia_precos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "provedor",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "modelo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "membros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ativo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "papel",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "membros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "membros",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "user_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ativo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conexao_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conexao_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id_externo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conexao_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id_gateway",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "cancelada_por_mensagem_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "conexao_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id_externo",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "midia_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "midia_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "midia_caminho",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "ordem",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tipo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "apagada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordem",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "midia_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "rodada_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origem",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordem",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "direcao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "momento",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mensagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "cancelada_por_mensagem_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "iniciada_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "terminada_em",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "conversa_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "criado_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "iniciada_em",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "iniciada_em",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "rodadas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "terminada_em",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
