@@ -63,17 +63,25 @@ function descreverOperacao(method:string,suffix:string,body:unknown){
  return `${method} ${rota}${transacao}${colecoes.length?` [${colecoes.join(', ')}]`:''}`;
 }
 export class FirestoreStore implements Store{
- constructor(private accessToken:()=>Promise<string>=getDatabaseAccessToken, private transport:typeof fetch=fetch){}
+ /**
+  * transacoes: 'servidor' usa :beginTransaction (identidade própria do serviço publicado, com IAM). 'otimista' é o
+  * modo dos SDKs do Firebase no navegador: lê guardando a versão e grava com precondição. Sem identidade própria, o
+  * servidor usa o login do usuário, e o Firestore real recusa :beginTransaction com PERMISSION_DENIED (o emulador
+  * aceita). Padrão: 'servidor' só com JANETE_RUNTIME_SERVICE_ACCOUNT, como em getDatabaseAccessToken.
+  */
+ constructor(private accessToken:()=>Promise<string>=getDatabaseAccessToken, private transport:typeof fetch=fetch, private transacoes?:'servidor'|'otimista'){}
+ private modoTransacao(){return this.transacoes??(process.env['JANETE_RUNTIME_SERVICE_ACCOUNT']?'servidor':'otimista');}
  private async base(){
   const c=await getInstallationConfig();const emulator=process.env['FIRESTORE_EMULATOR_HOST'];
   if(emulator){if(process.env['NODE_ENV']!=='test'||!c.projectId.startsWith('demo-')||! /^(127\.0\.0\.1|localhost):\d{2,5}$/.test(emulator))throw new Error('Emulador permitido somente em testes locais com projeto demo.');return `http://${emulator}/v1/projects/${c.projectId}/databases/${encodeURIComponent(c.firestoreDatabaseId)}/documents`;}
   return `https://firestore.googleapis.com/v1/projects/${c.projectId}/databases/${encodeURIComponent(c.firestoreDatabaseId)}/documents`;
  }
  private async request(suffix:string,body?:unknown,method=body===undefined?'GET':'POST'):Promise<any>{
+  const ausenteVira404=suffix!==':commit';
   const token=await this.accessToken();const url=(await this.base())+suffix;
   const send=(credential:string)=>this.transport(url,{method,headers:{Authorization:`Bearer ${credential}`,'Content-Type':'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
   const response=await send(token);
-  if(response.status===404)return null;
+  if(response.status===404&&ausenteVira404)return null;
   const data=await response.json().catch(()=>({}));
   if(!response.ok)throw Object.assign(new Error(data?.error?.message??'Não foi possível concluir a operação no Firestore.'),{status:response.status,code:data?.error?.status,operacao:descreverOperacao(method,suffix,body)});
   return data;
@@ -116,11 +124,48 @@ export class FirestoreStore implements Store{
  async set(collection:string,id:string|number,row:Row,merge=false){await this.request(':commit',{writes:[await this.write(collection,id,row,merge),...(collection==='mudancas'?[]:[await this.revision(collection)])]});}
  async delete(collection:string,id:string|number){await this.request(':commit',{writes:[{delete:await this.docName(collection,id)},...(collection==='mudancas'?[]:[await this.revision(collection)])]});}
  async runTransaction<T>(fn:(tx:StoreTransaction)=>Promise<T>):Promise<T>{
+  if(this.modoTransacao()==='otimista')return this.transacaoOtimista(fn);
   for(let attempt=0;attempt<5;attempt++){
    const begin=await this.request(':beginTransaction',{options:{readWrite:{}}});const transaction=begin.transaction;const writes:Row[]=[];const touched=new Set<string>();
    const tx:StoreTransaction={get:(c,id)=>this.getDocument(c,id,transaction),list:(c,o)=>this.listDocuments(c,o,transaction),set:async(c,id,row,merge)=>{writes.push(await this.write(c,id,row,merge));touched.add(c);},delete:async(c,id)=>{writes.push({delete:await this.docName(c,id)});touched.add(c);}};
    try{const result=await fn(tx);for(const collection of touched)if(collection!=='mudancas')writes.push(await this.revision(collection));await this.request(':commit',{transaction,writes});return result;}
    catch(error){await this.request(':rollback',{transaction}).catch(()=>{});if((error as any).code!=='ABORTED'||attempt===4)throw error;await new Promise(r=>setTimeout(r,20*(attempt+1)));}
+  }
+  throw new Error('A operação foi alterada por outra sessão. Tente novamente.');
+ }
+ /** Lê um documento guardando a versão (updateTime), ou null se não existe. */
+ private async lerComVersao(collection:string,id:string|number){
+  const data=await this.request(`/${safePart(collection)}/${encodeURIComponent(safePart(id))}`);
+  const row=data?{id:typeof id==='number'?id:decodeValue(data.fields?.id??{stringValue:String(id)}),...decodeFields(data.fields??{})}:null;
+  return {row,versao:data?.updateTime as string|undefined};
+ }
+ /**
+  * Transação como os SDKs do Firebase fazem no navegador: lê guardando a versão de cada documento e grava num commit
+  * com precondição (updateTime, ou exists:false para o que não existia). Se alguém alterou ou criou um desses
+  * documentos no meio, o commit falha e tudo é refeito. Assim só o primeiro login vira dono, como no outro app AI PRO.
+  * Leituras de listas não entram na precondição; com identidade própria, o modo 'servidor' tem isolamento completo.
+  */
+ private async transacaoOtimista<T>(fn:(tx:StoreTransaction)=>Promise<T>):Promise<T>{
+  for(let attempt=0;attempt<5;attempt++){
+   const lidos=new Map<string,string|null>();const writes:Row[]=[];const touched=new Set<string>();
+   const tx:StoreTransaction={
+    get:async(c,id)=>{const {row,versao}=await this.lerComVersao(c,id);const nome=await this.docName(c,id);if(!lidos.has(nome))lidos.set(nome,versao??null);return row;},
+    list:(c,o)=>this.listDocuments(c,o),
+    set:async(c,id,row,merge)=>{writes.push(await this.write(c,id,row,merge));touched.add(c);},
+    delete:async(c,id)=>{writes.push({delete:await this.docName(c,id)});touched.add(c);},
+   };
+   try{
+    const result=await fn(tx);
+    if(!writes.length)return result;
+    for(const collection of touched)if(collection!=='mudancas')writes.push(await this.revision(collection));
+    for(const write of writes){const nome=write['update']?.name??write['delete'];if(nome&&lidos.has(nome)){const versao=lidos.get(nome);write['currentDocument']=versao?{updateTime:versao}:{exists:false};}}
+    await this.request(':commit',{writes});
+    return result;
+   }catch(error){
+    // Precondição falhou: alguém criou ou alterou um documento lido. Refaz com o estado novo.
+    if(!['ALREADY_EXISTS','FAILED_PRECONDITION','NOT_FOUND','ABORTED'].includes((error as any)?.code)||attempt===4)throw error;
+    await new Promise(r=>setTimeout(r,20*(attempt+1)));
+   }
   }
   throw new Error('A operação foi alterada por outra sessão. Tente novamente.');
  }
