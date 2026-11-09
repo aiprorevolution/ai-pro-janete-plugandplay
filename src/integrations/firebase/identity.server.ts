@@ -14,7 +14,10 @@ export async function getDatabaseAccessToken():Promise<string>{
  const userToken=requestIdentity.getStore()?.token;
  if(!process.env['JANETE_RUNTIME_SERVICE_ACCOUNT']){
   if(userToken)return userToken;
-  throw Object.assign(new Error('Publique a Janete e conclua a identidade própria do servidor para ativar o atendimento automático.'),{status:503,code:'server_identity_required'});
+  // Sem ninguém logado (webhook, fila) e sem o instalador: o app publicado pelo AI Studio roda com a identidade do
+  // próprio serviço. Se o Google não der acesso ao banco para ela, o Firestore recusa e o log mostra a operação.
+  try{return await getServerAccessToken();}
+  catch{throw Object.assign(new Error('Publique a Janete e conclua a identidade própria do servidor para ativar o atendimento automático.'),{status:503,code:'server_identity_required'});}
  }
  return getServerAccessToken();
 }

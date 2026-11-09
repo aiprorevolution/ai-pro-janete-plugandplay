@@ -53,6 +53,7 @@ async function upload(request:Request,url:URL){
 export async function handleFirebaseRequest(request:Request):Promise<Response|null>{
  const url=new URL(request.url);if(!url.pathname.startsWith('/api/firebase'))return null;
  if(url.pathname==='/api/firebase/config'&&request.method==='GET')return json(await readInstallationConfig());
+ if(url.pathname==='/api/firebase/diagnostico'&&request.method==='GET'){const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor());}
  if(url.pathname==='/api/firebase/media-upload'&&request.method==='POST'){try{return await upload(request,url);}catch(error){return json({error:safeError(error)},(error as any)?.status??400);}}
  if(url.pathname!=='/api/firebase'||request.method!=='POST')return json({error:{message:'Rota não encontrada.'}},404);
  try{

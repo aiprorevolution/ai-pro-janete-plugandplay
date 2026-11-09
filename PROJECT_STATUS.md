@@ -32,7 +32,8 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - Causa raiz, confirmada pelo log com a operação: o Firestore real recusa `:beginTransaction` pela API REST com o token do usuário (PERMISSION_DENIED; a conta chegava verificada e com o e-mail correto). O emulador aceita. Corrigido: sem identidade própria do servidor, as transações são otimistas, como nos SDKs do Firebase no navegador (leitura com versão e commit com precondição `updateTime` ou `exists:false`, refeito se alguém mudou no meio). Com `JANETE_RUNTIME_SERVICE_ACCOUNT` (serviço publicado), segue a transação de servidor.
 - **Validado no AI Studio (9/11/2026):** depois da atualização, o primeiro login com Google criou o dono e abriu o assistente de configuração.
 - Observação: no AI Studio o Node é 22; alguns pacotes do Firebase avisam que pedem Node 24 (só aviso no `npm ci`; o app roda).
-- Próximo passo: configurar chaves e WhatsApp e decidir o caminho do atendimento 24h (publicação e identidade própria do servidor).
+- Sem ninguém logado e sem o instalador, o servidor tenta a identidade do próprio serviço publicado; o endereço público pode vir do `APP_URL` do AI Studio. `/api/firebase/diagnostico` diz se isso funciona no app publicado.
+- Próximo passo: publicar, abrir o diagnóstico e decidir a fila (Cloud Tasks pelo instalador ou processamento no próprio webhook).
 
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.
