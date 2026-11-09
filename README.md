@@ -12,11 +12,12 @@ Esta é a versão independente para importar no **Google AI Studio**, conectar o
 2. No **Build** do Google AI Studio, conecte o seu GitHub e importe **o seu fork** pelo **Import from GitHub**. Não cole o link do repositório no chat: o agente tenta recriar o app em vez de importá-lo.
 3. Na tela **"Prepare sua AI PRO Janete"**, clique em **Copiar instrução**, cole no chat do AI Studio e **aceite o cartão do Firebase**. O agente segue a seção 1 do [AGENTS.md](AGENTS.md): conecta o Firebase da sua cópia, publica as regras e reinicia a prévia.
 4. Clique em **Entrar com Google**. O primeiro login verificado cria o proprietário dessa instalação; faça isso antes de compartilhar o endereço.
-5. Na configuração do aplicativo, informe suas próprias chaves de IA e do provedor WhatsApp.
+5. Clique em **Publish** no AI Studio e escolha o endereço (`nome.ai.studio`). O atendimento com o navegador fechado só funciona no app publicado: a prévia é protegida e o WhatsApp não a alcança.
+6. Abra o **endereço publicado**, entre com Google e, **lá**, informe sua chave de IA e conecte o WhatsApp. A Janete registra o webhook no provedor e, nesse primeiro acesso, prepara sozinha o banco (índices) para o atendimento.
 
 Se, depois de entrar, aparecer *"A instalação do Firebase ainda precisa ser concluída pelo agente do AI Studio"*, peça no chat: *"Publique as regras do Firestore desta cópia, seguindo o AGENTS.md, e reinicie a prévia."* Depois recarregue a página e entre de novo.
 
-A integração nativa prepara login e Firestore. **Receber webhooks, guardar mídias e atender com o navegador fechado também exige publicação e os recursos de servidor descritos no guia.** O instalador acompanha o código, mas precisa de uma sessão Google com permissão administrativa para aplicar esses recursos. A disponibilidade dessa autorização no ambiente do AI Studio ainda precisa ser conferida no teste de importação. Não há etapa de criar um arquivo de credenciais JSON.
+No app publicado, a Janete usa a identidade que o próprio Publish cria: recebe o webhook, cria os índices que faltam e responde na hora, sem fila e sem instalador (em validação). O instalador (`scripts/configurar-google.mjs`) continua opcional para quem quiser fila durável, recuperação agendada e bucket de mídia, e exige uma sessão Google com permissão administrativa. Não há etapa de criar um arquivo de credenciais JSON.
 
 ## Atualizar uma cópia (sem perder dados)
 

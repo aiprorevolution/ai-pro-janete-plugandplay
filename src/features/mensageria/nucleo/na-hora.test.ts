@@ -12,6 +12,7 @@ function relogio(pendencias:Array<{proximoEm:number|null;vencidoDesde:number|nul
   rodar:vi.fn(async()=>{rodadas.push(t);}),
   pendencias:vi.fn(async()=>{const p=pendencias.shift()??{proximoEm:null,vencidoDesde:null};return {proximoEm:p.proximoEm===null?null:t+p.proximoEm,vencidoDesde:p.vencidoDesde===null?null:t+p.vencidoDesde,atrasadoDesde:null};}),
   marcarVisto:vi.fn(async()=>true),
+  garantirIndices:vi.fn(async()=>true),
  };
  return {deps,esperas,rodadas};
 }
@@ -24,6 +25,7 @@ describe('webhook sem fila: atendimento na hora',()=>{
   expect(deps.rodar).toHaveBeenCalledTimes(2);
   expect(esperas).toEqual([8_000]);
   expect(deps.marcarVisto).toHaveBeenCalled();
+  expect(deps.garantirIndices).toHaveBeenCalled();
  });
  it('rodada que vence depois do teto fica para o próximo toque, sem prender o pedido',async()=>{
   const {deps,esperas}=relogio([{proximoEm:60_000,vencidoDesde:null}]);

@@ -60,3 +60,34 @@ describe('diagnóstico com motor e índices',()=>{
   expect(JSON.stringify(r)).not.toContain('detalhe interno');
  });
 });
+
+import {garantirIndicesUmaVez,reiniciarIndicesAutomaticos} from './indices-automaticos.server';
+describe('índices automáticos (o aluno não dispara nada)',()=>{
+ const situacao=(faltando=0)=>vi.fn(async()=>({exigidos:110,prontos:0,criando:110-faltando,faltando,criadosAgora:110-faltando}));
+ it('na prévia (sem endereço público) não faz nada',async()=>{
+  reiniciarIndicesAutomaticos();const s=situacao();
+  expect(await garantirIndicesUmaVez({publicado:()=>false,situacao:s})).toBe(false);
+  expect(s).not.toHaveBeenCalled();
+ });
+ it('no app publicado cria uma vez; depois que todos existem, não confere de novo',async()=>{
+  reiniciarIndicesAutomaticos();const s=situacao();vi.spyOn(console,'info').mockImplementation(()=>{});
+  expect(await garantirIndicesUmaVez({publicado:()=>true,situacao:s})).toBe(true);
+  expect(await garantirIndicesUmaVez({publicado:()=>true,situacao:s})).toBe(true);
+  expect(s).toHaveBeenCalledTimes(1);
+ });
+ it('se falhar ou ficar faltando, tenta de novo na próxima vez',async()=>{
+  reiniciarIndicesAutomaticos();vi.spyOn(console,'error').mockImplementation(()=>{});
+  const falha=vi.fn(async()=>{throw Object.assign(new Error('x'),{status:403,code:'PERMISSION_DENIED'});});
+  expect(await garantirIndicesUmaVez({publicado:()=>true,situacao:falha})).toBe(false);
+  const faltando=situacao(3);
+  expect(await garantirIndicesUmaVez({publicado:()=>true,situacao:faltando})).toBe(false);
+  const ok=situacao();
+  expect(await garantirIndicesUmaVez({publicado:()=>true,situacao:ok})).toBe(true);
+  expect(ok).toHaveBeenCalledTimes(1);
+ });
+ it('duas chamadas ao mesmo tempo fazem um trabalho só',async()=>{
+  reiniciarIndicesAutomaticos();const s=situacao();vi.spyOn(console,'info').mockImplementation(()=>{});
+  await Promise.all([garantirIndicesUmaVez({publicado:()=>true,situacao:s}),garantirIndicesUmaVez({publicado:()=>true,situacao:s})]);
+  expect(s).toHaveBeenCalledTimes(1);
+ });
+});

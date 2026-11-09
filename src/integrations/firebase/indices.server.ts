@@ -52,3 +52,13 @@ export async function situacaoDosIndices(api:Api,projeto:{projectId:string;datab
  }
  return situacao;
 }
+
+/** Chamada à API do Google com a identidade do serviço; erro leva status e código, nunca o corpo. */
+export function apiComToken(token:string):Api{
+ return async(url,init={})=>{
+  const resposta=await fetch(url,{method:init.method??'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(init.body!==undefined?{body:JSON.stringify(init.body)}:{}),signal:AbortSignal.timeout(15000)});
+  const dados=await resposta.json().catch(()=>({}));
+  if(!resposta.ok)throw Object.assign(new Error('google_api_recusou'),{status:resposta.status,code:dados?.error?.status});
+  return dados;
+ };
+}

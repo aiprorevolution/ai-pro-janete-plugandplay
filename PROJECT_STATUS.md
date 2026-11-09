@@ -37,7 +37,8 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - Sem fila, o webhook processa na hora (`acordarMotor(..., { naHora: true })` → `processarNaHora`): roda o ciclo, espera o agrupamento de mensagens vencer e responde, até 45 s por pedido. Com o instalador (Cloud Tasks), segue a fila.
 - Sem ninguém logado, o banco é acessado pela identidade do serviço com transação de servidor (isolamento completo contra resposta duplicada); com login, modo otimista.
 - O motor precisa de 110 índices compostos. Sem o instalador, o app publicado os cria com a própria identidade (`POST /api/firebase/diagnostico/indices`); o diagnóstico mostra índices e estado do motor.
-- Próximo passo: atualizar, republicar, criar os índices e testar uma mensagem real no número de teste.
+- Índices automáticos: no login do dono no app publicado (até 25 s, sem impedir o login) e antes do atendimento no webhook (até 20 s), uma vez por processo; na prévia não faz nada.
+- Próximo passo: atualizar, republicar, entrar no app publicado e testar uma mensagem real no número de teste.
 
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.

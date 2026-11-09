@@ -65,7 +65,12 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
   const body=JSON.parse(content);const identity=await identityFromRequest(request);
   return await requestIdentity.run(identity,async()=>{
    if(body.kind==='bootstrap'){
-    try{return json({data:await bootstrapInstallation(firestoreStore,identity.actor),error:null});}
+    try{
+     const resultado=await bootstrapInstallation(firestoreStore,identity.actor);
+     // Plug and play: no app publicado, o login do dono já prepara os índices do atendimento (nunca impede o login).
+     if(resultado.owner){const {garantirIndicesComTeto}=await import('./indices-automaticos.server');await garantirIndicesComTeto(25_000).catch(()=>false);}
+     return json({data:resultado,error:null});
+    }
     catch(error){
      // Para o log: como a conta chegou ao servidor (só verdadeiro/falso e provedor; nunca e-mail nem token).
      const claims=(()=>{try{return JSON.parse(Buffer.from(String(identity.token).split('.')[1]??'','base64url').toString());}catch{return {};}})();

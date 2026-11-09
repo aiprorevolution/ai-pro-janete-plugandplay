@@ -54,6 +54,7 @@ type DependenciasNaHora = {
   esperar: (ms: number) => Promise<void>;
   agora: () => number;
   marcarVisto: () => Promise<unknown>;
+  garantirIndices: () => Promise<unknown>;
 };
 const naHoraPadrao: DependenciasNaHora = {
   rodar: async (opcoes) => (await import("./ciclo.server")).rodarCiclo(opcoes),
@@ -61,6 +62,7 @@ const naHoraPadrao: DependenciasNaHora = {
   esperar: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   agora: () => Date.now(),
   marcarVisto: async () => (await import("./banco.server")).marcarWorkerVisto(),
+  garantirIndices: async () => (await import("@/integrations/firebase/indices-automaticos.server")).garantirIndicesComTeto(20_000),
 };
 
 /**
@@ -75,6 +77,7 @@ export async function processarNaHora(
   const fim = deps.agora() + tetoMs;
   try {
     await deps.marcarVisto().catch(() => {});
+    await deps.garantirIndices().catch(() => {});
     for (;;) {
       const restante = fim - deps.agora();
       if (restante <= 1_000) return "tocado";

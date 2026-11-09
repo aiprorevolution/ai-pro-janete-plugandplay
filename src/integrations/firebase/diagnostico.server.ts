@@ -1,6 +1,6 @@
 import {enderecoPublicoDoAmbiente,getInstallationConfig} from './config.server';
 import {getServerAccessToken} from './identity.server';
-import {situacaoDosIndices,type Api,type SituacaoIndices} from './indices.server';
+import {apiComToken,situacaoDosIndices,type SituacaoIndices} from './indices.server';
 import {FirestoreStore} from './store.server';
 
 /**
@@ -28,15 +28,6 @@ type Dependencias={
  motor?:(token:string)=>Promise<EstadoMotor>;
 };
 
-/** Chamada à API do Google com a identidade do serviço; erro leva status e código, nunca o corpo. */
-function apiComToken(token:string):Api{
- return async(url,init={})=>{
-  const resposta=await fetch(url,{method:init.method??'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(init.body!==undefined?{body:JSON.stringify(init.body)}:{}),signal:AbortSignal.timeout(15000)});
-  const dados=await resposta.json().catch(()=>({}));
-  if(!resposta.ok)throw Object.assign(new Error('google_api_recusou'),{status:resposta.status,code:dados?.error?.status});
-  return dados;
- };
-}
 const texto=(v:unknown)=>typeof v==='string'?v.slice(0,200):null;
 const padrao:Dependencias={
  obterToken:()=>Promise.race([getServerAccessToken(),new Promise<string>((_,rejeita)=>setTimeout(()=>rejeita(new Error('tempo_esgotado')),8000))]),
