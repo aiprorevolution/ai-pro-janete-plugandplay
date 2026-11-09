@@ -58,12 +58,12 @@ Não faça mais nada nesse primeiro acesso. Em especial: não publique o app, n�
 
 **Gatilho:** o aluno pede, por exemplo: *"Atualize esta cópia pelo GitHub, seguindo o AGENTS.md."*
 
-O código novo vem do GitHub; os dados (dono, atendimentos, chaves) ficam no Firestore e não são tocados. Os arquivos particulares da cópia (`firebase-applet-config.json`, `firebase-blueprint.json` e `google-installation-receipt.json`) não estão no repositório e precisam sobreviver.
+O código novo vem do GitHub; os dados (dono, atendimentos, chaves) ficam no Firestore e não são tocados. Os arquivos particulares da cópia (`firebase-applet-config.json`, `firebase-blueprint.json`, `google-installation-receipt.json` e o `metadata.json` do AI Studio) não estão no repositório e precisam sobreviver.
 
 **A atualização é tudo ou nada.** Copie o repositório inteiro com os comandos abaixo, na raiz da cópia. Não escolha arquivos e não copie "só os que mudaram": uma cópia pela metade (um arquivo novo que procura uma função num arquivo antigo) derruba o servidor com `does not provide an export named …`.
 
 ```bash
-rm -rf /tmp/janete-backup && mkdir -p /tmp/janete-backup && for f in firebase-applet-config.json firebase-blueprint.json google-installation-receipt.json; do [ -f "$f" ] && cp "$f" /tmp/janete-backup/; done
+rm -rf /tmp/janete-backup && mkdir -p /tmp/janete-backup && for f in firebase-applet-config.json firebase-blueprint.json google-installation-receipt.json metadata.json; do [ -f "$f" ] && cp "$f" /tmp/janete-backup/; done
 rm -rf /tmp/janete-main && git clone --depth 1 https://github.com/thiagocaliman/ai-pro-janete-plugandplay /tmp/janete-main && rm -rf /tmp/janete-main/.git
 cp -R /tmp/janete-main/. .
 for f in /tmp/janete-backup/*; do [ -f "$f" ] && cp "$f" .; done

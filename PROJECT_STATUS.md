@@ -30,7 +30,9 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - O primeiro login com Google era recusado. Causa 1 (diagnóstico): o proxy da prévia troca o corpo das respostas 403/502/503/504 por HTML; corrigido com a mesma proteção do outro app AI PRO (status original em `error_status`, log da recusa e mensagem do servidor na tela).
 - Prevenção: o primeiro acesso gravava 13 documentos num commit, e as regras somavam ~36 consultas (o Firestore de produção recusa acima de 20). Agora o dono é decidido numa transação pequena e o resto vem em gravações pequenas, com teste que conta as consultas por commit.
 - Causa raiz, confirmada pelo log com a operação: o Firestore real recusa `:beginTransaction` pela API REST com o token do usuário (PERMISSION_DENIED; a conta chegava verificada e com o e-mail correto). O emulador aceita. Corrigido: sem identidade própria do servidor, as transações são otimistas, como nos SDKs do Firebase no navegador (leitura com versão e commit com precondição `updateTime` ou `exists:false`, refeito se alguém mudou no meio). Com `JANETE_RUNTIME_SERVICE_ACCOUNT` (serviço publicado), segue a transação de servidor.
-- Próximo passo: atualizar a cópia e repetir o primeiro login.
+- **Validado no AI Studio (9/11/2026):** depois da atualização, o primeiro login com Google criou o dono e abriu o assistente de configuração.
+- Observação: no AI Studio o Node é 22; alguns pacotes do Firebase avisam que pedem Node 24 (só aviso no `npm ci`; o app roda).
+- Próximo passo: configurar chaves e WhatsApp e decidir o caminho do atendimento 24h (publicação e identidade própria do servidor).
 
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.
