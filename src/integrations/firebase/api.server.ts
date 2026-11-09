@@ -54,6 +54,9 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
  const url=new URL(request.url);if(!url.pathname.startsWith('/api/firebase'))return null;
  if(url.pathname==='/api/firebase/config'&&request.method==='GET')return json(await readInstallationConfig());
  if(url.pathname==='/api/firebase/diagnostico'&&request.method==='GET'){const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor());}
+ // Cria os índices declarados em firestore.indexes.json que faltam, com a identidade do serviço. Idempotente; POST para não
+ // ser disparado por robôs de busca. Não cria nada além do que o próprio app declara.
+ if(url.pathname==='/api/firebase/diagnostico/indices'&&request.method==='POST'){const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor(undefined,{criarIndices:true}));}
  if(url.pathname==='/api/firebase/media-upload'&&request.method==='POST'){try{return await upload(request,url);}catch(error){return json({error:safeError(error)},(error as any)?.status??400);}}
  if(url.pathname!=='/api/firebase'||request.method!=='POST')return json({error:{message:'Rota não encontrada.'}},404);
  try{

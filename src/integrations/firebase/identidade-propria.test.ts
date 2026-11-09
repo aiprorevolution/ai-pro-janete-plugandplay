@@ -5,7 +5,9 @@ import {afterEach,describe,expect,it,vi} from 'vitest';
 // o servidor tenta a identidade do próprio serviço. O diagnóstico diz, só com sim/não, se ela alcança o banco.
 const google=vi.hoisted(()=>({token:null as string|null}));
 vi.mock('google-auth-library',()=>({GoogleAuth:class{async getAccessToken(){if(!google.token)throw new Error('sem identidade no ambiente');return google.token;}}}));
+vi.mock('./config.server',async original=>({...(await original<typeof import('./config.server')>()),getInstallationConfig:async()=>({projectId:'demo-janete',apiKey:'k',appId:'a',authDomain:'d',firestoreDatabaseId:'banco',storageBucket:''})}));
 const {getDatabaseAccessToken,requestIdentity}=await import('./identity.server');
+const {FirestoreStore}=await import('./store.server');
 const {enderecoPublicoDoAmbiente}=await import('./config.server');
 const {diagnosticarServidor}=await import('./diagnostico.server');
 
@@ -58,5 +60,20 @@ describe('diagnóstico do servidor',()=>{
   const resultado=await diagnosticarServidor({obterToken:async()=>{throw new Error('sem');},lerInstalacao});
   expect(resultado).toMatchObject({identidadePropria:'não',bancoComIdentidadePropria:'sem identidade'});
   expect(lerInstalacao).not.toHaveBeenCalled();
+ });
+});
+
+describe('modo de transação segue a identidade em uso',()=>{
+ function transporte(){const urls:string[]=[];const fetcher=vi.fn(async(input:any,init:any)=>{const url=String(input);urls.push(url);if(url.endsWith(':beginTransaction'))return Response.json({transaction:'t'});if(url.endsWith(':batchGet'))return Response.json([{missing:'x'}]);if((init?.method??'GET')==='GET')return new Response('{}',{status:404});return Response.json({});}) as unknown as typeof fetch;return {urls,fetcher};}
+ const transacao=(store:InstanceType<typeof FirestoreStore>)=>store.runTransaction(async tx=>{await tx.get('contatos','um');await tx.set('contatos','um',{id:'um'});});
+ it('com o login de alguém (prévia): otimista, sem abrir transação no servidor',async()=>{
+  const {urls,fetcher}=transporte();
+  await requestIdentity.run({actor:{uid:'u',verified:true},token:'do-usuario'},()=>transacao(new FirestoreStore(async()=>'do-usuario',fetcher)));
+  expect(urls.some(u=>u.endsWith(':beginTransaction'))).toBe(false);
+ });
+ it('sem ninguém logado (webhook): identidade do serviço, com transação de servidor',async()=>{
+  const {urls,fetcher}=transporte();
+  await transacao(new FirestoreStore(async()=>'do-servico',fetcher));
+  expect(urls.some(u=>u.endsWith(':beginTransaction'))).toBe(true);
  });
 });

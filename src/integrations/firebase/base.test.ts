@@ -24,12 +24,12 @@ describe('Firebase installation and transport',()=>{
  it('round trips document values without putting arrays or media into strings',()=>{const value={id:1,name:'Janete',on:true,price:1.5,nil:null,meta:{tags:['a','b']},missing:undefined};expect(decodeFields(encodeFields(value))).toEqual({id:1,name:'Janete',on:true,price:1.5,nil:null,meta:{tags:['a','b']}});});
  it('sends filtering, pagination and disjunction to Firestore',()=>{const query=buildQuery('mensagens',{filters:[{field:'conversa_id',op:'eq',value:'conv'}],or:parseOr('apagada_em.is.null,status.eq.enviada'),order:[{field:'momento',ascending:false}],limit:30,offset:30});expect(query['limit']).toBe(30);expect(query['offset']).toBe(30);expect(query['where'].compositeFilter.filters[1].compositeFilter.op).toBe('OR');});
  it('uses actual named-database REST paths and decodes responses',async()=>{const calls:string[]=[];const transport=vi.fn(async(input:any)=>{calls.push(String(input));return Response.json({fields:encodeFields({id:'u1',ativo:true})})}) as unknown as typeof fetch;const store=new FirestoreStore(async()=>'test-only',transport);expect(await store.get('membros','u1')).toEqual({id:'u1',ativo:true});expect(calls[0]).toContain('/databases/aluno-nomeado/documents/membros/u1');});
- it('a recusa do Firestore diz a operação e as coleções, sem ids nem credenciais',async()=>{const transport=vi.fn(async(input:any,init:any)=>(init?.method??'GET')==='GET'?new Response('{}',{status:404}):Response.json({error:{code:403,message:'Missing or insufficient permissions.',status:'PERMISSION_DENIED'}},{status:403})) as unknown as typeof fetch;const store=new FirestoreStore(async()=>'credencial-secreta',transport);const erro:any=await bootstrapInstallation(store,{uid:'uid-do-dono',email:'dono@example.test',verified:true}).catch(e=>e);expect(erro).toMatchObject({code:'PERMISSION_DENIED',status:403,operacao:'POST :commit [instalacao, membros, mudancas, mudancas]'});expect(erro.operacao).not.toContain('uid-do-dono');expect(erro.operacao).not.toContain('credencial-secreta');});
+ it('a recusa do Firestore diz a operação e as coleções, sem ids nem credenciais',async()=>{const transport=vi.fn(async(input:any,init:any)=>(init?.method??'GET')==='GET'?new Response('{}',{status:404}):Response.json({error:{code:403,message:'Missing or insufficient permissions.',status:'PERMISSION_DENIED'}},{status:403})) as unknown as typeof fetch;const store=new FirestoreStore(async()=>'credencial-secreta',transport,'otimista');const erro:any=await bootstrapInstallation(store,{uid:'uid-do-dono',email:'dono@example.test',verified:true}).catch(e=>e);expect(erro).toMatchObject({code:'PERMISSION_DENIED',status:403,operacao:'POST :commit [instalacao, membros, mudancas, mudancas]'});expect(erro.operacao).not.toContain('uid-do-dono');expect(erro.operacao).not.toContain('credencial-secreta');});
  it('com o login do usuário (prévia), não abre transação no servidor: lê e grava com precondição',async()=>{
   // Teste real no AI Studio: o Firestore recusa :beginTransaction com o token do usuário (PERMISSION_DENIED).
   const chamadas:string[]=[];const commits:any[]=[];
   const transport=vi.fn(async(input:any,init:any)=>{const url=String(input);chamadas.push(url);if((init?.method??'GET')==='GET')return new Response('{}',{status:404});if(url.endsWith(':commit')){commits.push(JSON.parse(init.body));return Response.json({});}return Response.json({});}) as unknown as typeof fetch;
-  const store=new FirestoreStore(async()=>'token-do-usuario',transport);
+  const store=new FirestoreStore(async()=>'token-do-usuario',transport,'otimista');
   expect(await bootstrapInstallation(store,{uid:'dono',email:'dono@example.test',verified:true})).toEqual({owner:true,member:true});
   expect(chamadas.some(u=>u.endsWith(':beginTransaction'))).toBe(false);
   const primeiro=commits[0].writes;
@@ -44,7 +44,7 @@ describe('Firebase installation and transport',()=>{
    if((init?.method??'GET')==='GET'){if(url.includes('/instalacao/principal')&&instalacaoExiste)return Response.json({name:'x',updateTime:'2026-11-09T00:00:00Z',fields:encodeFields({id:'principal',ownerUid:'outra',versao:1})});return new Response('{}',{status:404});}
    if(url.endsWith(':commit')){commits++;instalacaoExiste=true;return Response.json({error:{status:'ALREADY_EXISTS',message:'Document already exists'}},{status:409});}
    return Response.json([]);}) as unknown as typeof fetch;
-  const store=new FirestoreStore(async()=>'token-do-usuario',transport);
+  const store=new FirestoreStore(async()=>'token-do-usuario',transport,'otimista');
   expect(await bootstrapInstallation(store,{uid:'dono',email:'dono@example.test',verified:true})).toEqual({owner:false,member:false});
   expect(commits).toBe(1);
  });

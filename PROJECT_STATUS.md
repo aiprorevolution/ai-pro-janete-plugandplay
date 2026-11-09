@@ -35,7 +35,9 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - Sem ninguém logado e sem o instalador, o servidor tenta a identidade do próprio serviço publicado; o endereço público pode vir do `APP_URL` do AI Studio. `/api/firebase/diagnostico` diz se isso funciona no app publicado.
 - **Diagnóstico no app publicado (9/11/2026):** identidade própria = sim; banco com identidade própria = ok; endereço público = o do serviço; fila = ausente. Mensagens da Z-API passaram a ser recebidas e gravadas.
 - Sem fila, o webhook processa na hora (`acordarMotor(..., { naHora: true })` → `processarNaHora`): roda o ciclo, espera o agrupamento de mensagens vencer e responde, até 45 s por pedido. Com o instalador (Cloud Tasks), segue a fila.
-- Próximo passo: atualizar, republicar e testar uma mensagem real no número de teste.
+- Sem ninguém logado, o banco é acessado pela identidade do serviço com transação de servidor (isolamento completo contra resposta duplicada); com login, modo otimista.
+- O motor precisa de 110 índices compostos. Sem o instalador, o app publicado os cria com a própria identidade (`POST /api/firebase/diagnostico/indices`); o diagnóstico mostra índices e estado do motor.
+- Próximo passo: atualizar, republicar, criar os índices e testar uma mensagem real no número de teste.
 
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.

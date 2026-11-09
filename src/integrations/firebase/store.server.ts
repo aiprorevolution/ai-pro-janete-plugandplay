@@ -1,6 +1,6 @@
 import {getInstallationConfig} from './config.server';
 import {randomUUID} from 'node:crypto';
-import {getDatabaseAccessToken} from './identity.server';
+import {getDatabaseAccessToken,requestIdentity} from './identity.server';
 import type {Store,StoreTransaction,Row,ListOptions,Filter} from './store-types';
 export function encodeValue(value:any):any{
  if(value===null || value===undefined)return {nullValue:null};
@@ -67,10 +67,12 @@ export class FirestoreStore implements Store{
   * transacoes: 'servidor' usa :beginTransaction (identidade própria do serviço publicado, com IAM). 'otimista' é o
   * modo dos SDKs do Firebase no navegador: lê guardando a versão e grava com precondição. Sem identidade própria, o
   * servidor usa o login do usuário, e o Firestore real recusa :beginTransaction com PERMISSION_DENIED (o emulador
-  * aceita). Padrão: 'servidor' só com JANETE_RUNTIME_SERVICE_ACCOUNT, como em getDatabaseAccessToken.
+  * aceita). Padrão, seguindo getDatabaseAccessToken: com o login de alguém no pedido, 'otimista'; sem ninguém logado
+  * (webhook, fila) ou com JANETE_RUNTIME_SERVICE_ACCOUNT, o banco é acessado pela identidade do serviço, que pode abrir
+  * transação de servidor: 'servidor', com isolamento completo (a reserva da conversa evita resposta duplicada).
   */
  constructor(private accessToken:()=>Promise<string>=getDatabaseAccessToken, private transport:typeof fetch=fetch, private transacoes?:'servidor'|'otimista'){}
- private modoTransacao(){return this.transacoes??(process.env['JANETE_RUNTIME_SERVICE_ACCOUNT']?'servidor':'otimista');}
+ private modoTransacao(){return this.transacoes??(process.env['JANETE_RUNTIME_SERVICE_ACCOUNT']||!requestIdentity.getStore()?.token?'servidor':'otimista');}
  private async base(){
   const c=await getInstallationConfig();const emulator=process.env['FIRESTORE_EMULATOR_HOST'];
   if(emulator){if(process.env['NODE_ENV']!=='test'||!c.projectId.startsWith('demo-')||! /^(127\.0\.0\.1|localhost):\d{2,5}$/.test(emulator))throw new Error('Emulador permitido somente em testes locais com projeto demo.');return `http://${emulator}/v1/projects/${c.projectId}/databases/${encodeURIComponent(c.firestoreDatabaseId)}/documents`;}
