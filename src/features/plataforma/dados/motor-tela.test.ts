@@ -73,6 +73,10 @@ vi.mock("@/integrations/firebase/client.server", () => ({
 const { acordarMotorPelaTela } = await import("./servidor.functions");
 
 beforeEach(() => {
+  // Estes testes verificam o toque com a fila do Cloud Tasks (instalador) e a segurança do endereço do motor.
+  // Sem fila, o toque processa na hora: coberto em mensageria/nucleo/na-hora.test.ts.
+  vi.stubEnv("JANETE_TASKS_LOCATION", "us-west1");
+  vi.stubEnv("JANETE_TASKS_SERVICE_ACCOUNT", "janete@example.iam.gserviceaccount.com");
   estado.membro = true;
   estado.url = "https://janete.exemplo.com";
   estado.rpcs = [];
