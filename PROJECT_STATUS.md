@@ -33,7 +33,9 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - **Validado no AI Studio (9/11/2026):** depois da atualização, o primeiro login com Google criou o dono e abriu o assistente de configuração.
 - Observação: no AI Studio o Node é 22; alguns pacotes do Firebase avisam que pedem Node 24 (só aviso no `npm ci`; o app roda).
 - Sem ninguém logado e sem o instalador, o servidor tenta a identidade do próprio serviço publicado; o endereço público pode vir do `APP_URL` do AI Studio. `/api/firebase/diagnostico` diz se isso funciona no app publicado.
-- Próximo passo: publicar, abrir o diagnóstico e decidir a fila (Cloud Tasks pelo instalador ou processamento no próprio webhook).
+- **Diagnóstico no app publicado (9/11/2026):** identidade própria = sim; banco com identidade própria = ok; endereço público = o do serviço; fila = ausente. Mensagens da Z-API passaram a ser recebidas e gravadas.
+- Sem fila, o webhook processa na hora (`acordarMotor(..., { naHora: true })` → `processarNaHora`): roda o ciclo, espera o agrupamento de mensagens vencer e responde, até 45 s por pedido. Com o instalador (Cloud Tasks), segue a fila.
+- Próximo passo: atualizar, republicar e testar uma mensagem real no número de teste.
 
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.

@@ -438,7 +438,7 @@ describe("o toque no motor depois de gravar (spec-motor-acordado)", () => {
     expect(r.status).toBe(200);
     expect(await r.text()).toBe("ok");
     expect(mocks.acordarMotor).toHaveBeenCalledTimes(1);
-    expect(mocks.acordarMotor).toHaveBeenCalledWith(ORIGEM);
+    expect(mocks.acordarMotor).toHaveBeenCalledWith(ORIGEM, { naHora: true });
     // o evento já estava aplicado e marcado quando o toque saiu
     expect(marcadoNoToque).toBeTruthy();
   });
@@ -448,7 +448,7 @@ describe("o toque no motor depois de gravar (spec-motor-acordado)", () => {
     const r = await processarWebhook(pedido({ eventos: [status] }), "zapi", CONEXAO_ID);
     expect(r.status).toBe(200);
     expect(primeira(falso.estado.eventos).processado_em).toBeNull();
-    expect(mocks.acordarMotor).toHaveBeenCalledWith(ORIGEM);
+    expect(mocks.acordarMotor).toHaveBeenCalledWith(ORIGEM, { naHora: true });
   });
 
   it("200 com a tradução que falhou: toca", async () => {

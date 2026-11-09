@@ -228,7 +228,7 @@ export async function processarWebhook(
     // Reentrega: já gravado. Se ficou pendente, o ciclo do worker termina o serviço.
     if (gravado.duplicado) {
       // A primeira entrega pode ter persistido o evento e perdido a confirmação da fila.
-      const toque = await acordarMotor(new URL(req.url).origin).catch(() => "falhou");
+      const toque = await acordarMotor(new URL(req.url).origin, { naHora: true }).catch(() => "falhou");
       return toque === "tocado" ? texto(200, "ok") : texto(503, "fila_indisponivel");
     }
     eventoId = gravado.id;
@@ -239,7 +239,7 @@ export async function processarWebhook(
 
   const resposta = await tratarEventoGravado(eventoId, eventos, falhou, conexao);
   // 2xx só depois de a fila durável confirmar. 503 pede reentrega ao gateway sem perder o evento.
-  const toque = await acordarMotor(new URL(req.url).origin).catch(() => "falhou");
+  const toque = await acordarMotor(new URL(req.url).origin, { naHora: true }).catch(() => "falhou");
   return toque === "tocado" ? resposta : texto(503, "fila_indisponivel");
 }
 

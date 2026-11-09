@@ -26,8 +26,10 @@ export function origemDoMotor(origin: string | null | undefined): string | null 
 /** O destino vem da configuração instalada, nunca de Host/Origin recebido na requisição. */
 export async function acordarMotor(
   _origem?: string | null,
-  options: { renovar?: boolean; tetoMs?: number } = {},
+  options: { renovar?: boolean; tetoMs?: number; naHora?: boolean } = {},
 ): Promise<ResultadoToque> {
+  // Webhook sem fila (app publicado pelo AI Studio, sem o instalador): processa dentro do próprio pedido.
+  if (options.naHora && !filaConfigurada()) return processarNaHora();
   try {
     const config = await getInstallationConfig();
     const origin = origemDoMotor(process.env["JANETE_PUBLIC_URL"] || config.publicUrl);
@@ -36,6 +38,57 @@ export async function acordarMotor(
     return "tocado";
   } catch {
     console.error("motor_enfileiramento_falhou");
+    return "falhou";
+  }
+}
+
+/** A fila do Cloud Tasks existe quando o instalador configurou local e identidade da fila. */
+export function filaConfigurada(): boolean {
+  return !!process.env["JANETE_TASKS_LOCATION"] && !!process.env["JANETE_TASKS_SERVICE_ACCOUNT"];
+}
+
+export const TETO_NA_HORA_MS = 45_000;
+type DependenciasNaHora = {
+  rodar: (opcoes: { orcamentoMs: number }) => Promise<unknown>;
+  pendencias: () => Promise<PendenciasMotor | null>;
+  esperar: (ms: number) => Promise<void>;
+  agora: () => number;
+  marcarVisto: () => Promise<unknown>;
+};
+const naHoraPadrao: DependenciasNaHora = {
+  rodar: async (opcoes) => (await import("./ciclo.server")).rodarCiclo(opcoes),
+  pendencias: () => pendenciasDoMotor(),
+  esperar: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  agora: () => Date.now(),
+  marcarVisto: async () => (await import("./banco.server")).marcarWorkerVisto(),
+};
+
+/**
+ * Sem fila, o próprio webhook faz o trabalho do worker: roda o ciclo de atendimento, espera as rodadas vencerem
+ * (o agrupamento de mensagens seguidas) e roda de novo, até o teto. O que vencer depois do teto fica pendente para o
+ * próximo toque. Leases e outbox do ciclo impedem resposta repetida se o gateway reenviar o webhook.
+ */
+export async function processarNaHora(
+  tetoMs = TETO_NA_HORA_MS,
+  deps: DependenciasNaHora = naHoraPadrao,
+): Promise<ResultadoToque> {
+  const fim = deps.agora() + tetoMs;
+  try {
+    await deps.marcarVisto().catch(() => {});
+    for (;;) {
+      const restante = fim - deps.agora();
+      if (restante <= 1_000) return "tocado";
+      await deps.rodar({ orcamentoMs: restante });
+      const pendentes = await deps.pendencias();
+      if (!pendentes) return "falhou";
+      const momentos = [pendentes.proximoEm, pendentes.vencidoDesde].filter((n): n is number => n !== null);
+      if (!momentos.length) return "tocado";
+      const proximo = Math.max(deps.agora() + 1_000, Math.min(...momentos));
+      if (proximo >= fim) return "tocado";
+      await deps.esperar(proximo - deps.agora());
+    }
+  } catch {
+    console.error("motor_na_hora_falhou");
     return "falhou";
   }
 }
