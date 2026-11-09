@@ -30,7 +30,17 @@ function safeError(error:any){
  if(error?.name==='DomainError'&&/^[a-z_]{1,80}$/.test(error.message))return {message:error.message,code};
  return {message:'Não foi possível concluir agora. Confira a instalação ou tente novamente.',code};
 }
-const MEDIA_PATH=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+let resumoLembrado:{em:number;valor:Promise<unknown>}|null=null;
+/** Só para testes. */
+export function esquecerDiagnostico(){resumoLembrado=null;}
+/** O pedido traz o login de um administrador ativo? Qualquer falha (sem login, sessão vencida, atendente) = não. */
+async function pedidoDeAdministrador(request:Request):Promise<boolean>{
+ if(!request.headers.get('authorization'))return false;
+ try{
+  const identity=await identityFromRequest(request);
+  return await requestIdentity.run(identity,async()=>(await requireMember(firestoreStore,identity.actor))['papel']==='admin');
+ }catch{return false;}
+}const MEDIA_PATH=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 async function upload(request:Request,url:URL){
  const identity=await identityFromRequest(request);
  return requestIdentity.run(identity,async()=>{
@@ -53,10 +63,17 @@ async function upload(request:Request,url:URL){
 export async function handleFirebaseRequest(request:Request):Promise<Response|null>{
  const url=new URL(request.url);if(!url.pathname.startsWith('/api/firebase'))return null;
  if(url.pathname==='/api/firebase/config'&&request.method==='GET')return json(await readInstallationConfig());
- if(url.pathname==='/api/firebase/diagnostico'&&request.method==='GET'){const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor());}
- // Cria os índices declarados em firestore.indexes.json que faltam, com a identidade do serviço. Idempotente; POST para não
- // ser disparado por robôs de busca. Não cria nada além do que o próprio app declara.
- if(url.pathname==='/api/firebase/diagnostico/indices'&&request.method==='POST'){const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor(undefined,{criarIndices:true}));}
+ // Diagnóstico: o resumo (sim/não) é público e lembrado por 1 min, para a rota não virar gasto de leituras do banco.
+ // O estado do motor (horários e tipos dos últimos eventos e rodadas) só sai para um administrador logado.
+ if(url.pathname==='/api/firebase/diagnostico'&&request.method==='GET'){
+  const {diagnosticarServidor}=await import('./diagnostico.server');
+  if(await pedidoDeAdministrador(request))return json(await diagnosticarServidor(undefined,{motor:true}));
+  if(!resumoLembrado||Date.now()-resumoLembrado.em>60_000)resumoLembrado={em:Date.now(),valor:diagnosticarServidor(undefined,{motor:false})};
+  return json(await resumoLembrado.valor);
+ }
+ // Cria os índices declarados em firestore.indexes.json que faltam, com a identidade do serviço. Idempotente; só para um
+ // administrador logado. Não cria nada além do que o próprio app declara.
+ if(url.pathname==='/api/firebase/diagnostico/indices'&&request.method==='POST'){if(!(await pedidoDeAdministrador(request)))return json({error:{message:'Entre como administrador para usar esta função.',code:'sem_acesso'}},401);const {diagnosticarServidor}=await import('./diagnostico.server');return json(await diagnosticarServidor(undefined,{criarIndices:true,motor:true}));}
  if(url.pathname==='/api/firebase/media-upload'&&request.method==='POST'){try{return await upload(request,url);}catch(error){return json({error:safeError(error)},(error as any)?.status??400);}}
  if(url.pathname!=='/api/firebase'||request.method!=='POST')return json({error:{message:'Rota não encontrada.'}},404);
  try{

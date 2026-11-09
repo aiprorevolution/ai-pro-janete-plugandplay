@@ -7,7 +7,7 @@ import {bootstrapInstallation} from './bootstrap.server';
 import {executeQuery} from './query.server';
 import type {Store,StoreTransaction,Row,ListOptions} from './store-types';
 vi.mock('./config.server',()=>({getInstallationConfig:async()=>({projectId:'demo-janete-test',apiKey:'public-test',appId:'web-test',firestoreDatabaseId:'aluno-nomeado',authDomain:'demo-janete-test.firebaseapp.com',storageBucket:''})}));
-vi.mock('./identity.server',()=>({getDatabaseAccessToken:async()=>{throw new Error('Rede real proibida no teste');},currentActor:()=>({uid:'service',verified:true,system:true}),requestIdentity:{getStore:()=>undefined}}));
+vi.mock('./identity.server',()=>({getDatabaseAccessToken:async()=>{throw new Error('Rede real proibida no teste');},currentActor:()=>({uid:'service',verified:true,system:true}),requestIdentity:{getStore:()=>undefined},usaIdentidadeDoServico:()=>true}));
 afterEach(()=>vi.unstubAllEnvs());
 class MemoryStore implements Store{
  rows=new Map<string,Row>();private chain:Promise<any>=Promise.resolve();

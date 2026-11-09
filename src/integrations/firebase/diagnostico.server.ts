@@ -49,7 +49,7 @@ const padrao:Dependencias={
 };
 const motivo=(error:unknown)=>(error as any)?.status===403||(error as any)?.code==='PERMISSION_DENIED'?'sem permissão':(error as any)?.code==='FAILED_PRECONDITION'?'falta índice':'erro';
 
-export async function diagnosticarServidor(dependencias:Dependencias=padrao,opcoes:{criarIndices?:boolean}={}):Promise<Diagnostico>{
+export async function diagnosticarServidor(dependencias:Dependencias=padrao,opcoes:{criarIndices?:boolean;motor?:boolean}={}):Promise<Diagnostico>{
  let token:string|undefined;
  try{token=await dependencias.obterToken();}catch{token=undefined;}
  let banco:Diagnostico['bancoComIdentidadePropria']='sem identidade';
@@ -61,7 +61,7 @@ export async function diagnosticarServidor(dependencias:Dependencias=padrao,opco
  const resultado:Diagnostico={aplicativo:'AI PRO Janete',identidadePropria:token?'sim':'não',bancoComIdentidadePropria:banco,enderecoPublico:enderecoPublicoDoAmbiente()??'ausente',fila};
  if(token&&banco==='ok'){
   if(dependencias.indices){try{resultado.indices=await dependencias.indices(token,!!opcoes.criarIndices);}catch(error){resultado.indices={erro:motivo(error)};}}
-  if(dependencias.motor){try{resultado.motor=await dependencias.motor(token);}catch(error){resultado.motor={erro:motivo(error)};}}
+  if(dependencias.motor&&opcoes.motor!==false){try{resultado.motor=await dependencias.motor(token);}catch(error){resultado.motor={erro:motivo(error)};}}
  }
  return resultado;
 }

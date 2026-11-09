@@ -1,6 +1,6 @@
 import {getInstallationConfig} from './config.server';
 import {randomUUID} from 'node:crypto';
-import {getDatabaseAccessToken,requestIdentity} from './identity.server';
+import {getDatabaseAccessToken,usaIdentidadeDoServico} from './identity.server';
 import type {Store,StoreTransaction,Row,ListOptions,Filter} from './store-types';
 export function encodeValue(value:any):any{
  if(value===null || value===undefined)return {nullValue:null};
@@ -72,7 +72,7 @@ export class FirestoreStore implements Store{
   * transação de servidor: 'servidor', com isolamento completo (a reserva da conversa evita resposta duplicada).
   */
  constructor(private accessToken:()=>Promise<string>=getDatabaseAccessToken, private transport:typeof fetch=fetch, private transacoes?:'servidor'|'otimista'){}
- private modoTransacao(){return this.transacoes??(process.env['JANETE_RUNTIME_SERVICE_ACCOUNT']||!requestIdentity.getStore()?.token?'servidor':'otimista');}
+ private modoTransacao(){return this.transacoes??(usaIdentidadeDoServico()?'servidor':'otimista');}
  private async base(){
   const c=await getInstallationConfig();const emulator=process.env['FIRESTORE_EMULATOR_HOST'];
   if(emulator){if(process.env['NODE_ENV']!=='test'||!c.projectId.startsWith('demo-')||! /^(127\.0\.0\.1|localhost):\d{2,5}$/.test(emulator))throw new Error('Emulador permitido somente em testes locais com projeto demo.');return `http://${emulator}/v1/projects/${c.projectId}/databases/${encodeURIComponent(c.firestoreDatabaseId)}/documents`;}
