@@ -69,6 +69,10 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
      const resultado=await bootstrapInstallation(firestoreStore,identity.actor);
      // Plug and play: no app publicado, o login do dono já prepara os índices do atendimento (nunca impede o login).
      if(resultado.owner){const {garantirIndicesComTeto}=await import('./indices-automaticos.server');await garantirIndicesComTeto(25_000).catch(()=>false);}
+     // Quem conecta o WhatsApp na prévia e depois publica: o webhook só passa a apontar para o endereço publicado dentro
+     // da rodada do worker, e o worker só rodava quando chegava mensagem (que não chega sem o webhook). O login de um
+     // membro no app publicado pede o toque; na prévia, sem endereço publicado, não faz nada. Nunca impede o login.
+     if(resultado.member){const {acordarMotor}=await import('@/features/mensageria/nucleo/motor.server');await requestIdentity.exit(()=>acordarMotor()).catch(()=>'falhou');}
      return json({data:resultado,error:null});
     }
     catch(error){

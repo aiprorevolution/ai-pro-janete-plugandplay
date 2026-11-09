@@ -41,7 +41,11 @@ async function executarToque(chave: string): Promise<Response> {
   if (!(await motor.conferirChaveDoToque(chave))) return new Response("Não autorizado", { status: 401 });
   try {
     const { sincronizarWebhookPublicado } = await import("@/features/mensageria/nucleo/webhook-publicado.server");
-    await sincronizarWebhookPublicado().catch(() => {});
+    // A falha não impede o atendimento; o código fica no log e a rodada seguinte tenta de novo.
+    await sincronizarWebhookPublicado().catch((erro) => {
+      const codigo = erro instanceof Error && /^[a-z0-9_]{1,60}$/.test(erro.message) ? erro.message : "erro_interno";
+      console.error("webhook_publicado_falhou", codigo);
+    });
     const { resultado, toque } = await motor.rodarWorkerSemFila();
     return Response.json({ ok: resultado !== "falhou", continuacao: toque }, { status: resultado === "falhou" ? 503 : 200 });
   } catch {
