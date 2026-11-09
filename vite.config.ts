@@ -13,5 +13,6 @@ export default defineConfig(({ command }) => ({
     react(),
     ...(command === 'build' ? [nitro({ preset: 'node_server' })] : []),
   ],
-  server: { host: process.env['HOST'] || '127.0.0.1', port: Number(process.env['PORT'] || 3000) },
+  // O AI Studio acessa a prévia por 0.0.0.0:3000 (ele mesmo acrescenta --host/--port ao npm run dev; isto é a rede de segurança).
+  server: { host: process.env['HOST'] || '0.0.0.0', port: Number(process.env['PORT'] || 3000) },
 }));

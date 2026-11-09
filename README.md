@@ -8,16 +8,26 @@ Esta é a versão independente para importar no **Google AI Studio**, conectar o
 
 ## Começar no Google AI Studio
 
-1. Importe este repositório em um aplicativo novo do AI Studio.
-2. Cole esta instrução no agente:
+1. **GitHub:** crie uma conta em [github.com/signup](https://github.com/signup), abra [github.com/thiagocaliman/ai-pro-janete-plugandplay](https://github.com/thiagocaliman/ai-pro-janete-plugandplay) e clique em **Fork › Create fork**. O fork serve só para importar; as atualizações vêm direto deste repositório.
+2. No **Build** do Google AI Studio, conecte o seu GitHub e importe **o seu fork** pelo **Import from GitHub**. Não cole o link do repositório no chat: o agente tenta recriar o app em vez de importá-lo.
+3. Na tela **"Prepare sua AI PRO Janete"**, clique em **Copiar instrução**, cole no chat do AI Studio e **aceite o cartão do Firebase**. O agente segue a seção 1 do [AGENTS.md](AGENTS.md): conecta o Firebase da sua cópia, publica as regras e reinicia a prévia.
+4. Clique em **Entrar com Google**. O primeiro login verificado cria o proprietário dessa instalação; faça isso antes de compartilhar o endereço.
+5. Na configuração do aplicativo, informe suas próprias chaves de IA e do provedor WhatsApp.
 
-> Leia o AGENTS.md e instale esta AI PRO Janete usando a integração nativa Firebase na minha conta. Preserve a implementação existente. Conduza a configuração, o primeiro login e a publicação seguindo o roteiro, sem pedir credencial JSON manual. Mostre claramente qualquer etapa que não puder concluir e não declare o atendimento pronto só porque a prévia abriu.
-
-3. Autorize o cartão Firebase e entre com sua conta Google. O primeiro login verificado cria o proprietário dessa instalação; faça isso antes de compartilhar o endereço.
-4. Na configuração do aplicativo, informe suas próprias chaves de IA e do provedor WhatsApp.
-5. Siga a publicação e a instalação do atendimento em segundo plano conduzidas pelo agente.
+Se, depois de entrar, aparecer *"A instalação do Firebase ainda precisa ser concluída pelo agente do AI Studio"*, peça no chat: *"Publique as regras do Firestore desta cópia, seguindo o AGENTS.md, e reinicie a prévia."* Depois recarregue a página e entre de novo.
 
 A integração nativa prepara login e Firestore. **Receber webhooks, guardar mídias e atender com o navegador fechado também exige publicação e os recursos de servidor descritos no guia.** O instalador acompanha o código, mas precisa de uma sessão Google com permissão administrativa para aplicar esses recursos. A disponibilidade dessa autorização no ambiente do AI Studio ainda precisa ser conferida no teste de importação. Não há etapa de criar um arquivo de credenciais JSON.
+
+## Atualizar uma cópia (sem perder dados)
+
+Quando houver uma versão nova, escreva no chat do AI Studio da sua cópia:
+
+> Atualize esta cópia pelo GitHub, seguindo o AGENTS.md.
+
+O agente copia o repositório inteiro de uma vez (seção 3 do [AGENTS.md](AGENTS.md)), mantém a conexão com o seu Firebase, publica as regras e reinicia. Dono, atendimentos e chaves ficam no Firestore e não são tocados.
+
+- **Não use** o botão **Sync to GitHub / Force push** do AI Studio: ele envia a sua cópia para o GitHub, e não o contrário.
+- Se algo der errado, use **Restore** no checkpoint anterior à atualização e peça de novo.
 
 ## O que está incluído
 

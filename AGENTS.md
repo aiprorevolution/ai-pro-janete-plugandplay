@@ -17,22 +17,85 @@ Projeto independente para importação no Google AI Studio e integração nativa
 
 ## Leia antes de instalar
 
-Leia `README.md`, `PROJECT_STATUS.md`, `docs/INFRAESTRUTURA-GOOGLE.md` e `docs/MATRIZ-OPERACOES.md`. O código já contém a persistência Firebase e as operações de negócio. Sua tarefa ao importar é configurar e validar esta instalação, preservando o comportamento existente.
+Leia `README.md`, `PROJECT_STATUS.md`, `docs/INFRAESTRUTURA-GOOGLE.md` e `docs/MATRIZ-OPERACOES.md`. O código já contém a persistência Firebase e as operações de negócio. Sua tarefa ao importar é configurar esta instalação pelo roteiro da seção 1, preservando o comportamento existente.
 
 Não trocar o backend por outro SDK, criar um banco paralelo, carregar dados demonstrativos como dados reais ou deixar ações retornarem sucesso sem persistência. Não sobrescrever `window.fetch`. O banco nomeado da integração é obrigatório: não substituí-lo silenciosamente por `(default)`.
 
-## Roteiro de instalação no Google AI Studio
+## 1. Primeiro acesso (siga na ordem, sem pular)
 
-1. **Preparar o projeto.** Use Node.js >=22.12 e `npm ci` com `package-lock.json`. O comando de prévia é `npm run dev -- --host 0.0.0.0 --port 3000`, ajustando apenas a porta solicitada pelo ambiente. Sem Firebase, a tela de instalação deve abrir normalmente. Não solicitar variáveis de outro backend.
-2. **Ativar a integração nativa.** Apresente o cartão Firebase e aguarde a autorização do usuário. Confira o projeto e a localização escolhidos. Use Auth Google e o Firestore nativo criado por essa integração, no mesmo projeto da futura publicação. Não pedir arquivo de conta de serviço. Não editar manualmente `firebase-blueprint.json`.
-3. **Conectar a configuração real.** Preserve os valores gerados pelo Google em `firebase-applet-config.json`: `projectId`, `apiKey` pública Firebase, `appId`, `authDomain`, `firestoreDatabaseId` e, quando existir, `storageBucket`. O leitor aceita esses campos diretamente ou dentro de `firebaseConfig`, com o banco na raiz. Reinicie a prévia e confira `/api/firebase/config`. Não usar a chave Gemini nesse arquivo.
-4. **Publicar regras e índices.** Use `firestore.rules` e `firestore.indexes.json` neste banco específico. Nunca resolver uma recusa com `allow read, write: if true`. Preserve a proteção do proprietário, dos convites e do cofre. O instalador também publica e aguarda os índices. O emulador não comprova a existência de índices na nuvem; confira `READY` antes do aceite.
-5. **Primeiro acesso.** Solicite ao proprietário o login Google na prévia antes de divulgar a URL. `bootstrapInstallation` cria dono, configurações e etapas apenas uma vez, em transação. Login de outra pessoa não reinicializa a instalação. Teste leitura, alteração e persistência após recarregar. Convites são criados para um e-mail e compartilhados por link; não prometer envio automático de e-mail.
-6. **Configurar integrações do aluno.** Use somente as chaves fornecidas pelo aluno nos campos do aplicativo. Elas são cifradas no servidor. Teste salvar, listar metadados e reabrir a configuração sem expor a chave em resposta, log ou chat. Não enviar WhatsApp nem executar geração paga sem autorização específica. O aluno escolhe o modelo de resposta; transcrição e voz têm configurações próprias.
-7. **Publicar e preparar o atendimento.** Use a publicação nativa `Share > Publish`, no mesmo projeto Firebase. Obtenha o nome do serviço Cloud Run e sua região a partir da publicação real. Execute primeiro `node scripts/configurar-google.mjs --region REGIAO --service SERVICO`, substituindo os valores observados. Esse comando só mostra o plano. Com autorização explícita para infraestrutura/cobrança e uma sessão Google administrativa disponível, execute com `--apply`. O script configura identidade própria, fila Cloud Tasks, recuperação Cloud Scheduler, bucket privado e índices, preservando recursos existentes. Nunca atribuir privilégios administrativos à identidade compartilhada da prévia. Não assumir que o cartão Firebase também autoriza essas APIs administrativas.
-8. **Aceitar o resultado.** Confirme `google-installation-receipt.json`, índices prontos, projeto/banco corretos e o checklist completo de `docs/INFRAESTRUTURA-GOOGLE.md`. Só chamar de atendimento funcionando depois de um teste publicado autorizado, com o navegador fechado. Repetir o instalador idempotente após uma republicação que possa alterar a identidade ou as variáveis.
+**Gatilho:** o aluno cola a frase da tela inicial, *"Conecte o Firebase desta cópia e publique as regras do Firestore, seguindo o AGENTS.md."*, ou pede para conectar o Firebase.
 
-Se o passo 7 não tiver uma sessão autorizada ou retornar 403, informar exatamente a operação e a permissão ausentes; não pedir um JSON privado, não fingir sucesso e não apresentar como concluído. A disponibilidade da autorização administrativa no ambiente do AI Studio é um ponto de aceite ainda não comprovado nesta entrega. A interface da prévia não equivale a um worker publicado.
+Esta sequência de ferramentas foi validada do zero, com uma conta Google nova, em outro app AI PRO no AI Studio.
+
+1. **Prepare o projeto.** Use Node.js >=22.12 e `npm ci` com o `package-lock.json`. A prévia roda `npm run dev` em `0.0.0.0:3000` (o AI Studio acrescenta `--host` e `--port`). Sem Firebase, a tela de instalação abre normalmente. Não solicite variáveis de outro backend.
+2. **Leia a skill de Firebase:** `/skills/system_skills/firebase-integration-rpc/SKILL.md` com `view_file`.
+3. **Peça a autorização:** chame `show_aistudio_ui` com `ui_type: "firebase_setup"` e **pare o turno** até o aceite (`user_confirmed_in_ui: true`). Não peça arquivo de conta de serviço.
+4. **Provisione o Firebase da cópia:** `rpc_action` com `service_name: "fax"`, `method_name: "ProvisionFirebase"` e `arguments: { "platform": "web", "project_id": "<ID do projeto escolhido no cartão>" }`.
+   - Passe o `project_id` explicitamente. Em outro app, a chamada sem ele usou um projeto antigo da conta, embora o cartão mostrasse outro.
+   - Preserve os valores gerados em `firebase-applet-config.json`: `projectId`, `apiKey` pública, `appId`, `authDomain`, `firestoreDatabaseId` e, quando existir, `storageBucket`. O leitor aceita esses campos diretamente ou dentro de `firebaseConfig`, com o banco na raiz. Não use a chave Gemini nesse arquivo e não edite `firebase-blueprint.json` à mão.
+   - Confira se o `projectId` gravado é o do cartão. Se não for, pare e corrija antes do passo 5.
+5. **Publique as regras (obrigatório, nunca pule):** valide `firestore.rules` com `lint_applet` e chame `rpc_action` com `service_name: "fax"`, `method_name: "DeployRules"` e `arguments: {}`.
+   - O banco novo nasce com as regras padrão, que **recusam tudo**. Sem este passo, o primeiro login falha com *"A instalação do Firebase ainda precisa ser concluída pelo agente do AI Studio."*
+   - Em outro app, num teste com conta nova, este passo foi pulado depois do aceite do cartão. Faça-o sempre, mesmo que o `ProvisionFirebase` tenha terminado sem erro.
+   - Nunca resolva uma recusa com `allow read, write: if true`. Preserve a proteção do proprietário, dos convites e do cofre.
+6. **Reinicie:** chame `restart_dev_server` e confira `/api/firebase/config`.
+7. **Confira que o `DeployRules` do passo 5 terminou com sucesso** e só então responda ao aluno numa frase: *"Pronto! Na prévia, clique em **Entrar com Google**. O primeiro login verificado vira o dono desta cópia."*
+
+Não faça mais nada nesse primeiro acesso. Em especial: não publique o app, não rode o instalador da seção 2, não grave documentos no Firestore e não peça e-mail. `bootstrapInstallation` cria dono, configurações e etapas uma única vez, em transação, no primeiro login; o login de outra pessoa não reinicializa a instalação.
+
+**Índices:** `firestore.indexes.json` é publicado pelo instalador da seção 2, não pelo `DeployRules`. Se uma tela mostrar *"O banco ainda precisa concluir os índices"*, informe o aluno qual tela foi e não desative a consulta.
+
+## 2. Depois do primeiro acesso (só quando o aluno pedir)
+
+1. **Integrações do aluno.** Use somente as chaves fornecidas pelo aluno nos campos do aplicativo. Elas são cifradas no servidor. Teste salvar, listar metadados e reabrir a configuração sem expor a chave em resposta, log ou chat. Não envie WhatsApp nem execute geração paga sem autorização específica. O aluno escolhe o modelo de resposta; transcrição e voz têm configurações próprias. Convites são criados para um e-mail e compartilhados por link; não prometa envio automático de e-mail.
+2. **Publicar e preparar o atendimento.** Use a publicação nativa (`Share > Publish`), no mesmo projeto Firebase. Obtenha o nome do serviço Cloud Run e a região a partir da publicação real. Execute primeiro `node scripts/configurar-google.mjs --region REGIAO --service SERVICO`, com os valores observados. Esse comando só mostra o plano.
+   - Execute com `--apply` somente com autorização explícita do aluno para infraestrutura e cobrança **e** com uma sessão Google administrativa disponível. O script configura identidade própria, fila Cloud Tasks, recuperação Cloud Scheduler, bucket privado e índices, preservando recursos existentes.
+   - Nunca atribua privilégios administrativos à identidade compartilhada da prévia. Não assuma que o cartão Firebase também autoriza essas APIs.
+   - Se não houver sessão autorizada ou a resposta for 403, informe exatamente a operação e a permissão ausentes. Não peça um JSON privado, não finja sucesso e não apresente como concluído. **A disponibilidade dessa autorização no ambiente do AI Studio ainda não foi comprovada.**
+3. **Aceitar o resultado.** Confirme `google-installation-receipt.json`, índices `READY`, projeto e banco corretos e o checklist de `docs/INFRAESTRUTURA-GOOGLE.md`. Só chame de atendimento funcionando depois de um teste publicado autorizado, com o navegador fechado. A prévia não equivale a um worker publicado. Repita o instalador (idempotente) depois de uma republicação que possa alterar a identidade ou as variáveis.
+
+## 3. Atualização de uma cópia existente
+
+**Gatilho:** o aluno pede, por exemplo: *"Atualize esta cópia pelo GitHub, seguindo o AGENTS.md."*
+
+O código novo vem do GitHub; os dados (dono, atendimentos, chaves) ficam no Firestore e não são tocados. Os arquivos particulares da cópia (`firebase-applet-config.json`, `firebase-blueprint.json` e `google-installation-receipt.json`) não estão no repositório e precisam sobreviver.
+
+**A atualização é tudo ou nada.** Copie o repositório inteiro com os comandos abaixo, na raiz da cópia. Não escolha arquivos e não copie "só os que mudaram": uma cópia pela metade (um arquivo novo que procura uma função num arquivo antigo) derruba o servidor com `does not provide an export named …`.
+
+```bash
+rm -rf /tmp/janete-backup && mkdir -p /tmp/janete-backup && for f in firebase-applet-config.json firebase-blueprint.json google-installation-receipt.json; do [ -f "$f" ] && cp "$f" /tmp/janete-backup/; done
+rm -rf /tmp/janete-main && git clone --depth 1 https://github.com/thiagocaliman/ai-pro-janete-plugandplay /tmp/janete-main && rm -rf /tmp/janete-main/.git
+cp -R /tmp/janete-main/. .
+for f in /tmp/janete-backup/*; do [ -f "$f" ] && cp "$f" .; done
+```
+
+Se o `git` não existir no ambiente, troque a segunda linha por:
+`rm -rf /tmp/janete-main && mkdir -p /tmp/janete-main && curl -fsSL https://codeload.github.com/thiagocaliman/ai-pro-janete-plugandplay/tar.gz/refs/heads/main | tar -xz --strip-components=1 -C /tmp/janete-main`
+
+**Confira antes de seguir** (as duas verificações são obrigatórias):
+
+```bash
+grep -c '"projectId"' firebase-applet-config.json
+diff -rq /tmp/janete-main . -x node_modules -x .output -x .tanstack -x .nitro -x dist | grep -v "^Only in \.:"
+```
+
+- A primeira deve mostrar `1` ou mais: a cópia continua conectada ao próprio Firebase.
+- A segunda **não deve mostrar nada**: nenhum arquivo do GitHub ficou diferente na cópia. Arquivos que só existem na cópia são normais e não aparecem.
+
+Depois: `npm ci`, `lint_applet` e o build; publique as regras (`DeployRules`) e reinicie (`restart_dev_server`). Responda ao aluno numa frase: *"Cópia atualizada! Seus dados e chaves continuam os mesmos."*
+
+**Nunca** envie nada ao GitHub (nada de Sync nem Force push), não provisione outro banco, não altere dados do Firestore e não redefina o dono. Se um comando falhar (por exemplo, o clone pedir usuário e senha ou responder *not found*, sinal de repositório privado), **pare e mostre o erro exato**: não recrie código de memória nem copie arquivos um a um.
+
+## 4. Problemas comuns
+
+| O aluno vê | Causa provável | Ação do agente |
+|---|---|---|
+| *"A instalação do Firebase ainda precisa ser concluída pelo agente do AI Studio"* logo no primeiro login | Regras não publicadas neste banco: o passo 5 da seção 1 foi pulado | `lint_applet` + `DeployRules` e `restart_dev_server`; peça para recarregar e entrar de novo com Google |
+| Tela "Prepare sua AI PRO Janete" depois de aceitar o cartão | `ProvisionFirebase` não gravou a configuração ou a prévia não reiniciou | Confira `firebase-applet-config.json` e chame `restart_dev_server` |
+| *"O banco ainda precisa concluir os índices"* | Índice composto ainda não existe neste banco | Informe a tela afetada; os índices são publicados pelo instalador da seção 2 |
+| *"Conclua a publicação e a identidade do servidor para usar esta função"* | Função que depende do serviço publicado (webhook, fila, mídia) | Explique que isso faz parte da seção 2 e ainda não foi comprovado no AI Studio |
+| *"O limite de uso do Firebase foi atingido"* | Cota diária do Firestore esgotada | Informe que a cota volta no dia seguinte e que o consumo aparece em Firestore › Uso |
+| Cartão mostra um projeto que não é desta cópia | Seleção anterior lembrada pelo AI Studio | Escolha o projeto certo no cartão antes do aceite e passe o `project_id` dele |
 
 ## Organização técnica
 

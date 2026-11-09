@@ -16,6 +16,15 @@ Versão 0.1.0 candidata a teste de importação, 9 de novembro de 2026.
 - Primeiro acesso da compilação observado no navegador: instrução de integração e identificação AI PRO Janete / Thiago Caliman.
 - Repositório privado criado: https://github.com/thiagocaliman/ai-pro-janete-plugandplay .
 
+## Ajustes antes do teste de importação (9 de novembro de 2026)
+Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
+- Frase da tela inicial curta: conecta o Firebase, publica as regras e reinicia; a publicação vem depois, a pedido.
+- AGENTS.md em quatro roteiros: primeiro acesso (com as ferramentas do AI Studio que funcionaram), depois do primeiro acesso (publicação e instalador), atualização da cópia (tudo ou nada, preservando os arquivos particulares) e problemas comuns.
+- `DeployRules` obrigatório: num banco novo, as regras padrão recusam tudo; em outro app, o agente pulou esse passo.
+- Prévia escuta em `0.0.0.0` por padrão (o AI Studio também acrescenta `--host` e `--port`).
+- README: importação por fork (o Import from GitHub só lista repositórios da conta conectada; colar o link no chat faz o agente recriar o app) e seção de atualização.
+- O repositório está privado: o dono importa direto; para alunos, ele precisa ficar público.
+
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.
 - 17 testes aprovados no emulador oficial Firestore.
