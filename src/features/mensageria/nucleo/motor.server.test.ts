@@ -8,6 +8,9 @@ import { acordarMotor, origemDoMotor, pendenciasDoMotor, prepararCopia } from ".
 beforeEach(() => {
   vi.resetAllMocks();
   vi.stubEnv("JANETE_PUBLIC_URL", "");
+  // Cenário com o instalador: a fila do Cloud Tasks existe. Sem fila, ver toque-proprio.test.ts.
+  vi.stubEnv("JANETE_TASKS_LOCATION", "us-west1");
+  vi.stubEnv("JANETE_TASKS_SERVICE_ACCOUNT", "janete@example.iam.gserviceaccount.com");
   m.config.mockResolvedValue({ publicUrl: "https://janete.example.test" });
   m.schedule.mockResolvedValue("projects/test/tasks/real");
   m.rpc.mockResolvedValue({ data: "preparada", error: null });

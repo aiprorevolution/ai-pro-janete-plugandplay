@@ -1,7 +1,8 @@
 // Valida o webhook, persiste o evento com deduplicação transacional e aplica os dados.
-// Nenhuma geração de IA acontece nesta requisição. Antes de confirmar, aguarda a gravação
-// da tarefa durável. Reentregas também acordam a fila: o evento pode ter sido salvo antes
-// de uma falha ao agendar. Se a fila não aceitar, retorna 503 para permitir nova tentativa.
+// Nenhuma geração de IA acontece nesta requisição: depois de gravar, pede um toque no motor
+// (a fila do Cloud Tasks ou, sem ela, a rota do worker do próprio app) e responde ao gateway.
+// Reentregas também tocam: o evento pode ter sido salvo antes de o toque sair. Se o toque
+// falhar, retorna 503 para o gateway reenviar.
 import { adaptadorDe } from "../gateways";
 import {
   atualizarStatus,
@@ -229,7 +230,7 @@ export async function processarWebhook(
     if (gravado.duplicado) {
       // A primeira entrega pode ter persistido o evento e perdido a confirmação da fila.
       const toque = await acordarMotor(new URL(req.url).origin, { naHora: true }).catch(() => "falhou");
-      return toque === "tocado" ? texto(200, "ok") : texto(503, "fila_indisponivel");
+      return toque === "tocado" || toque === "recente" ? texto(200, "ok") : texto(503, "fila_indisponivel");
     }
     eventoId = gravado.id;
   } catch (erro) {
@@ -240,7 +241,7 @@ export async function processarWebhook(
   const resposta = await tratarEventoGravado(eventoId, eventos, falhou, conexao);
   // 2xx só depois de a fila durável confirmar. 503 pede reentrega ao gateway sem perder o evento.
   const toque = await acordarMotor(new URL(req.url).origin, { naHora: true }).catch(() => "falhou");
-  return toque === "tocado" ? resposta : texto(503, "fila_indisponivel");
+  return toque === "tocado" || toque === "recente" ? resposta : texto(503, "fila_indisponivel");
 }
 
 /** O que vem depois de gravar o evento novo: aplicar e marcar. Devolve a resposta ao gateway. */

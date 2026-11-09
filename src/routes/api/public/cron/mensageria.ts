@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 /** Só responde 2xx quando os efeitos e a continuação foram persistidos. */
 export async function executarTarefa(request: Request): Promise<Response> {
+  // O toque do próprio app (sem fila): a chave do motor decide. Chave errada = 401, sem tentar o OIDC.
+  const chave = request.headers.get("x-janete-motor");
+  if (chave !== null) return executarToque(chave);
   const { authenticateCronRequest } = await import("@/integrations/firebase/cron-auth");
   const denied = await authenticateCronRequest(request);
   if (denied) return denied;
@@ -25,6 +28,23 @@ export async function executarTarefa(request: Request): Promise<Response> {
     return Response.json({ ok: true, resumo, continuacao: moments.length > 0 });
   } catch {
     // Cloud Tasks repete com backoff; leases e outbox evitam repetir efeitos já confirmados.
+    return Response.json({ ok: false, erro: "processamento_pendente" }, { status: 503 });
+  }
+}
+
+/**
+ * A rodada pedida pelo toque do próprio app publicado, sem Cloud Tasks. Quem tocou não espera esta resposta: o
+ * resultado serve ao log e ao diagnóstico. A própria rodada pede o toque seguinte enquanto houver trabalho perto.
+ */
+async function executarToque(chave: string): Promise<Response> {
+  const motor = await import("@/features/mensageria/nucleo/motor.server");
+  if (!(await motor.conferirChaveDoToque(chave))) return new Response("Não autorizado", { status: 401 });
+  try {
+    const { sincronizarWebhookPublicado } = await import("@/features/mensageria/nucleo/webhook-publicado.server");
+    await sincronizarWebhookPublicado().catch(() => {});
+    const { resultado, toque } = await motor.rodarWorkerSemFila();
+    return Response.json({ ok: resultado !== "falhou", continuacao: toque }, { status: resultado === "falhou" ? 503 : 200 });
+  } catch {
     return Response.json({ ok: false, erro: "processamento_pendente" }, { status: 503 });
   }
 }
