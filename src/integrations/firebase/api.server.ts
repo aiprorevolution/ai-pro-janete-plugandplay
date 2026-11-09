@@ -17,7 +17,8 @@ const json=(body:unknown,status=200)=>{
 function registrarRecusa(onde:string,error:any,status:number){
  const codigo=typeof error?.code==='string'?error.code:'sem_codigo';
  const mensagem=typeof error?.message==='string'?error.message.replace(/\s+/g,' ').slice(0,200):'';
- console.error(`[AI PRO Janete] ${onde} recusou (${status}, ${codigo}): ${mensagem}`);
+ const detalhe=[error?.operacao,error?.contexto].filter(x=>typeof x==='string'&&x).join(' | ');
+ console.error(`[AI PRO Janete] ${onde} recusou (${status}, ${codigo}): ${mensagem}${detalhe?` | ${detalhe}`:''}`);
 }
 function safeError(error:any){
  const code=typeof error?.code==='string'?error.code:'operation_failed';
@@ -59,7 +60,15 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
   const content=await request.text();if(content.length>1024*1024)return json({error:{message:'Pedido muito grande.'}},413);
   const body=JSON.parse(content);const identity=await identityFromRequest(request);
   return await requestIdentity.run(identity,async()=>{
-   if(body.kind==='bootstrap')return json({data:await bootstrapInstallation(firestoreStore,identity.actor),error:null});
+   if(body.kind==='bootstrap'){
+    try{return json({data:await bootstrapInstallation(firestoreStore,identity.actor),error:null});}
+    catch(error){
+     // Para o log: como a conta chegou ao servidor (só verdadeiro/falso e provedor; nunca e-mail nem token).
+     const claims=(()=>{try{return JSON.parse(Buffer.from(String(identity.token).split('.')[1]??'','base64url').toString());}catch{return {};}})();
+     if(error&&typeof error==='object')Object.assign(error,{contexto:`primeiro acesso: verificado=${identity.actor.verified} token.email_verified=${claims.email_verified===true} email_confere=${!!identity.actor.email&&claims.email===identity.actor.email} provedor=${identity.actor.provider||'?'}`});
+     throw error;
+    }
+   }
    if(body.kind==='query'){const result=await executeQuery(body.query,{actor:identity.actor,remote:true});if(result.error)registrarRecusa('consulta',result.error,result.error.status??400);return result.error?json({data:null,error:safeError(result.error)},result.error.status??400):json(result);}
    if(body.kind==='mediaUrls'){
     await requireMember(firestoreStore,identity.actor);

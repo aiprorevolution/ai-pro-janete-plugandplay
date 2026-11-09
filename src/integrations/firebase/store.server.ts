@@ -54,6 +54,14 @@ function splitOptions(options:ListOptions):ListOptions[]|null{
  return or.map(group=>({...common,filters:[...filters,...group]}));
 }
 function compareRows(a:Row,b:Row,order:ListOptions['order']){for(const term of order?.length?order:[{field:'id',ascending:true}]){const left=a[term.field],right=b[term.field];const delta=left===right?0:left==null?-1:right==null?1:left<right?-1:1;if(delta)return term.ascending===false?-delta:delta;}const tie=String(a['id']).localeCompare(String(b['id']));return order?.at(-1)?.ascending===false?-tie:tie;}
+/** Operação recusada, para o log: método, rota e coleções gravadas. Nunca ids, valores nem credenciais. */
+function descreverOperacao(method:string,suffix:string,body:unknown){
+ const rota=suffix.startsWith(':')?suffix:suffix.split('/').slice(0,2).join('/');
+ const writes=Array.isArray((body as any)?.writes)?(body as any).writes as any[]:[];
+ const colecoes=writes.map(w=>String(w?.update?.name??w?.delete??'').split('/documents/')[1]?.split('/')[0]).filter(Boolean);
+ const transacao=(body as any)?.transaction?' em transação':'';
+ return `${method} ${rota}${transacao}${colecoes.length?` [${colecoes.join(', ')}]`:''}`;
+}
 export class FirestoreStore implements Store{
  constructor(private accessToken:()=>Promise<string>=getDatabaseAccessToken, private transport:typeof fetch=fetch){}
  private async base(){
@@ -67,7 +75,7 @@ export class FirestoreStore implements Store{
   const response=await send(token);
   if(response.status===404)return null;
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw Object.assign(new Error(data?.error?.message??'Não foi possível concluir a operação no Firestore.'),{status:response.status,code:data?.error?.status});
+  if(!response.ok)throw Object.assign(new Error(data?.error?.message??'Não foi possível concluir a operação no Firestore.'),{status:response.status,code:data?.error?.status,operacao:descreverOperacao(method,suffix,body)});
   return data;
  }
  private async docName(collection:string,id:string|number){return decodeURIComponent((await this.base()).replace(/^https?:\/\/[^/]+\/v1\//,''))+`/${safePart(collection)}/${safePart(id)}`;}
