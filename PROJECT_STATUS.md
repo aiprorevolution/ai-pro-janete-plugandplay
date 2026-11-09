@@ -25,6 +25,12 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - README: importação por fork (o Import from GitHub só lista repositórios da conta conectada; colar o link no chat faz o agente recriar o app) e seção de atualização.
 - O repositório está privado: o dono importa direto; para alunos, ele precisa ficar público.
 
+## Teste de importação no AI Studio (9 de novembro de 2026)
+- Importação, tela inicial, cartão Firebase, provisionamento e `DeployRules` funcionaram; as regras publicadas no banco conferem com `firestore.rules`.
+- O primeiro login com Google era recusado. Causa 1 (diagnóstico): o proxy da prévia troca o corpo das respostas 403/502/503/504 por HTML; corrigido com a mesma proteção do outro app AI PRO (status original em `error_status`, log da recusa e mensagem do servidor na tela).
+- Causa 2 (raiz): `PERMISSION_DENIED` no commit do primeiro acesso. A transação única gravava 13 documentos, e as regras somavam ~36 consultas; o Firestore de produção recusa acima de 20 (o emulador não aplica o limite). Corrigido: transação pequena para o dono e o resto em gravações pequenas, com teste que conta as consultas por commit.
+- Próximo passo: atualizar a cópia e repetir o primeiro login.
+
 ## Validação
 - 3.827 testes gerais aprovados, sem rede externa.
 - 17 testes aprovados no emulador oficial Firestore.

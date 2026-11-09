@@ -41,7 +41,7 @@ Esta sequência de ferramentas foi validada do zero, com uma conta Google nova, 
 6. **Reinicie:** chame `restart_dev_server` e confira `/api/firebase/config`.
 7. **Confira que o `DeployRules` do passo 5 terminou com sucesso** e só então responda ao aluno numa frase: *"Pronto! Na prévia, clique em **Entrar com Google**. O primeiro login verificado vira o dono desta cópia."*
 
-Não faça mais nada nesse primeiro acesso. Em especial: não publique o app, não rode o instalador da seção 2, não grave documentos no Firestore e não peça e-mail. `bootstrapInstallation` cria dono, configurações e etapas uma única vez, em transação, no primeiro login; o login de outra pessoa não reinicializa a instalação.
+Não faça mais nada nesse primeiro acesso. Em especial: não publique o app, não rode o instalador da seção 2, não grave documentos no Firestore e não peça e-mail. No primeiro login, `bootstrapInstallation` decide o dono numa transação pequena (instalação e membro administrador) e, em seguida, cria a configuração e as etapas que faltarem, uma gravação por vez. O Firestore de produção recusa um commit cujas regras façam mais de 20 consultas; o emulador não aplica esse limite. O login de outra pessoa não reinicializa a instalação.
 
 **Índices:** `firestore.indexes.json` é publicado pelo instalador da seção 2, não pelo `DeployRules`. Se uma tela mostrar *"O banco ainda precisa concluir os índices"*, informe o aluno qual tela foi e não desative a consulta.
 
