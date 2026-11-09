@@ -1,6 +1,7 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
 import { firebaseAdmin } from "@/integrations/firebase/client.server";
 import { getInstallationConfig } from "@/integrations/firebase/config.server";
+import { chaveDerivada, esquecerChavesDerivadas } from "./chave-derivada.server";
 import { agendarProcessamento, CAMINHO_WORKER, conferirOrigemPublicada } from "./tasks.server";
 
 export type ResultadoToque = "tocado" | "recente" | "sem_endereco" | "falhou";
@@ -66,25 +67,11 @@ export async function acordarMotor(
 // ---------- o toque sem fila: o app publicado chama a própria rota do worker ----------
 
 const FORMATO_CHAVE = /^[0-9a-f]{64}$/;
-let chaveLembrada: string | null = null;
 /** Workers sem fila rodando nesta instância. Enquanto houver um, ele mesmo vê o que chegar: não sai outro toque. */
 let workersAtivos = 0;
 
-/**
- * A chave do toque: derivada do segredo da instalação (o do cofre), sempre com a identidade do serviço. Nunca vai para
- * o navegador nem para o log. Só faz o worker rodar; não abre nenhum dado.
- */
-async function chaveDoToque(): Promise<string> {
-  if (chaveLembrada) return chaveLembrada;
-  const [{ requestIdentity }, { segredoDaInstalacao }] = await Promise.all([
-    import("@/integrations/firebase/identity.server"),
-    import("./segredo-instalacao.server"),
-  ]);
-  const segredo = await requestIdentity.exit(() => segredoDaInstalacao());
-  chaveLembrada = createHmac("sha256", segredo).update("janete-motor-toque-v1").digest("hex");
-  return chaveLembrada;
-}
-
+/** A chave do toque só faz o worker rodar; não abre nenhum dado. */
+const chaveDoToque = () => chaveDerivada("janete-motor-toque-v1");
 /** A chave que chegou no cabeçalho é a desta instalação? A que nem tem o formato é recusada sem ir ao banco. */
 export async function conferirChaveDoToque(chave: string | null): Promise<boolean> {
   if (!chave || !FORMATO_CHAVE.test(chave)) return false;
@@ -117,7 +104,7 @@ async function tocarProprioApp(origin: string, renovar: boolean, tetoMs: number)
 }
 
 /** Só para testes. */
-export function reiniciarToque() { chaveLembrada = null; workersAtivos = 0; }
+export function reiniciarToque() { esquecerChavesDerivadas(); workersAtivos = 0; }
 
 /** A fila do Cloud Tasks existe quando o instalador configurou local e identidade da fila. */
 export function filaConfigurada(): boolean {

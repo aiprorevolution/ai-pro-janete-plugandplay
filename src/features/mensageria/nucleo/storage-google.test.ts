@@ -8,7 +8,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   m.config.mockResolvedValue({ projectId: "test-project", storageBucket: "test-project-janete-private" });
   m.token.mockResolvedValue("adc-fixture");
-  vi.stubEnv("JANETE_STORAGE_BUCKET", "");
+  vi.stubEnv("JANETE_STORAGE_BUCKET", "test-project-janete-private");
   vi.stubEnv("JANETE_RUNTIME_SERVICE_ACCOUNT", "janete@test-project.iam.gserviceaccount.com");
   vi.stubGlobal("fetch", vi.fn(async () => Response.json({ signedBlob: Buffer.from("signature-fixture").toString("base64") })));
 });

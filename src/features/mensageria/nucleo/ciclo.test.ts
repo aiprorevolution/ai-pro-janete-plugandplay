@@ -483,6 +483,27 @@ describe("rodarCiclo", () => {
     expect(resumo.midias.copiadas).toBe(1);
   });
 
+  it("depósito fora do ar: o áudio é transcrito mesmo assim e a mídia é encerrada sem arquivo", async () => {
+    m.pegarMidias.mockResolvedValueOnce([mensagem(1, { tipo: "audio", midia_ref_externa: "ref" })]);
+    m.garantirBucket.mockRejectedValueOnce(new Error("bucket_indisponivel"));
+    m.transcrever.mockResolvedValueOnce({ texto: "quero saber o preço" });
+    const resumo = await rodarCiclo();
+    expect(m.gravarTranscricao).toHaveBeenCalledWith(msgId(1), "quero saber o preço");
+    expect(m.desistirMidia).toHaveBeenCalledWith(msgId(1), "midia_sem_deposito");
+    expect(m.concluirMidia).not.toHaveBeenCalled();
+    expect(resumo.midias.transcritas).toBe(1);
+    expect(resumo.midias.copiadas).toBe(0);
+  });
+
+  it("depósito fora do ar com imagem: segue como falha comum, para nova tentativa", async () => {
+    m.pegarMidias.mockResolvedValueOnce([mensagem(1, { tipo: "imagem", midia_ref_externa: "ref" })]);
+    m.enviarArquivo.mockRejectedValueOnce(new Error("midia_envio_falhou"));
+    const resumo = await rodarCiclo();
+    expect(m.desistirMidia).not.toHaveBeenCalled();
+    expect(m.concluirMidia).toHaveBeenCalledWith(msgId(1), "", "", 0, false);
+    expect(resumo.midias.falhas).toBe(1);
+  });
+
   it("transcrição que lança erro também não trava; com texto, grava a transcrição", async () => {
     m.pegarMidias
       .mockResolvedValueOnce([mensagem(1, { tipo: "audio", midia_ref_externa: "a" })])

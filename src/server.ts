@@ -6,6 +6,10 @@ export default {
     try {
       const pathname = new URL(request.url).pathname;
       if (pathname === '/healthz') return Response.json({ status: 'ok', application: 'AI PRO Janete' });
+      if (pathname.startsWith('/api/public/midia/')) {
+        const { servirMidiaPublica } = await import('./integrations/firebase/storage.server');
+        return await servirMidiaPublica(request);
+      }
       if (pathname.startsWith('/api/firebase')) {
         const { handleFirebaseRequest } = await import('./integrations/firebase/api.server');
         const response = await handleFirebaseRequest(request);

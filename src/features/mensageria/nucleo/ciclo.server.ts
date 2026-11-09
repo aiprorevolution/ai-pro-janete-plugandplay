@@ -459,8 +459,17 @@ async function copiarMidia(
     });
     const mime = baixada.mime || m.midia_mime || "application/octet-stream";
     const caminho = caminhoMidia(m.conversa_id, m.id);
-    await garantirBucket();
-    await enviarArquivo(caminho, baixada.bytes, mime);
+    // O áudio não depende do depósito para ser entendido: se guardar o arquivo falhar, a Janete ainda
+    // transcreve e responde. O arquivo fica indisponível no chat; a transcrição fica no banco.
+    let guardada = true;
+    try {
+      await garantirBucket();
+      await enviarArquivo(caminho, baixada.bytes, mime);
+    } catch (erro) {
+      if (m.tipo !== "audio") throw erro;
+      guardada = false;
+      anotar("midias", erro);
+    }
 
     // Transcrição: sem texto por motivo definitivo, a mídia é concluída do mesmo jeito (a
     // rodada passa o áudio sem transcrição para humano). Falha passageira (429, 5xx, rede,
@@ -495,6 +504,11 @@ async function copiarMidia(
       }
     }
 
+    if (!guardada) {
+      // sem arquivo guardado: encerra a mídia (não tenta de novo) para a rodada seguir com a transcrição
+      await desistirDaMidia(m, "midia_sem_deposito", anotar);
+      return;
+    }
     await concluirMidia(m.id, caminho, mime, baixada.bytes.byteLength, true);
     resumo.midias.copiadas++;
   } catch (erro) {

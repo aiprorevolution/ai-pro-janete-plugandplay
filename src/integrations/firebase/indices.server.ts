@@ -6,7 +6,7 @@ import especificacao from '../../../firestore.indexes.json';
  * cria os que faltam e informa a situação. O Google leva alguns minutos para construir cada um.
  */
 export type Api=(url:string,init?:{method?:string;body?:unknown})=>Promise<any>;
-export type SituacaoIndices={exigidos:number;prontos:number;criando:number;faltando:number;criadosAgora:number};
+export type SituacaoIndices={exigidos:number;prontos:number;criando:number;faltando:number;criadosAgora:number;dispensados?:boolean};
 type Campo={fieldPath:string;order?:string;arrayConfig?:string};
 type Indice={collectionGroup:string;queryScope:string;apiScope?:string;density?:string;fields:Campo[]};
 
@@ -34,11 +34,14 @@ export async function situacaoDosIndices(api:Api,projeto:{projectId:string;datab
  const banco=`projects/${projeto.projectId}/databases/${encodeURIComponent(projeto.databaseId)}`;
  const meta=await api(`https://firestore.googleapis.com/v1/${banco}`);
  const edicao=meta?.databaseEdition==='ENTERPRISE'?'ENTERPRISE':'STANDARD';
+ // O banco que o Google AI Studio cria é da edição Enterprise, que executa consultas sem índice composto (conferido num
+ // banco real em 9/11/2026, com zero índices: o atendimento inteiro funcionou). Nela o app não cria nem confere índices.
+ if(edicao==='ENTERPRISE')return {exigidos:0,prontos:0,criando:0,faltando:0,criadosAgora:0,dispensados:true};
  const esperados=indices.map(indice=>({grupo:indice.collectionGroup,corpo:corpoDoIndice(indice,edicao),chave:chaveDoIndice(indice,edicao)}));
  const existentes=new Map<string,any[]>();
  const listar=async(grupo:string)=>{
   const lista:any[]=[];let proxima='';
-  do{const r=await api(`https://firestore.googleapis.com/v1/${banco}/collectionGroups/${encodeURIComponent(grupo)}/indexes?pageSize=100${proxima?`&pageToken=${encodeURIComponent(proxima)}`:''}`);lista.push(...(r?.indexes??[]));proxima=r?.nextPageToken??'';}while(proxima);
+  do{const r=await api(`https://firestore.googleapis.com/v1/${banco}/collectionGroups/${encodeURIComponent(grupo)}/indexes${proxima?`?pageToken=${encodeURIComponent(proxima)}`:''}`);lista.push(...(r?.indexes??[]));proxima=r?.nextPageToken??'';}while(proxima);
   return lista;
  };
  const situacao:SituacaoIndices={exigidos:esperados.length,prontos:0,criando:0,faltando:0,criadosAgora:0};

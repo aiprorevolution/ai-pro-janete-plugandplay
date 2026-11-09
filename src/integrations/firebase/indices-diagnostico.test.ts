@@ -16,7 +16,7 @@ function googleFalso(resposta:(url:string,init?:any)=>any){
  const api=vi.fn(async(url:string,init?:any)=>{chamadas.push({url,init});return resposta(url,init);});
  return {api,chamadas};
 }
-const listagens=(url:string)=>url.includes('/collectionGroups/rodadas/indexes?')?{indexes:[pronto]}:url.includes('/indexes?')?{indexes:[]}:{databaseEdition:'STANDARD'};
+const listagens=(url:string)=>url.includes('/collectionGroups/rodadas/indexes')?{indexes:[pronto]}:url.includes('/indexes')?{indexes:[]}:{databaseEdition:'STANDARD'};
 
 describe('índices criados pelo próprio app publicado',()=>{
  it('só confere: conta os prontos e os que faltam, sem criar',async()=>{
@@ -38,7 +38,7 @@ describe('índices criados pelo próprio app publicado',()=>{
   await expect(situacaoDosIndices(negado.api,projeto,true,indices)).rejects.toMatchObject({status:403});
  });
  it('o arquivo real de índices do app é válido para o criador',async()=>{
-  const {api}=googleFalso(url=>url.includes('/indexes?')?{indexes:[]}:{databaseEdition:'STANDARD'});
+  const {api}=googleFalso(url=>url.includes('/indexes')?{indexes:[]}:{databaseEdition:'STANDARD'});
   const situacao=await situacaoDosIndices(api,projeto,false);
   expect(situacao.exigidos).toBeGreaterThan(100);
   expect(situacao.faltando).toBe(situacao.exigidos);
@@ -89,5 +89,18 @@ describe('índices automáticos (o aluno não dispara nada)',()=>{
   reiniciarIndicesAutomaticos();const s=situacao();vi.spyOn(console,'info').mockImplementation(()=>{});
   await Promise.all([garantirIndicesUmaVez({publicado:()=>true,situacao:s}),garantirIndicesUmaVez({publicado:()=>true,situacao:s})]);
   expect(s).toHaveBeenCalledTimes(1);
+ });
+});
+
+describe('banco da edição Enterprise (o que o Google AI Studio cria)',()=>{
+ it('não confere nem cria índices: a edição executa as consultas sem eles',async()=>{
+  const {api,chamadas}=googleFalso(()=>({databaseEdition:'ENTERPRISE'}));
+  expect(await situacaoDosIndices(api,projeto,true,indices)).toEqual({exigidos:0,prontos:0,criando:0,faltando:0,criadosAgora:0,dispensados:true});
+  expect(chamadas).toHaveLength(1);
+ });
+ it('na edição Standard a listagem não manda tamanho de página (a Enterprise recusava com 400)',async()=>{
+  const {api,chamadas}=googleFalso(listagens);
+  await situacaoDosIndices(api,projeto,false,indices);
+  expect(chamadas.some(c=>c.url.includes('pageSize'))).toBe(false);
  });
 });
