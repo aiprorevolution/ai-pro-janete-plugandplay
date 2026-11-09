@@ -124,10 +124,21 @@ export async function garantirBucketMidiasLogica(
 // ---------- toque no motor ----------
 
 /** Pede o toque (motor.server: grava a origem válida e fora da prévia). Nunca lança. */
+/**
+ * O ciclo e o motor usam operações internas só do sistema (requireSystem): pegar_envios, pegar_rodadas e outras.
+ * Rodando com a identidade do usuário logado, eram recusadas (sem_acesso), e a mensagem ficava "na_fila". Depois de
+ * conferir que quem pediu é membro, rodam fora da identidade do usuário, como o worker: com a identidade do serviço.
+ */
+async function comoSistema<T>(fn: () => Promise<T>): Promise<T> {
+  const { requestIdentity } = await import("@/integrations/firebase/identity.server");
+  return requestIdentity.exit(fn);
+}
+
 async function tocarMotor(origem: string | null | undefined): Promise<ResultadoAcordarMotor> {
   try {
     const { acordarMotor } = await import("@/features/mensageria/nucleo/motor.server");
-    return { ok: true, toque: await acordarMotor(origem ?? null) };
+    // Sem a fila do Cloud Tasks, o toque processa na hora (a Janete responde já, sem esperar a próxima mensagem).
+    return { ok: true, toque: await comoSistema(() => acordarMotor(origem ?? null, { naHora: true })) };
   } catch (erro) {
     return falha(codigoDe(erro, "motor_indisponivel"));
   }
@@ -172,10 +183,12 @@ export async function pedirEnvioLogica(
     const { rodarCiclo, ORCAMENTO_SOMENTE_ENVIOS_MS } = await import(
       "@/features/mensageria/nucleo/ciclo.server"
     );
-    const resumo = await rodarCiclo({
-      somenteEnvios: true,
-      orcamentoMs: ORCAMENTO_SOMENTE_ENVIOS_MS,
-    });
+    const resumo = await comoSistema(() =>
+      rodarCiclo({
+        somenteEnvios: true,
+        orcamentoMs: ORCAMENTO_SOMENTE_ENVIOS_MS,
+      }),
+    );
     const { enviados, falhas, devolvidos, incertos } = resumo.envios;
     return { ok: true, enviados, falhas, devolvidos, incertos };
   } catch (erro) {

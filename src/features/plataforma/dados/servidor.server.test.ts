@@ -379,6 +379,19 @@ describe("pedirEnvioLogica", () => {
     expect(r).toEqual({ ok: true, enviados: 2, falhas: 1, devolvidos: 0, incertos: 0 });
   });
 
+  it("o ciclo de envio roda como sistema, mesmo pedido por um membro logado (as operações internas exigem o sistema)", async () => {
+    // Teste real: com a identidade do usuário, pegar_envios era recusado e a mensagem ficava "na_fila".
+    const { requestIdentity, currentActor } = await import("@/integrations/firebase/identity.server");
+    let atorNoCiclo: unknown;
+    let atorNoToque: unknown;
+    estado.rodarCiclo.mockImplementation(async () => { atorNoCiclo = currentActor(); return resumo; });
+    estado.acordarMotor.mockImplementation(async () => { atorNoToque = currentActor(); return "tocado"; });
+    await requestIdentity.run({ actor: { uid: "membro", verified: true }, token: "do-usuario" }, () =>
+      pedirEnvioLogica(contexto().ctx));
+    expect(atorNoCiclo).toMatchObject({ system: true });
+    expect(atorNoToque).toMatchObject({ system: true });
+  });
+
   it("quem não é membro: sem_acesso, sem rodar o ciclo", async () => {
     const { ctx, rpc } = contexto({ membro: false });
     expect(await pedirEnvioLogica(ctx)).toEqual({ ok: false, erro: "sem_acesso" });
@@ -396,7 +409,7 @@ describe("pedirEnvioLogica", () => {
     estado.rodarCiclo.mockResolvedValue(resumo);
     await pedirEnvioLogica(contexto().ctx, { origem: "https://janete.exemplo.com" });
     expect(estado.acordarMotor).toHaveBeenCalledTimes(1);
-    expect(estado.acordarMotor).toHaveBeenCalledWith("https://janete.exemplo.com");
+    expect(estado.acordarMotor).toHaveBeenCalledWith("https://janete.exemplo.com", { naHora: true });
     expect(estado.rodarCiclo.mock.invocationCallOrder[0]!).toBeLessThan(
       estado.acordarMotor.mock.invocationCallOrder[0]!,
     );
@@ -405,7 +418,7 @@ describe("pedirEnvioLogica", () => {
   it("toca também quando a passada falha; sem origem, toca com o endereço já gravado", async () => {
     estado.rodarCiclo.mockRejectedValue(new Error("x"));
     await pedirEnvioLogica(contexto().ctx);
-    expect(estado.acordarMotor).toHaveBeenCalledWith(null);
+    expect(estado.acordarMotor).toHaveBeenCalledWith(null, { naHora: true });
   });
 
   it("o toque que lança não muda o resultado da passada", async () => {
@@ -433,7 +446,7 @@ describe("acordarMotorPelaTelaLogica", () => {
       origem: "https://janete.exemplo.com",
     });
     expect(r).toEqual({ ok: true, toque: "tocado" });
-    expect(estado.acordarMotor).toHaveBeenCalledWith("https://janete.exemplo.com");
+    expect(estado.acordarMotor).toHaveBeenCalledWith("https://janete.exemplo.com", { naHora: true });
   });
 
   it("quem não é membro: sem_acesso, sem tocar", async () => {

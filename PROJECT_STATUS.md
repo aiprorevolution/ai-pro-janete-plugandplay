@@ -38,6 +38,7 @@ Lições de outro app AI PRO validado do zero no AI Studio, aplicadas aqui:
 - Sem ninguém logado, o banco é acessado pela identidade do serviço com transação de servidor (isolamento completo contra resposta duplicada); com login, modo otimista.
 - O motor precisa de 110 índices compostos. Sem o instalador, o app publicado os cria com a própria identidade (`POST /api/firebase/diagnostico/indices`); o diagnóstico mostra índices e estado do motor.
 - Índices automáticos: no login do dono no app publicado (até 25 s, sem impedir o login) e antes do atendimento no webhook (até 20 s), uma vez por processo; na prévia não faz nada.
+- Envio manual pelo chat ficava "na_fila": o `pedirEnvio` rodava o ciclo com a identidade do usuário, e `pegar_envios` só aceita o sistema (`requireSystem`); depois o toque dependia da fila. Agora, conferido o membro, ciclo e toque rodam como sistema, e o toque processa na hora sem fila.
 - Próximo passo: atualizar, republicar, entrar no app publicado e testar uma mensagem real no número de teste.
 
 ## Validação
