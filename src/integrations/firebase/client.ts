@@ -18,8 +18,20 @@ async function mappedSession(user:FirebaseUser|null):Promise<Session|null>{retur
 async function requestApi(body:unknown){
  const auth=await authRequired();if(!auth.currentUser)throw new Error('Entre na sua conta para continuar.');
  const response=await fetch('/api/firebase',{method:'POST',headers:{'content-type':'application/json',Authorization:`Bearer ${await auth.currentUser.getIdToken()}`},body:JSON.stringify(body)});
- const data=await response.json().catch(()=>({error:{message:'O servidor não respondeu como esperado.'}}));
- if(!response.ok)throw Object.assign(new Error(data.error?.message??'Não foi possível concluir agora.'),{code:data.error?.code,status:response.status});
+ return interpretarRespostaApi(response.status,response.ok,await response.text());
+}
+/**
+ * Lê a resposta de /api/firebase. Na prévia do AI Studio, 403/502/503/504 chegam como HTTP 500 com o status original
+ * em error_status (o proxy trocaria o corpo por HTML); aqui o status volta ao original. O erro leva origem 'api', para a
+ * tela mostrar a mensagem do servidor, que já vem em português e sem detalhes internos.
+ */
+export function interpretarRespostaApi(status:number,ok:boolean,texto:string){
+ const html=/^\s*(?:<!doctype\s+html|<html\b)/i.test(texto);
+ let data:any;
+ try{data=html?null:JSON.parse(texto);}catch{data=null;}
+ if(!data||typeof data!=='object')data={error:{message:html?'A prévia do Google AI Studio recusou o pedido antes de ele chegar ao app. Recarregue a página e tente de novo.':'O servidor não respondeu como esperado.',code:'resposta_invalida'}};
+ const original=status===500&&[403,502,503,504].includes(data.error_status)?data.error_status:status;
+ if(!ok)throw Object.assign(new Error(data.error?.message??'Não foi possível concluir agora.'),{code:data.error?.code,status:original,origem:'api'});
  return data;
 }
 async function bootstrap(){await requestApi({kind:'bootstrap'});}

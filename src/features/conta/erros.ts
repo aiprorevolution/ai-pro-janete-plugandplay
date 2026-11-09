@@ -14,6 +14,8 @@ export interface ErroConta {
 }
 
 interface ErroBruto {
+  /** 'api' quando o erro veio de /api/firebase: a mensagem já é do servidor, em português. */
+  origem?: unknown;
   name?: unknown;
   message?: unknown;
   status?: unknown;
@@ -58,6 +60,8 @@ export function traduzirErroConta(erro: unknown, onde: "criar" | "entrar"): Erro
   if(codigo==='auth/network-request-failed')return SEM_INTERNET;
   if(codigo==='auth/user-disabled')return {mensagem:'Esta conta está desativada. Fale com o administrador da Janete.'};
   if(codigo==='PERMISSION_DENIED'||codigo==='server_identity_required'||codigo==='firebase_not_configured')return {mensagem:'A instalação do Firebase ainda precisa ser concluída pelo agente do AI Studio. Confira as regras e a identidade do servidor.'};
+  // Erro do servidor da Janete (sem acesso, índices, cota, prévia…): mostrar o motivo, e não a mensagem genérica.
+  if(e.origem==='api'&&typeof e.message==='string'&&e.message.trim())return {mensagem:e.message.trim()};
 
   if (semInternet() || nome === "AuthRetryableFetchError" || status === 0 || erro instanceof TypeError) {
     return SEM_INTERNET;

@@ -4,7 +4,21 @@ import {firestoreStore} from './store.server';
 import {bootstrapInstallation} from './bootstrap.server';
 import {executeQuery,requireMember} from './query.server';
 import {storageAdapter} from './storage.server';
-const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+// O proxy da prévia do AI Studio troca o corpo das respostas 403/502/503/504 por uma página HTML da plataforma,
+// e o motivo do erro some. Na prévia (APPLET_ID definido), esses erros saem como HTTP 500 com o status original em
+// error_status, como no outro app AI PRO validado no AI Studio; o cliente restaura o status. Nenhuma checagem de
+// acesso muda, e fora do AI Studio o status é o original.
+const STATUS_TROCADOS_PELA_PREVIA=new Set([403,502,503,504]);
+const json=(body:unknown,status=200)=>{
+ const naPrevia=!!process.env['APPLET_ID']&&STATUS_TROCADOS_PELA_PREVIA.has(status)&&!!body&&typeof body==='object'&&!Array.isArray(body);
+ return Response.json(naPrevia?{...(body as object),error_status:status}:body,{status:naPrevia?500:status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+};
+/** Registra no log do servidor o motivo de uma recusa: código, status e mensagem curta. Nunca o pedido nem o token. */
+function registrarRecusa(onde:string,error:any,status:number){
+ const codigo=typeof error?.code==='string'?error.code:'sem_codigo';
+ const mensagem=typeof error?.message==='string'?error.message.replace(/\s+/g,' ').slice(0,200):'';
+ console.error(`[AI PRO Janete] ${onde} recusou (${status}, ${codigo}): ${mensagem}`);
+}
 function safeError(error:any){
  const code=typeof error?.code==='string'?error.code:'operation_failed';
  const messages:Record<string,string>={PERMISSION_DENIED:'O Firebase recusou o acesso. Confira a instalação e as permissões desta conta.',FAILED_PRECONDITION:'O banco ainda precisa concluir os índices. Peça ao agente do AI Studio para executar a verificação da instalação.',RESOURCE_EXHAUSTED:'O limite de uso do Firebase foi atingido. Confira o uso e o plano do projeto.',server_identity_required:'Conclua a publicação e a identidade do servidor para usar esta função.',firebase_not_configured:'Conecte o Firebase desta cópia pelo Google AI Studio.',sem_acesso:'Sua conta não tem acesso a esta operação.'};
@@ -46,7 +60,7 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
   const body=JSON.parse(content);const identity=await identityFromRequest(request);
   return await requestIdentity.run(identity,async()=>{
    if(body.kind==='bootstrap')return json({data:await bootstrapInstallation(firestoreStore,identity.actor),error:null});
-   if(body.kind==='query'){const result=await executeQuery(body.query,{actor:identity.actor,remote:true});return result.error?json({data:null,error:safeError(result.error)},result.error.status??400):json(result);}
+   if(body.kind==='query'){const result=await executeQuery(body.query,{actor:identity.actor,remote:true});if(result.error)registrarRecusa('consulta',result.error,result.error.status??400);return result.error?json({data:null,error:safeError(result.error)},result.error.status??400):json(result);}
    if(body.kind==='mediaUrls'){
     await requireMember(firestoreStore,identity.actor);
     if(body.namespace!=='midias'||!Array.isArray(body.paths)||body.paths.length>100||body.paths.some((p:any)=>typeof p!=='string'||!MEDIA_PATH.test(p)))return json({error:{message:'Lista de arquivos inválida.'}},400);
@@ -62,5 +76,5 @@ export async function handleFirebaseRequest(request:Request):Promise<Response|nu
    }
    return json({error:{message:'Operação inválida.'}},400);
   });
- }catch(error){return json({data:null,error:safeError(error)},Math.min(599,Math.max(400,(error as any)?.status??400)));}
+ }catch(error){const status=Math.min(599,Math.max(400,(error as any)?.status??400));registrarRecusa('/api/firebase',error,status);return json({data:null,error:safeError(error)},status);}
 }
